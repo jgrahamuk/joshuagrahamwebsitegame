@@ -12,7 +12,15 @@ body {
 }
 
 #ui-container {
-  margin-left: 20px;
-  padding: 10px;
+  position: fixed;
+  padding: 0.25rem 2rem;
   background-color: #fff;
+
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+#ui-container p {
 }

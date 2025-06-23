@@ -1,13 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const TILE_SIZE = 40;
-    const MAP_WIDTH_TILES = 32;
-    const MAP_HEIGHT_TILES = 24;
+    let TILE_SIZE = 40;
+    const MAP_WIDTH_TILES = 64;
+    const MAP_HEIGHT_TILES = 48;
 
     const gameContainer = document.getElementById('game-container');
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('width', MAP_WIDTH_TILES * TILE_SIZE);
-    svg.setAttribute('height', MAP_HEIGHT_TILES * TILE_SIZE);
     gameContainer.appendChild(svg);
+    updateTileSize();
 
     let movementController = null;
 
@@ -15,8 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const stoneCountSpan = document.getElementById('stone-count');
 
     const player = {
-        x: 10,
-        y: 7,
+        x: 0,
+        y: 0,
         element: null,
         direction: 'front' // 'front', 'back', 'left', 'right'
     };
@@ -38,6 +37,145 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Map is now a 2D array of tile arrays for layering.
     const map = [];
+
+    // Chicken logic
+    const chickenSprites = {
+        front: 'chicken-front.png',
+        back: 'chicken-back.png',
+        left: 'chicken-left.png',
+        right: 'chicken-right.png',
+        peckRight: 'chicken-peck-right.png',
+        peckLeft: 'chicken-peck-left.png',
+    };
+
+    function randomGrassOrDirt() {
+        while (true) {
+            const x = Math.floor(Math.random() * MAP_WIDTH_TILES);
+            const y = Math.floor(Math.random() * MAP_HEIGHT_TILES);
+            const tiles = map[y][x];
+            if (tiles.includes(tileTypes.GRASS) || tiles.includes(tileTypes.DIRT)) {
+                return { x, y };
+            }
+        }
+    }
+
+    let chickens = [];
+
+    function createChickens() {
+        chickens.forEach(chicken => {
+            chicken.element = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+            updateChickenPosition(chicken);
+            svg.appendChild(chicken.element);
+        });
+    }
+
+    function updateChickenPosition(chicken) {
+        let sprite;
+        if (chicken.state === 'peck' && chicken.isPeckingPose) {
+            if (chicken.direction === 'right') sprite = chickenSprites.peckRight;
+            else if (chicken.direction === 'left') sprite = chickenSprites.peckLeft;
+            else sprite = chickenSprites[chicken.direction];
+        } else {
+            sprite = chickenSprites[chicken.direction];
+        }
+        chicken.element.setAttribute('href', `resources/images/${sprite}`);
+        chicken.element.setAttribute('x', chicken.x * TILE_SIZE);
+        chicken.element.setAttribute('y', chicken.y * TILE_SIZE);
+        chicken.element.setAttribute('width', TILE_SIZE);
+        chicken.element.setAttribute('height', TILE_SIZE);
+    }
+
+    function moveChicken(chicken, to) {
+        // Only move if destination is grass/dirt
+        if (!map[to.y][to.x].includes(tileTypes.GRASS) && !map[to.y][to.x].includes(tileTypes.DIRT)) return;
+        // Use A* pathfinding
+        const start = { x: chicken.x, y: chicken.y };
+        const end = { x: to.x, y: to.y };
+        const path = findPath(start, end);
+        if (path && path.length > 1) {
+            chicken.path = path.slice(1); // Exclude current position
+            chicken.moving = true;
+        }
+    }
+
+    function chickenTick() {
+        const now = Date.now();
+        chickens.forEach(chicken => {
+            // Handle pecking animation
+            if (chicken.state === 'peck') {
+                if (now >= chicken.nextPeckFrame) {
+                    if (chicken.pecksLeft > 0) {
+                        chicken.isPeckingPose = !chicken.isPeckingPose;
+                        updateChickenPosition(chicken);
+                        chicken.nextPeckFrame = now + 150 + Math.floor(Math.random() * 100);
+                        if (!chicken.isPeckingPose) chicken.pecksLeft--;
+                    } else {
+                        chicken.state = 'walk';
+                        chicken.isPeckingPose = false;
+                        updateChickenPosition(chicken);
+                    }
+                }
+                return;
+            }
+            // Move along path if moving
+            if (chicken.moving && chicken.path && chicken.path.length > 0) {
+                const next = chicken.path.shift();
+                // Set direction
+                if (next.x > chicken.x) chicken.direction = 'right';
+                else if (next.x < chicken.x) chicken.direction = 'left';
+                else if (next.y > chicken.y) chicken.direction = 'front';
+                else if (next.y < chicken.y) chicken.direction = 'back';
+                chicken.x = next.x;
+                chicken.y = next.y;
+                chicken.lastMove = now;
+                updateChickenPosition(chicken);
+                if (chicken.path.length === 0) {
+                    chicken.moving = false;
+                    // Start pecking after move
+                    if (chicken.direction === 'right' || chicken.direction === 'left') {
+                        chicken.state = 'peck';
+                        chicken.pecksLeft = 3 + Math.floor(Math.random() * 2);
+                        chicken.isPeckingPose = false;
+                        chicken.nextPeckFrame = now + 100;
+                        updateChickenPosition(chicken);
+                        return;
+                    }
+                }
+                return;
+            }
+            // Far move?
+            if (now > chicken.nextFarMove && !chicken.moving && chicken.state !== 'peck') {
+                const pos = randomGrassOrDirt();
+                moveChicken(chicken, pos);
+                chicken.nextFarMove = now + 30000 + Math.random() * 30000;
+                return;
+            }
+            // Move to a nearby tile if not moving
+            if (!chicken.moving && now - chicken.lastMove > 1000 + Math.random() * 2000) {
+                let tries = 0;
+                while (tries < 10) {
+                    const dx = Math.floor(Math.random() * 7) - 3;
+                    const dy = Math.floor(Math.random() * 7) - 3;
+                    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) { tries++; continue; }
+                    const nx = chicken.x + dx;
+                    const ny = chicken.y + dy;
+                    if (nx >= 0 && ny >= 0 && nx < MAP_WIDTH_TILES && ny < MAP_HEIGHT_TILES && (map[ny][nx].includes(tileTypes.GRASS) || map[ny][nx].includes(tileTypes.DIRT))) {
+                        moveChicken(chicken, { x: nx, y: ny });
+                        break;
+                    }
+                    tries++;
+                }
+            }
+        });
+    }
+
+    function updateTileSize() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        TILE_SIZE = Math.floor(Math.min(w / MAP_WIDTH_TILES, h / MAP_HEIGHT_TILES));
+        svg.setAttribute('width', MAP_WIDTH_TILES * TILE_SIZE);
+        svg.setAttribute('height', MAP_HEIGHT_TILES * TILE_SIZE);
+    }
 
     function initializeMap() {
         // Parameters for organic island shape
@@ -100,6 +238,46 @@ document.addEventListener('DOMContentLoaded', () => {
         placeResource(tileTypes.SMALL_TREE, 8, 2);
         placeResource(tileTypes.ROCK, 6, 2);
         placeResource(tileTypes.FLOWER, 6, 2);
+
+        // Find a grass or dirt tile near the center for player start
+        function isValidStartTile(x, y) {
+            if (x < 0 || y < 0 || x >= MAP_WIDTH_TILES || y >= MAP_HEIGHT_TILES) return false;
+            const tiles = map[y][x];
+            return tiles.includes(tileTypes.GRASS) || tiles.includes(tileTypes.DIRT);
+        }
+        let found = false;
+        let radius = 0;
+        while (!found && radius < Math.max(MAP_WIDTH_TILES, MAP_HEIGHT_TILES)) {
+            for (let dy = -radius; dy <= radius; dy++) {
+                for (let dx = -radius; dx <= radius; dx++) {
+                    const x = cx + dx, y = cy + dy;
+                    if (isValidStartTile(x, y)) {
+                        player.x = x;
+                        player.y = y;
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+            radius++;
+        }
+
+        // Initialize chickens after map is ready
+        chickens = Array.from({ length: 3 }, () => {
+            const pos = randomGrassOrDirt();
+            return {
+                x: pos.x,
+                y: pos.y,
+                direction: 'front',
+                state: 'walk', // 'walk' or 'peck'
+                pecksLeft: 0,
+                lastMove: Date.now(),
+                nextFarMove: Date.now() + 30000 + Math.random() * 30000,
+                element: null,
+            };
+        });
+        createChickens();
     }
 
     function getTile(x, y) {
@@ -150,12 +328,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+        createChickens();
     }
 
     function createPlayer() {
         player.element = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         updatePlayerPosition();
         svg.appendChild(player.element);
+        createChickens();
     }
 
     function updatePlayerPosition() {
@@ -360,4 +540,16 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeMap();
     drawMap();
     createPlayer();
+
+    window.addEventListener('resize', () => {
+        updateTileSize();
+        drawMap();
+        createPlayer();
+    });
+
+    // Animation loop for chickens
+    setInterval(() => {
+        chickenTick();
+        chickens.forEach(updateChickenPosition);
+    }, 500);
 }); 
