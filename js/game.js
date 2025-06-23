@@ -1,4 +1,4 @@
-import { initializeMap, getTile, randomGrassOrDirt, tileTypes, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES } from './map.js';
+import { initializeMap, getTile, randomGrassOrDirt, tileTypes, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, farmhouse, chickenCoop, signObj } from './map.js';
 import { findPath } from './movement.js';
 import { Player } from './player.js';
 import { Chicken } from './chickens.js';
@@ -35,7 +35,42 @@ function drawMap() {
             imgBase.setAttribute('width', window.TILE_SIZE);
             imgBase.setAttribute('height', window.TILE_SIZE);
             svg.appendChild(imgBase);
-            // Overlay for resources
+        }
+    }
+    // Draw farmhouse (as one image)
+    if (farmhouse) {
+        const imgFarm = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        imgFarm.setAttribute('href', getSpriteUrl('farmhouse.png'));
+        imgFarm.setAttribute('x', farmhouse.x * window.TILE_SIZE);
+        imgFarm.setAttribute('y', farmhouse.y * window.TILE_SIZE);
+        imgFarm.setAttribute('width', farmhouse.w * window.TILE_SIZE);
+        imgFarm.setAttribute('height', farmhouse.h * window.TILE_SIZE);
+        svg.appendChild(imgFarm);
+    }
+    // Draw chicken coop (as one image)
+    if (chickenCoop) {
+        const imgCoop = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        imgCoop.setAttribute('href', getSpriteUrl('chicken-coop.png'));
+        imgCoop.setAttribute('x', chickenCoop.x * window.TILE_SIZE);
+        imgCoop.setAttribute('y', chickenCoop.y * window.TILE_SIZE);
+        imgCoop.setAttribute('width', chickenCoop.w * window.TILE_SIZE);
+        imgCoop.setAttribute('height', chickenCoop.h * window.TILE_SIZE);
+        svg.appendChild(imgCoop);
+    }
+    // Draw sign (as one image)
+    if (signObj) {
+        const imgSign = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        imgSign.setAttribute('href', getSpriteUrl('sign-joshuagraham.png'));
+        imgSign.setAttribute('x', signObj.x * window.TILE_SIZE);
+        imgSign.setAttribute('y', signObj.y * window.TILE_SIZE);
+        imgSign.setAttribute('width', signObj.w * window.TILE_SIZE);
+        imgSign.setAttribute('height', signObj.h * window.TILE_SIZE);
+        svg.appendChild(imgSign);
+    }
+    // Draw overlays/resources
+    for (let y = 0; y < MAP_HEIGHT_TILES; y++) {
+        for (let x = 0; x < MAP_WIDTH_TILES; x++) {
+            const tiles = map[y][x];
             const top = tiles[tiles.length - 1];
             let overlay = null;
             if (top === tileTypes.LARGE_TREE || top === tileTypes.SMALL_TREE) {

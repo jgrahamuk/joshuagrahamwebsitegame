@@ -17,8 +17,8 @@ export class Player {
         this.element.setAttribute('href', getSpriteUrl(sprite));
         this.element.setAttribute('x', this.x * window.TILE_SIZE);
         this.element.setAttribute('y', this.y * window.TILE_SIZE);
-        this.element.setAttribute('width', window.TILE_SIZE);
-        this.element.setAttribute('height', window.TILE_SIZE);
+        this.element.setAttribute('width', window.TILE_SIZE * 2);
+        this.element.setAttribute('height', window.TILE_SIZE * 2);
     }
     async moveTo(path) {
         let last = { x: this.x, y: this.y };
