@@ -2,6 +2,7 @@ import { initializeMap, getTile, randomGrassOrDirt, tileTypes, map, MAP_WIDTH_TI
 import { findPath } from './movement.js';
 import { Player } from './player.js';
 import { Chicken } from './chickens.js';
+import { preloadSprites, getSpriteUrl } from './spriteCache.js';
 
 window.TILE_SIZE = 40;
 
@@ -16,15 +17,6 @@ function updateTileSize() {
     svg.setAttribute('width', MAP_WIDTH_TILES * window.TILE_SIZE);
     svg.setAttribute('height', MAP_HEIGHT_TILES * window.TILE_SIZE);
 }
-updateTileSize();
-window.addEventListener('resize', () => {
-    updateTileSize();
-    drawMap();
-    player.updatePosition();
-    chickens.forEach(c => c.updatePosition());
-});
-
-initializeMap();
 
 function drawMap() {
     svg.innerHTML = '';
@@ -35,7 +27,7 @@ function drawMap() {
                 : tiles.find(t => t === tileTypes.GRASS) ? 'tile-grass.png'
                     : tiles.find(t => t === tileTypes.WATER || (t.color && t.color === '#3bbcff')) ? 'tile-water.png'
                         : 'tile-grass.png';
-            let basePath = `resources/images/${baseTile}`;
+            let basePath = getSpriteUrl(baseTile);
             const imgBase = document.createElementNS('http://www.w3.org/2000/svg', 'image');
             imgBase.setAttribute('href', basePath);
             imgBase.setAttribute('x', x * window.TILE_SIZE);
@@ -55,7 +47,7 @@ function drawMap() {
             }
             if (overlay) {
                 const imgOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-                imgOverlay.setAttribute('href', `resources/images/${overlay}`);
+                imgOverlay.setAttribute('href', getSpriteUrl(overlay));
                 imgOverlay.setAttribute('x', x * window.TILE_SIZE);
                 imgOverlay.setAttribute('y', y * window.TILE_SIZE);
                 imgOverlay.setAttribute('width', window.TILE_SIZE);
@@ -65,33 +57,45 @@ function drawMap() {
         }
     }
 }
-drawMap();
 
-// Find a valid player start
-let start = randomGrassOrDirt();
-const player = new Player(svg, start.x, start.y);
+preloadSprites().then(() => {
+    updateTileSize();
+    window.addEventListener('resize', () => {
+        updateTileSize();
+        drawMap();
+        player.updatePosition();
+        chickens.forEach(c => c.updatePosition());
+    });
 
-// Chickens
-const chickens = [new Chicken(svg), new Chicken(svg), new Chicken(svg)];
+    initializeMap();
+    drawMap();
 
-// Main chicken animation loop
-setInterval(() => {
-    const now = Date.now();
-    chickens.forEach(c => c.tick(now));
-}, 50);
+    // Find a valid player start
+    let start = randomGrassOrDirt();
+    window.player = new Player(svg, start.x, start.y);
 
-// Player movement
-svg.addEventListener('click', (e) => {
-    const rect = svg.getBoundingClientRect();
-    const x = Math.floor((e.clientX - rect.left) / window.TILE_SIZE);
-    const y = Math.floor((e.clientY - rect.top) / window.TILE_SIZE);
-    if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
-        const start = { x: player.x, y: player.y };
-        const end = { x, y };
-        const tile = getTile(x, y);
-        if (tile.passable) {
-            const path = findPath(start, end, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
-            if (path) player.moveTo(path.slice(1));
+    // Chickens
+    window.chickens = [new Chicken(svg), new Chicken(svg), new Chicken(svg)];
+
+    // Main chicken animation loop
+    setInterval(() => {
+        const now = Date.now();
+        window.chickens.forEach(c => c.tick(now));
+    }, 50);
+
+    // Player movement
+    svg.addEventListener('click', (e) => {
+        const rect = svg.getBoundingClientRect();
+        const x = Math.floor((e.clientX - rect.left) / window.TILE_SIZE);
+        const y = Math.floor((e.clientY - rect.top) / window.TILE_SIZE);
+        if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
+            const start = { x: window.player.x, y: window.player.y };
+            const end = { x, y };
+            const tile = getTile(x, y);
+            if (tile.passable) {
+                const path = findPath(start, end, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
+                if (path) window.player.moveTo(path.slice(1));
+            }
         }
-    }
+    });
 }); 

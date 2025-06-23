@@ -1,5 +1,6 @@
 import { tileTypes, getTile, randomGrassOrDirt, MAP_WIDTH_TILES, MAP_HEIGHT_TILES } from './map.js';
 import { findPath } from './movement.js';
+import { getSpriteUrl } from './spriteCache.js';
 
 const chickenSprites = {
     front: 'chicken-front.png',
@@ -40,7 +41,7 @@ export class Chicken {
         } else {
             sprite = chickenSprites[this.direction];
         }
-        this.element.setAttribute('href', `resources/images/${sprite}`);
+        this.element.setAttribute('href', getSpriteUrl(sprite));
         this.element.setAttribute('x', this.x * window.TILE_SIZE);
         this.element.setAttribute('y', this.y * window.TILE_SIZE);
         this.element.setAttribute('width', window.TILE_SIZE);

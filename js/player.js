@@ -1,5 +1,6 @@
 import { tileTypes, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES } from './map.js';
 import { findPath } from './movement.js';
+import { getSpriteUrl } from './spriteCache.js';
 
 export class Player {
     constructor(svg, startX, startY) {
@@ -12,8 +13,8 @@ export class Player {
         this.updatePosition();
     }
     updatePosition() {
-        let sprite = `resources/images/character-${this.direction}.png`;
-        this.element.setAttribute('href', sprite);
+        let sprite = `character-${this.direction}.png`;
+        this.element.setAttribute('href', getSpriteUrl(sprite));
         this.element.setAttribute('x', this.x * window.TILE_SIZE);
         this.element.setAttribute('y', this.y * window.TILE_SIZE);
         this.element.setAttribute('width', window.TILE_SIZE);
