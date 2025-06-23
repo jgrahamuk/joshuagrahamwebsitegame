@@ -14,8 +14,8 @@ export let map = [];
 export let MAP_WIDTH_TILES = 64;
 export let MAP_HEIGHT_TILES = 48;
 export let farmhouse = null; // {x, y, w, h}
-export let chickenCoop = null; // {x, y, w, h}
-export let signObj = null; // {x, y, w, h}
+export let chickenCoop = { x: 18, y: 15, w: 5, h: 3 }; // {x, y, w, h} in tiles
+export let signObj = { x: 33, y: 8, w: 5, h: 3 }; // {x, y, w, h} in tiles
 
 export function initializeMap() {
     map.length = 0; // clear any previous map
@@ -90,55 +90,24 @@ export function initializeMap() {
     }
     farmhouse = { x: fx, y: fy, w: fw, h: fh };
 
-    // Place chicken coop (5x3) in the top-left part of the island, fully on grass/dirt, not overlapping farmhouse or water
-    const cw = 5, ch = 3;
-    let coopPlaced = false;
-    for (let y0 = 1; y0 < Math.floor(MAP_HEIGHT_TILES / 2) && !coopPlaced; y0++) {
-        for (let x0 = 1; x0 < Math.floor(MAP_WIDTH_TILES / 2) && !coopPlaced; x0++) {
-            let ok = true;
-            for (let y = y0; y < y0 + ch && ok; y++) {
-                for (let x = x0; x < x0 + cw && ok; x++) {
-                    const top = map[y][x][map[y][x].length - 1];
-                    if (top !== tileTypes.GRASS && top !== tileTypes.DIRT) ok = false;
-                    // Don't overlap farmhouse
-                    if (x >= fx && x < fx + fw && y >= fy && y < fy + fh) ok = false;
+    // Always use static chicken coop placement
+    if (chickenCoop && chickenCoop.x !== undefined && chickenCoop.y !== undefined) {
+        for (let y = chickenCoop.y; y < chickenCoop.y + chickenCoop.h; y++) {
+            for (let x = chickenCoop.x; x < chickenCoop.x + chickenCoop.w; x++) {
+                if (x >= 0 && y >= 0 && x < MAP_WIDTH_TILES && y < MAP_HEIGHT_TILES) {
+                    map[y][x].push(tileTypes.FARMHOUSE); // treat as impassable
                 }
-            }
-            if (ok) {
-                for (let y = y0; y < y0 + ch; y++) {
-                    for (let x = x0; x < x0 + cw; x++) {
-                        map[y][x].push(tileTypes.FARMHOUSE); // treat as impassable
-                    }
-                }
-                chickenCoop = { x: x0, y: y0, w: cw, h: ch };
-                coopPlaced = true;
             }
         }
     }
 
-    // Place sign (5x3) in the top-right part of the island, fully on grass/dirt, not overlapping water, farmhouse, or chicken coop
-    let signPlaced = false;
-    for (let y0 = 1; y0 < Math.floor(MAP_HEIGHT_TILES / 2) && !signPlaced; y0++) {
-        for (let x0 = Math.floor(MAP_WIDTH_TILES / 2); x0 < MAP_WIDTH_TILES - cw - 1 && !signPlaced; x0++) {
-            let ok = true;
-            for (let y = y0; y < y0 + ch && ok; y++) {
-                for (let x = x0; x < x0 + cw && ok; x++) {
-                    const top = map[y][x][map[y][x].length - 1];
-                    if (top !== tileTypes.GRASS && top !== tileTypes.DIRT) ok = false;
-                    // Don't overlap farmhouse
-                    if (x >= fx && x < fx + fw && y >= fy && y < fy + fh) ok = false;
-                    // Don't overlap chicken coop
-                    if (chickenCoop && x >= chickenCoop.x && x < chickenCoop.x + chickenCoop.w && y >= chickenCoop.y && y < chickenCoop.y + chickenCoop.h) ok = false;
+    // Always use static sign placement
+    if (signObj && signObj.x !== undefined && signObj.y !== undefined) {
+        for (let y = signObj.y; y < signObj.y + signObj.h; y++) {
+            for (let x = signObj.x; x < signObj.x + signObj.w; x++) {
+                if (x >= 0 && y >= 0 && x < MAP_WIDTH_TILES && y < MAP_HEIGHT_TILES) {
+                    map[y][x].push(tileTypes.FARMHOUSE); // treat as impassable
                 }
-            }
-            if (ok) {
-                for (let y = y0; y < y0 + ch; y++) {
-                    for (let x = x0; x < x0 + cw; x++) {
-                        map[y][x].push(tileTypes.FARMHOUSE); // treat as impassable
-                    }
-                }
-                signObj = { x: x0, y: y0, w: cw, h: ch };
-                signPlaced = true;
             }
         }
     }
