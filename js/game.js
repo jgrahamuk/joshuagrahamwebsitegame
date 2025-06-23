@@ -1,4 +1,4 @@
-import { initializeMap, getTile, randomGrassOrDirt, tileTypes, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, farmhouse, chickenCoop, signObj } from './map.js';
+import { initializeMap, getTile, randomGrassOrDirt, tileTypes, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, farmhouse, chickenCoop, signObj, setMapSize } from './map.js';
 import { findPath } from './movement.js';
 import { Player } from './player.js';
 import { Chicken } from './chickens.js';
@@ -93,10 +93,27 @@ function drawMap() {
     }
 }
 
+function isMobile() {
+    return /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent) || window.innerWidth < 700;
+}
+
+function getMapDims() {
+    if (isMobile()) {
+        return { width: 24, height: 36 };
+    } else {
+        return { width: 64, height: 48 };
+    }
+}
+
 preloadSprites().then(() => {
+    const dims = getMapDims();
+    setMapSize(dims.width, dims.height);
     updateTileSize();
     window.addEventListener('resize', () => {
+        const dims = getMapDims();
+        setMapSize(dims.width, dims.height);
         updateTileSize();
+        initializeMap();
         drawMap();
         player.updatePosition();
         chickens.forEach(c => c.updatePosition());
@@ -109,8 +126,24 @@ preloadSprites().then(() => {
     let start = randomGrassOrDirt();
     window.player = new Player(svg, start.x, start.y);
 
-    // Chickens
-    window.chickens = [new Chicken(svg), new Chicken(svg), new Chicken(svg)];
+    // Chickens: always guarantee at least one on land
+    window.chickens = [];
+    let firstChickenPlaced = false;
+    for (let i = 0; i < 3; i++) {
+        let chicken;
+        if (!firstChickenPlaced) {
+            // Force first chicken to a valid land tile
+            const pos = randomGrassOrDirt();
+            chicken = new Chicken(svg);
+            chicken.x = pos.x;
+            chicken.y = pos.y;
+            chicken.updatePosition();
+            firstChickenPlaced = true;
+        } else {
+            chicken = new Chicken(svg);
+        }
+        window.chickens.push(chicken);
+    }
 
     // Main chicken animation loop
     setInterval(() => {

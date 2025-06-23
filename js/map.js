@@ -9,20 +9,25 @@ export const tileTypes = {
     LARGE_TREE: { color: 'darkgreen', passable: false, resource: 'wood' },
     FARMHOUSE: { color: 'white', passable: false, resource: null },
 };
-
-export let map = [];
 export let MAP_WIDTH_TILES = 64;
 export let MAP_HEIGHT_TILES = 48;
+export let map = [];
 export let farmhouse = null; // {x, y, w, h}
 export let chickenCoop = { x: 18, y: 15, w: 5, h: 3 }; // {x, y, w, h} in tiles
 export let signObj = { x: 33, y: 8, w: 5, h: 3 }; // {x, y, w, h} in tiles
+
+export function setMapSize(width, height) {
+    MAP_WIDTH_TILES = width;
+    MAP_HEIGHT_TILES = height;
+}
 
 export function initializeMap() {
     map.length = 0; // clear any previous map
     const cx = MAP_WIDTH_TILES / 2;
     const cy = MAP_HEIGHT_TILES / 2;
-    const baseRadius = Math.min(MAP_WIDTH_TILES, MAP_HEIGHT_TILES) / 2.3;
-    const noise = (x, y) => 0.7 + 0.3 * Math.sin(x * 0.4) * Math.cos(y * 0.3 + x * 0.1);
+    // Increase land/sea ratio: bigger island
+    const baseRadius = Math.min(MAP_WIDTH_TILES, MAP_HEIGHT_TILES) / 2.0;
+    const noise = (x, y) => 0.8 + 0.25 * Math.sin(x * 0.4) * Math.cos(y * 0.3 + x * 0.1);
 
     for (let y = 0; y < MAP_HEIGHT_TILES; y++) {
         map[y] = [];
