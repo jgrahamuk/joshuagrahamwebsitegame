@@ -74,6 +74,8 @@ export function convertMapDataToGameFormat(mapData) {
                 case 'SMALL_TREE': gameMap[y][x].push(tileTypes.SMALL_TREE); break;
                 case 'ROCK': gameMap[y][x].push(tileTypes.ROCK); break;
                 case 'FLOWER': gameMap[y][x].push(tileTypes.FLOWER); break;
+                case 'EGG': gameMap[y][x].push(tileTypes.EGG); break;
+                case 'BADGE': gameMap[y][x].push(tileTypes.BADGE); break;
             }
         }
     });

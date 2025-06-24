@@ -1,6 +1,7 @@
 import { tileTypes, getTile, randomGrassOrDirt, MAP_WIDTH_TILES, MAP_HEIGHT_TILES } from './map.js';
 import { findPath } from './movement.js';
 import { getSpriteUrl } from './spriteCache.js';
+import { badgeSystem } from './badgeSystem.js';
 
 export class NPC {
     constructor(svg, name, message, startX, startY) {
@@ -122,18 +123,32 @@ export class NPC {
         this.isShowingMessage = true;
         this.updatePosition();
 
+        // Check if this is Joshua and player has a badge to deliver
+        let messageToShow = this.message;
+        if (this.name.toLowerCase() === 'joshua' && badgeSystem.hasBadge()) {
+            const badgeMessage = badgeSystem.deliverBadge();
+            if (badgeMessage) {
+                messageToShow = badgeMessage;
+                // Update player's badge count and display
+                if (window.player) {
+                    window.player.inventory.badges--;
+                    window.player.updateInventoryDisplay();
+                }
+            }
+        }
+
         // Create chatbox background
         this.messageElement = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         this.messageElement.setAttribute('href', getSpriteUrl('chatbox.png'));
-        this.messageElement.setAttribute('x', (window.MAP_OFFSET_X || 0) + (this.x - 5) * window.TILE_SIZE);
-        this.messageElement.setAttribute('y', (window.MAP_OFFSET_Y || 0) + (this.y - 6) * window.TILE_SIZE);
-        this.messageElement.setAttribute('width', window.TILE_SIZE * 12);
-        this.messageElement.setAttribute('height', window.TILE_SIZE * 6);
+        this.messageElement.setAttribute('x', (window.MAP_OFFSET_X || 0) + (this.x - 10) * window.TILE_SIZE);
+        this.messageElement.setAttribute('y', (window.MAP_OFFSET_Y || 0) + (this.y - 12) * window.TILE_SIZE);
+        this.messageElement.setAttribute('width', window.TILE_SIZE * 24);
+        this.messageElement.setAttribute('height', window.TILE_SIZE * 12);
 
         // Create message text with wrapping
         this.messageTextElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        this.messageTextElement.setAttribute('x', (window.MAP_OFFSET_X || 0) + (this.x - 1) * window.TILE_SIZE);
-        this.messageTextElement.setAttribute('y', (window.MAP_OFFSET_Y || 0) + (this.y + 4) * window.TILE_SIZE);
+        this.messageTextElement.setAttribute('x', (window.MAP_OFFSET_X || 0) + (this.x - 2) * window.TILE_SIZE);
+        this.messageTextElement.setAttribute('y', (window.MAP_OFFSET_Y || 0) + (this.y + 8) * window.TILE_SIZE);
         this.messageTextElement.setAttribute('text-anchor', 'middle');
         this.messageTextElement.setAttribute('font-family', 'Jersey 10, sans-serif');
         this.messageTextElement.setAttribute('font-size', '16px');
@@ -141,8 +156,8 @@ export class NPC {
 
         // Wrap text to fit chatbox width with padding
         const padding = window.TILE_SIZE * 0.5; // More padding
-        const maxWidth = window.TILE_SIZE * 8; // Chatbox width minus padding
-        const words = this.message.split(' ');
+        const maxWidth = window.TILE_SIZE * 16; // Chatbox width minus padding
+        const words = messageToShow.split(' ');
         const lines = [];
         let currentLine = '';
 
@@ -164,14 +179,14 @@ export class NPC {
         // Create multiple text elements for each line
         this.messageTextElements = [];
         const lineHeight = window.TILE_SIZE * 0.7; // Line spacing
-        const startY = (window.MAP_OFFSET_Y || 0) + (this.y - 5.2) * window.TILE_SIZE + padding; // Start from top of chatbox with padding
+        const startY = (window.MAP_OFFSET_Y || 0) + (this.y - 10.4) * window.TILE_SIZE + padding; // Start from top of chatbox with padding
 
         // Append chatbox first
         this.svg.appendChild(this.messageElement);
 
         lines.forEach((line, index) => {
             const textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            textElement.setAttribute('x', (window.MAP_OFFSET_X || 0) + (this.x + 1) * window.TILE_SIZE);
+            textElement.setAttribute('x', (window.MAP_OFFSET_X || 0) + (this.x + 2) * window.TILE_SIZE);
             textElement.setAttribute('y', startY + index * lineHeight);
             textElement.setAttribute('text-anchor', 'middle');
             textElement.setAttribute('font-family', 'Jersey 10, sans-serif');

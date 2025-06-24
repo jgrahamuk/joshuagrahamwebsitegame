@@ -585,12 +585,12 @@
     {
       "x": 46,
       "y": 13,
-      "layers": ["WATER", "GRASS", "WATER", "ROCK"]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 47,
       "y": 13,
-      "layers": ["WATER", "GRASS", "WATER", "LARGE_TREE"]
+      "layers": ["WATER", "GRASS", "WATER", "ROCK"]
     },
     {
       "x": 48,
@@ -1410,7 +1410,7 @@
     {
       "x": 56,
       "y": 17,
-      "layers": ["WATER", "GRASS", "WATER", "SMALL_TREE"]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 57,
@@ -1605,7 +1605,7 @@
     {
       "x": 55,
       "y": 18,
-      "layers": ["WATER", "GRASS", "WATER", "SMALL_TREE"]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 56,

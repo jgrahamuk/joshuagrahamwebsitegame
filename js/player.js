@@ -1,6 +1,7 @@
 import { tileTypes, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, map, removeResource, getResourceAt } from './map.js';
 import { findPath } from './movement.js';
 import { getSpriteUrl } from './spriteCache.js';
+import { badgeSystem } from './badgeSystem.js';
 
 export class Player {
     constructor(svg, startX, startY) {
@@ -20,7 +21,8 @@ export class Player {
         this.inventory = {
             wood: 0,
             stone: 0,
-            eggs: 0
+            eggs: 0,
+            badges: 0
         };
 
         this.updatePosition();
@@ -114,13 +116,20 @@ export class Player {
                 this.inventory.stone++;
             } else if (removedResource.resource === 'egg') {
                 this.inventory.eggs++;
+            } else if (removedResource.resource === 'badge') {
+                // Handle badge collection through badge system
+                if (badgeSystem.handleBadgeCollection(resourcePos)) {
+                    this.inventory.badges++;
+                }
             }
 
             // Update the display
             this.updateInventoryDisplay();
 
-            // Remove the visual element from SVG
-            this.removeResourceElement(resourcePos);
+            // Remove the visual element from SVG (for non-badge resources)
+            if (removedResource.resource !== 'badge') {
+                this.removeResourceElement(resourcePos);
+            }
         }
     }
 
@@ -164,6 +173,7 @@ export class Player {
         const woodCountElement = document.getElementById('wood-count');
         const stoneCountElement = document.getElementById('stone-count');
         const eggsCountElement = document.getElementById('eggs-count');
+        const badgesCountElement = document.getElementById('badges-count');
 
         if (woodCountElement) {
             woodCountElement.textContent = this.inventory.wood;
@@ -173,6 +183,9 @@ export class Player {
         }
         if (eggsCountElement) {
             eggsCountElement.textContent = this.inventory.eggs;
+        }
+        if (badgesCountElement) {
+            badgesCountElement.textContent = badgeSystem.getBadgeDisplayText();
         }
     }
 } 

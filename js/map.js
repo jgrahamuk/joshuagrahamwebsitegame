@@ -13,6 +13,7 @@ export const tileTypes = {
     SMALL_TREE: { color: 'darkgreen', passable: false, resource: 'wood' },
     LARGE_TREE: { color: 'darkgreen', passable: false, resource: 'wood' },
     EGG: { color: 'white', passable: true, resource: 'egg' },
+    BADGE: { color: 'gold', passable: true, resource: 'badge' },
     FARMHOUSE: { color: 'white', passable: false, resource: null },
 };
 export let MAP_WIDTH_TILES = 64;
@@ -208,6 +209,9 @@ export function drawMap(svg) {
             } else if (top === tileTypes.EGG) {
                 overlay = 'egg.png';
                 resourceType = 'egg';
+            } else if (top === tileTypes.BADGE) {
+                overlay = 'badge.png';
+                resourceType = 'badge';
             }
             if (overlay) {
                 const imgOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'image');

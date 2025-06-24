@@ -7,6 +7,7 @@ import { preloadSprites, getSpriteUrl } from './spriteCache.js';
 import { drawStructures } from './structures.js';
 import { MapEditor } from './mapEditor.js';
 import { HelpOverlay } from './helpOverlay.js';
+import { badgeSystem } from './badgeSystem.js';
 
 window.TILE_SIZE = 40;
 window.MAP_OFFSET_X = 0;
@@ -15,6 +16,9 @@ window.MAP_OFFSET_Y = 0;
 const gameContainer = document.getElementById('game-container');
 const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 gameContainer.appendChild(svg);
+
+// Make SVG globally accessible
+window.svg = svg;
 
 function updateTileSize() {
     const w = window.innerWidth;
@@ -89,6 +93,9 @@ preloadSprites().then(async () => {
 
     // Initialize help overlay
     window.helpOverlay = new HelpOverlay();
+
+    // Initialize badge system
+    badgeSystem.initialize();
 
     // Main animation loop
     setInterval(() => {

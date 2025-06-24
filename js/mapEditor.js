@@ -23,6 +23,7 @@ export class MapEditor {
             { id: 'rock', name: 'Rock', icon: 'stone.png', type: 'resource', tileType: tileTypes.ROCK },
             { id: 'flower', name: 'Flower', icon: 'flower.png', type: 'resource', tileType: tileTypes.FLOWER },
             { id: 'egg', name: 'Egg', icon: 'egg.png', type: 'resource', tileType: tileTypes.EGG },
+            { id: 'badge', name: 'Badge', icon: 'badge.png', type: 'resource', tileType: tileTypes.BADGE },
             // Structures
             { id: 'farmhouse', name: 'Farmhouse', icon: 'farmhouse.png', type: 'structure', structureType: 'FARMHOUSE', width: 10, height: 6 },
             { id: 'chicken_coop', name: 'Chicken Coop', icon: 'chicken-coop.png', type: 'structure', structureType: 'CHICKEN_COOP', width: 5, height: 3 },
@@ -554,6 +555,8 @@ export class MapEditor {
                         if (layer === tileTypes.SMALL_TREE) return 'SMALL_TREE';
                         if (layer === tileTypes.ROCK) return 'ROCK';
                         if (layer === tileTypes.FLOWER) return 'FLOWER';
+                        if (layer === tileTypes.EGG) return 'EGG';
+                        if (layer === tileTypes.BADGE) return 'BADGE';
                         return 'WATER';
                     });
 
@@ -566,6 +569,8 @@ export class MapEditor {
                         if (topLayer === tileTypes.SMALL_TREE) resourceType = 'SMALL_TREE';
                         else if (topLayer === tileTypes.ROCK) resourceType = 'ROCK';
                         else if (topLayer === tileTypes.FLOWER) resourceType = 'FLOWER';
+                        else if (topLayer === tileTypes.EGG) resourceType = 'EGG';
+                        else if (topLayer === tileTypes.BADGE) resourceType = 'BADGE';
 
                         resources.push({ type: resourceType, x, y });
                     }
