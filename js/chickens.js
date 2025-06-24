@@ -79,15 +79,12 @@ export class Chicken {
                 this.updatePosition();
 
                 // Place egg on the map
-                console.log(`Chicken at (${this.x}, ${this.y}) laid an egg!`);
                 placeResourceAtPosition(this.x, this.y, tileTypes.EGG);
 
                 // Debug: Check if egg was placed in map data
                 if (window.map && window.map[this.y] && window.map[this.y][this.x]) {
                     const tiles = window.map[this.y][this.x];
                     const topTile = tiles[tiles.length - 1];
-                    console.log(`Egg placement check - Top tile:`, topTile);
-                    console.log(`Egg placement check - Has resource:`, topTile && topTile.resource);
                 } else {
                     console.log('Map data not available for debugging');
                 }
@@ -103,7 +100,6 @@ export class Chicken {
 
         // Check if it's time to lay an egg - HIGH PRIORITY
         if (now >= this.nextEggLay && !this.moving) {
-            console.log(`Chicken at (${this.x}, ${this.y}) starting to lay egg. State: ${this.state}, Time until egg: ${this.nextEggLay - now}`);
             this.isLayingEgg = true;
             this.eggLayStartTime = now;
             this.state = 'peck'; // Use pecking animation for egg laying
@@ -112,11 +108,6 @@ export class Chicken {
             this.nextPeckFrame = now + 100;
             this.updatePosition();
             return;
-        }
-
-        // Debug: Log chicken state occasionally
-        if (Math.random() < 0.001) { // Very rare logging
-            console.log(`Chicken at (${this.x}, ${this.y}) - State: ${this.state}, Moving: ${this.moving}, Time until egg: ${Math.max(0, this.nextEggLay - now)}`);
         }
 
         // Pecking animation

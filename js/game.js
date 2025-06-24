@@ -24,12 +24,9 @@ function updateTileSize() {
     const w = window.innerWidth;
     const h = window.innerHeight;
 
-    // Calculate tile size to fill the entire screen
+    // Always use the width to determine tile size
     const tileSizeX = w / MAP_WIDTH_TILES;
-    const tileSizeY = h / MAP_HEIGHT_TILES;
-
-    // Use the larger tile size to ensure the map fills the screen
-    window.TILE_SIZE = Math.max(tileSizeX, tileSizeY);
+    window.TILE_SIZE = tileSizeX;
 
     // Set SVG size to fill the entire screen
     svg.setAttribute('width', w);
@@ -39,8 +36,8 @@ function updateTileSize() {
     const mapPixelWidth = MAP_WIDTH_TILES * window.TILE_SIZE;
     const mapPixelHeight = MAP_HEIGHT_TILES * window.TILE_SIZE;
 
-    // Calculate offsets to center the map
-    window.MAP_OFFSET_X = Math.max(0, (window.innerWidth - mapPixelWidth) / 2);
+    // Center the map vertically
+    window.MAP_OFFSET_X = 0;
     window.MAP_OFFSET_Y = Math.max(0, (window.innerHeight - mapPixelHeight) / 2);
 
     // Reset positioning since we're filling the screen

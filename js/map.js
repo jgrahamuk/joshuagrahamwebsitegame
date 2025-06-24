@@ -133,6 +133,26 @@ export function drawMap(svg) {
     svg.innerHTML = '';
     const offsetX = window.MAP_OFFSET_X || 0;
     const offsetY = window.MAP_OFFSET_Y || 0;
+    const svgWidth = window.innerWidth;
+    const svgHeight = window.innerHeight;
+    const tileSize = window.TILE_SIZE;
+
+    // Fill the entire SVG area with water tiles (no gaps)
+    const numXTiles = Math.ceil(svgWidth / tileSize);
+    const numYTiles = Math.ceil(svgHeight / tileSize);
+    for (let y = 0; y < numYTiles; y++) {
+        for (let x = 0; x < numXTiles; x++) {
+            const imgWater = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+            imgWater.setAttribute('href', getSpriteUrl('tile-water.png'));
+            imgWater.setAttribute('x', x * tileSize);
+            imgWater.setAttribute('y', y * tileSize);
+            imgWater.setAttribute('width', tileSize);
+            imgWater.setAttribute('height', tileSize);
+            svg.appendChild(imgWater);
+        }
+    }
+
+    // Draw the map tiles (centered vertically)
     for (let y = 0; y < MAP_HEIGHT_TILES; y++) {
         for (let x = 0; x < MAP_WIDTH_TILES; x++) {
             const tiles = map[y][x];
@@ -143,10 +163,10 @@ export function drawMap(svg) {
             let basePath = getSpriteUrl(baseTile);
             const imgBase = document.createElementNS('http://www.w3.org/2000/svg', 'image');
             imgBase.setAttribute('href', basePath);
-            imgBase.setAttribute('x', offsetX + x * window.TILE_SIZE);
-            imgBase.setAttribute('y', offsetY + y * window.TILE_SIZE);
-            imgBase.setAttribute('width', window.TILE_SIZE);
-            imgBase.setAttribute('height', window.TILE_SIZE);
+            imgBase.setAttribute('x', offsetX + x * tileSize);
+            imgBase.setAttribute('y', offsetY + y * tileSize);
+            imgBase.setAttribute('width', tileSize);
+            imgBase.setAttribute('height', tileSize);
             svg.appendChild(imgBase);
         }
     }
@@ -180,10 +200,10 @@ export function drawMap(svg) {
             if (overlay) {
                 const imgOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'image');
                 imgOverlay.setAttribute('href', getSpriteUrl(overlay));
-                imgOverlay.setAttribute('x', offsetX + x * window.TILE_SIZE);
-                imgOverlay.setAttribute('y', offsetY + y * window.TILE_SIZE);
-                imgOverlay.setAttribute('width', window.TILE_SIZE);
-                imgOverlay.setAttribute('height', window.TILE_SIZE);
+                imgOverlay.setAttribute('x', offsetX + x * tileSize);
+                imgOverlay.setAttribute('y', offsetY + y * tileSize);
+                imgOverlay.setAttribute('width', tileSize);
+                imgOverlay.setAttribute('height', tileSize);
                 imgOverlay.setAttribute('data-resource', resourceType);
                 svg.appendChild(imgOverlay);
             }

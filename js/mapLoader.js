@@ -45,33 +45,9 @@ export function convertMapDataToGameFormat(mapData, isLandscape) {
     // Determine if we need to transpose the map for portrait mode
     const shouldTranspose = !isLandscape;
 
-    // Calculate the final dimensions based on screen aspect ratio
-    const screenAspectRatio = window.innerWidth / window.innerHeight;
-    let finalWidth, finalHeight;
-
-    if (isLandscape) {
-        // Landscape: 16:9 aspect ratio
-        if (screenAspectRatio >= 16 / 9) {
-            // Screen is wider than 16:9, constrain by height
-            finalHeight = height;
-            finalWidth = Math.floor(height * 16 / 9);
-        } else {
-            // Screen is narrower than 16:9, constrain by width
-            finalWidth = width;
-            finalHeight = Math.floor(width * 9 / 16);
-        }
-    } else {
-        // Portrait: 9:16 aspect ratio (transposed)
-        if (screenAspectRatio <= 9 / 16) {
-            // Screen is taller than 9:16, constrain by width
-            finalWidth = height; // Transposed
-            finalHeight = Math.floor(height * 16 / 9);
-        } else {
-            // Screen is shorter than 9:16, constrain by height
-            finalHeight = width; // Transposed
-            finalWidth = Math.floor(width * 9 / 16);
-        }
-    }
+    // For landscape, use map width/height; for portrait, transpose
+    let finalWidth = isLandscape ? width : height;
+    let finalHeight = isLandscape ? height : width;
 
     // Convert tile data to game format
     const gameMap = [];
@@ -86,13 +62,9 @@ export function convertMapDataToGameFormat(mapData, isLandscape) {
     tiles.forEach(tile => {
         let { x, y } = tile;
         const { layers } = tile;
-
         if (shouldTranspose) {
-            // Transpose coordinates for portrait mode
             [x, y] = [y, x];
         }
-
-        // Only apply tiles that are within the final map bounds
         if (x >= 0 && x < finalWidth && y >= 0 && y < finalHeight) {
             gameMap[y][x] = layers.map(layerType => {
                 switch (layerType) {
@@ -109,11 +81,9 @@ export function convertMapDataToGameFormat(mapData, isLandscape) {
     // Apply resources with transposition if needed
     resources.forEach(resource => {
         let { x, y, type } = resource;
-
         if (shouldTranspose) {
             [x, y] = [y, x];
         }
-
         if (x >= 0 && x < finalWidth && y >= 0 && y < finalHeight && gameMap[y] && gameMap[y][x] && gameMap[y][x].length > 1) {
             switch (type) {
                 case 'LARGE_TREE': gameMap[y][x].push(tileTypes.LARGE_TREE); break;
@@ -129,34 +99,28 @@ export function convertMapDataToGameFormat(mapData, isLandscape) {
     // Transform structures with transposition if needed
     const transformedStructures = structures.map(structure => {
         let { x, y, width, height } = structure;
-
         if (shouldTranspose) {
             [x, y] = [y, x];
             [width, height] = [height, width];
         }
-
         return { ...structure, x, y, width, height };
     });
 
     // Transform NPCs with transposition if needed
     const transformedNpcs = npcs.map(npc => {
         let { x, y } = npc;
-
         if (shouldTranspose) {
             [x, y] = [y, x];
         }
-
         return { ...npc, x, y };
     });
 
     // Transform chickens with transposition if needed
     const transformedChickens = chickens.map(chicken => {
         let { x, y } = chicken;
-
         if (shouldTranspose) {
             [x, y] = [y, x];
         }
-
         return { x, y };
     });
 
