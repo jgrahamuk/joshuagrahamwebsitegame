@@ -50,18 +50,9 @@ function updateTileSize() {
 window.drawMap = drawMap;
 
 preloadSprites().then(async () => {
-    updateTileSize();
-    window.addEventListener('resize', async () => {
-        updateTileSize();
-        await initializeMap();
-        drawMap(svg);
-        player.updatePosition();
-        chickens.forEach(c => c.updatePosition());
-        npcs.forEach(n => n.updatePosition());
-    });
-
     // Initialize map and get loaded data
     const mapData = await initializeMap();
+    updateTileSize();
     drawMap(svg);
 
     // Update global map reference to point to the current map data
@@ -137,5 +128,14 @@ preloadSprites().then(async () => {
         if (!clickedNPC) {
             window.npcs.forEach(npc => npc.hideMessage());
         }
+    });
+
+    window.addEventListener('resize', async () => {
+        const mapData = await initializeMap();
+        updateTileSize();
+        drawMap(svg);
+        player.updatePosition();
+        chickens.forEach(c => c.updatePosition());
+        npcs.forEach(n => n.updatePosition());
     });
 }); 
