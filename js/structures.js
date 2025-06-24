@@ -71,14 +71,14 @@ export function placeStructures(map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES) {
     }
 }
 
-export function drawStructures(svg) {
+export function drawStructures(svg, offsetX = 0, offsetY = 0) {
     // Draw farmhouse
     if (structures.farmhouse.position) {
         const farm = structures.farmhouse;
         const imgFarm = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         imgFarm.setAttribute('href', getSpriteUrl(farm.sprite));
-        imgFarm.setAttribute('x', farm.position.x * window.TILE_SIZE);
-        imgFarm.setAttribute('y', farm.position.y * window.TILE_SIZE);
+        imgFarm.setAttribute('x', offsetX + farm.position.x * window.TILE_SIZE);
+        imgFarm.setAttribute('y', offsetY + farm.position.y * window.TILE_SIZE);
         imgFarm.setAttribute('width', farm.position.w * window.TILE_SIZE);
         imgFarm.setAttribute('height', farm.position.h * window.TILE_SIZE);
         svg.appendChild(imgFarm);
@@ -89,8 +89,8 @@ export function drawStructures(svg) {
         const coop = structures.chickenCoop;
         const imgCoop = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         imgCoop.setAttribute('href', getSpriteUrl(coop.sprite));
-        imgCoop.setAttribute('x', coop.position.x * window.TILE_SIZE);
-        imgCoop.setAttribute('y', coop.position.y * window.TILE_SIZE);
+        imgCoop.setAttribute('x', offsetX + coop.position.x * window.TILE_SIZE);
+        imgCoop.setAttribute('y', offsetY + coop.position.y * window.TILE_SIZE);
         imgCoop.setAttribute('width', coop.width * window.TILE_SIZE);
         imgCoop.setAttribute('height', coop.height * window.TILE_SIZE);
         svg.appendChild(imgCoop);
@@ -101,8 +101,8 @@ export function drawStructures(svg) {
         const sign = structures.sign;
         const imgSign = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         imgSign.setAttribute('href', getSpriteUrl(sign.sprite));
-        imgSign.setAttribute('x', sign.position.x * window.TILE_SIZE);
-        imgSign.setAttribute('y', sign.position.y * window.TILE_SIZE);
+        imgSign.setAttribute('x', offsetX + sign.position.x * window.TILE_SIZE);
+        imgSign.setAttribute('y', offsetY + sign.position.y * window.TILE_SIZE);
         imgSign.setAttribute('width', sign.width * window.TILE_SIZE);
         imgSign.setAttribute('height', sign.height * window.TILE_SIZE);
         svg.appendChild(imgSign);

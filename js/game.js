@@ -1,4 +1,4 @@
-import { initializeMap, getTile, randomGrassOrDirt, tileTypes, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, setMapSize } from './map.js';
+import { initializeMap, getTile, randomGrassOrDirt, tileTypes, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, setMapSize, drawMap, getMapDims } from './map.js';
 import { findPath, moveToTarget } from './movement.js';
 import { Player } from './player.js';
 import { Chicken } from './chickens.js';
@@ -9,6 +9,8 @@ import { MapEditor } from './mapEditor.js';
 import { HelpOverlay } from './helpOverlay.js';
 
 window.TILE_SIZE = 40;
+window.MAP_OFFSET_X = 0;
+window.MAP_OFFSET_Y = 0;
 
 const gameContainer = document.getElementById('game-container');
 const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -29,110 +31,22 @@ function updateTileSize() {
     svg.setAttribute('width', w);
     svg.setAttribute('height', h);
 
+    // Calculate map pixel dimensions
+    const mapPixelWidth = MAP_WIDTH_TILES * window.TILE_SIZE;
+    const mapPixelHeight = MAP_HEIGHT_TILES * window.TILE_SIZE;
+
+    // Calculate offsets to center the map
+    window.MAP_OFFSET_X = Math.max(0, (window.innerWidth - mapPixelWidth) / 2);
+    window.MAP_OFFSET_Y = Math.max(0, (window.innerHeight - mapPixelHeight) / 2);
+
     // Reset positioning since we're filling the screen
     svg.style.position = 'static';
     svg.style.left = '';
     svg.style.top = '';
 }
 
-function drawMap() {
-    svg.innerHTML = '';
-    for (let y = 0; y < MAP_HEIGHT_TILES; y++) {
-        for (let x = 0; x < MAP_WIDTH_TILES; x++) {
-            const tiles = map[y][x];
-            let baseTile = tiles.find(t => t === tileTypes.DIRT) ? 'tile-dirt.png'
-                : tiles.find(t => t === tileTypes.GRASS) ? 'tile-grass.png'
-                    : tiles.find(t => t === tileTypes.WATER || (t.color && t.color === '#3bbcff')) ? 'tile-water.png'
-                        : 'tile-grass.png';
-            let basePath = getSpriteUrl(baseTile);
-            const imgBase = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-            imgBase.setAttribute('href', basePath);
-            imgBase.setAttribute('x', x * window.TILE_SIZE);
-            imgBase.setAttribute('y', y * window.TILE_SIZE);
-            imgBase.setAttribute('width', window.TILE_SIZE);
-            imgBase.setAttribute('height', window.TILE_SIZE);
-            svg.appendChild(imgBase);
-        }
-    }
-
-    // Draw structures using the new module
-    drawStructures(svg);
-
-    // Draw overlays/resources
-    for (let y = 0; y < MAP_HEIGHT_TILES; y++) {
-        for (let x = 0; x < MAP_WIDTH_TILES; x++) {
-            const tiles = map[y][x];
-            const top = tiles[tiles.length - 1];
-            let overlay = null;
-            if (top === tileTypes.LARGE_TREE || top === tileTypes.SMALL_TREE) {
-                overlay = 'tree.png';
-            } else if (top === tileTypes.ROCK) {
-                overlay = 'stone.png';
-            } else if (top === tileTypes.FLOWER) {
-                overlay = 'flower.png';
-            }
-            if (overlay) {
-                const imgOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-                imgOverlay.setAttribute('href', getSpriteUrl(overlay));
-                imgOverlay.setAttribute('x', x * window.TILE_SIZE);
-                imgOverlay.setAttribute('y', y * window.TILE_SIZE);
-                imgOverlay.setAttribute('width', window.TILE_SIZE);
-                imgOverlay.setAttribute('height', window.TILE_SIZE);
-                svg.appendChild(imgOverlay);
-            }
-        }
-    }
-
-    // Redraw player and NPCs on top
-    if (window.player) {
-        window.player.updatePosition();
-    }
-    if (window.npcs) {
-        window.npcs.forEach(npc => npc.updatePosition());
-    }
-    if (window.chickens) {
-        window.chickens.forEach(chicken => chicken.updatePosition());
-    }
-}
-
 // Make drawMap globally accessible
 window.drawMap = drawMap;
-
-function getMapDims() {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    const aspectRatio = w / h;
-
-    // Calculate base tile count based on screen size
-    let baseTiles;
-    if (w < 700) {
-        // Mobile devices - use fewer tiles for better performance
-        baseTiles = 24;
-    } else if (w < 1200) {
-        // Medium screens
-        baseTiles = 36;
-    } else {
-        // Large screens
-        baseTiles = 48;
-    }
-
-    if (aspectRatio > 1.5) {
-        // Very wide landscape - make map wider to fill horizontal space
-        return { width: Math.floor(baseTiles * 1.8), height: baseTiles };
-    } else if (aspectRatio > 1.2) {
-        // Landscape - make map wider
-        return { width: Math.floor(baseTiles * 1.5), height: baseTiles };
-    } else if (aspectRatio < 0.7) {
-        // Very tall portrait - make map taller to fill vertical space
-        return { width: baseTiles, height: Math.floor(baseTiles * 1.8) };
-    } else if (aspectRatio < 0.9) {
-        // Portrait - make map taller
-        return { width: baseTiles, height: Math.floor(baseTiles * 1.5) };
-    } else {
-        // Square-ish - balanced dimensions
-        return { width: baseTiles, height: baseTiles };
-    }
-}
 
 preloadSprites().then(async () => {
     const dims = getMapDims();
@@ -143,7 +57,7 @@ preloadSprites().then(async () => {
         setMapSize(dims.width, dims.height);
         updateTileSize();
         await initializeMap();
-        drawMap();
+        drawMap(svg);
         player.updatePosition();
         chickens.forEach(c => c.updatePosition());
         npcs.forEach(n => n.updatePosition());
@@ -151,7 +65,7 @@ preloadSprites().then(async () => {
 
     // Initialize map and get loaded data
     const mapData = await initializeMap();
-    drawMap();
+    drawMap(svg);
 
     // Find a valid player start
     let start = randomGrassOrDirt();
@@ -160,10 +74,7 @@ preloadSprites().then(async () => {
     // Create chickens from loaded data
     window.chickens = [];
     mapData.chickens.forEach(chickenData => {
-        const chicken = new Chicken(svg);
-        chicken.x = chickenData.x;
-        chicken.y = chickenData.y;
-        chicken.updatePosition();
+        const chicken = new Chicken(svg, chickenData.x, chickenData.y);
         window.chickens.push(chicken);
     });
 

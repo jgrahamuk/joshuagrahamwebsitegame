@@ -25,6 +25,7 @@ export class NPC {
         this.element = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         this.svg = svg;
         this.svg.appendChild(this.element);
+        console.log(`NPC ${this.name} element created and added to SVG`);
 
         // Movement properties
         this.lastMove = Date.now();
@@ -41,13 +42,15 @@ export class NPC {
         this.isShowingMessage = false;
 
         this.updatePosition();
+        console.log(`NPC ${this.name} positioned at (${this.x}, ${this.y})`);
     }
 
     updatePosition() {
-        const sprite = `${this.name}-${this.direction}.png`;
+        const sprite = `${this.name.toLowerCase()}-${this.direction}.png`;
+        console.log(`NPC ${this.name} loading sprite: ${sprite}`);
         this.element.setAttribute('href', getSpriteUrl(sprite));
-        this.element.setAttribute('x', this.x * window.TILE_SIZE);
-        this.element.setAttribute('y', this.y * window.TILE_SIZE);
+        this.element.setAttribute('x', (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE);
+        this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE);
         this.element.setAttribute('width', window.TILE_SIZE * 2);
         this.element.setAttribute('height', window.TILE_SIZE * 2);
     }
@@ -122,15 +125,15 @@ export class NPC {
         // Create chatbox background
         this.messageElement = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         this.messageElement.setAttribute('href', getSpriteUrl('chatbox.png'));
-        this.messageElement.setAttribute('x', (this.x - 5) * window.TILE_SIZE);
-        this.messageElement.setAttribute('y', (this.y - 6) * window.TILE_SIZE);
+        this.messageElement.setAttribute('x', (window.MAP_OFFSET_X || 0) + (this.x - 5) * window.TILE_SIZE);
+        this.messageElement.setAttribute('y', (window.MAP_OFFSET_Y || 0) + (this.y - 6) * window.TILE_SIZE);
         this.messageElement.setAttribute('width', window.TILE_SIZE * 12);
         this.messageElement.setAttribute('height', window.TILE_SIZE * 6);
 
         // Create message text with wrapping
         this.messageTextElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        this.messageTextElement.setAttribute('x', (this.x - 1) * window.TILE_SIZE);
-        this.messageTextElement.setAttribute('y', (this.y + 4) * window.TILE_SIZE);
+        this.messageTextElement.setAttribute('x', (window.MAP_OFFSET_X || 0) + (this.x - 1) * window.TILE_SIZE);
+        this.messageTextElement.setAttribute('y', (window.MAP_OFFSET_Y || 0) + (this.y + 4) * window.TILE_SIZE);
         this.messageTextElement.setAttribute('text-anchor', 'middle');
         this.messageTextElement.setAttribute('font-family', 'Jersey 10, sans-serif');
         this.messageTextElement.setAttribute('font-size', '16px');
@@ -161,14 +164,14 @@ export class NPC {
         // Create multiple text elements for each line
         this.messageTextElements = [];
         const lineHeight = window.TILE_SIZE * 0.7; // Line spacing
-        const startY = (this.y - 5.2) * window.TILE_SIZE + padding; // Start from top of chatbox with padding
+        const startY = (window.MAP_OFFSET_Y || 0) + (this.y - 5.2) * window.TILE_SIZE + padding; // Start from top of chatbox with padding
 
         // Append chatbox first
         this.svg.appendChild(this.messageElement);
 
         lines.forEach((line, index) => {
             const textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            textElement.setAttribute('x', (this.x + 1) * window.TILE_SIZE);
+            textElement.setAttribute('x', (window.MAP_OFFSET_X || 0) + (this.x + 1) * window.TILE_SIZE);
             textElement.setAttribute('y', startY + index * lineHeight);
             textElement.setAttribute('text-anchor', 'middle');
             textElement.setAttribute('font-family', 'Jersey 10, sans-serif');

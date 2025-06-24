@@ -12,10 +12,17 @@ const chickenSprites = {
 };
 
 export class Chicken {
-    constructor(svg) {
-        const pos = randomGrassOrDirt();
-        this.x = pos.x;
-        this.y = pos.y;
+    constructor(svg, startX, startY) {
+        // Use provided coordinates or get random position
+        if (startX !== undefined && startY !== undefined) {
+            this.x = startX;
+            this.y = startY;
+        } else {
+            const pos = randomGrassOrDirt();
+            this.x = pos.x;
+            this.y = pos.y;
+        }
+
         this.direction = 'front';
         this.state = 'walk';
         this.pecksLeft = 0;
@@ -42,8 +49,8 @@ export class Chicken {
             sprite = chickenSprites[this.direction];
         }
         this.element.setAttribute('href', getSpriteUrl(sprite));
-        this.element.setAttribute('x', this.x * window.TILE_SIZE);
-        this.element.setAttribute('y', this.y * window.TILE_SIZE);
+        this.element.setAttribute('x', (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE);
+        this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE);
         this.element.setAttribute('width', window.TILE_SIZE);
         this.element.setAttribute('height', window.TILE_SIZE);
     }

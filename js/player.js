@@ -11,13 +11,31 @@ export class Player {
         this.svg = svg;
         this.svg.appendChild(this.element);
         this.targetResource = null; // Track if we're moving to gather a resource
+        this.isWalking = false;
+        this.walkFrame = 0;
+        this.lastWalkToggle = 0;
+        this.walkToggleInterval = 150; // ms between walk frame changes
         this.updatePosition();
     }
     updatePosition() {
         let sprite = `character-${this.direction}.png`;
+
+        // Add walking animation for left/right movement
+        if (this.isWalking && (this.direction === 'left' || this.direction === 'right')) {
+            const now = Date.now();
+            if (now - this.lastWalkToggle > this.walkToggleInterval) {
+                this.walkFrame = (this.walkFrame + 1) % 2;
+                this.lastWalkToggle = now;
+            }
+
+            if (this.walkFrame === 1) {
+                sprite = `character-${this.direction}-walk.png`;
+            }
+        }
+
         this.element.setAttribute('href', getSpriteUrl(sprite));
-        this.element.setAttribute('x', this.x * window.TILE_SIZE);
-        this.element.setAttribute('y', this.y * window.TILE_SIZE);
+        this.element.setAttribute('x', (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE);
+        this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE);
         this.element.setAttribute('width', window.TILE_SIZE * 2);
         this.element.setAttribute('height', window.TILE_SIZE * 2);
     }
@@ -25,6 +43,12 @@ export class Player {
         this.targetResource = targetResource; // Set the target resource if provided
         this.interactionData = interactionData; // Set interaction data if provided
         let last = { x: this.x, y: this.y };
+
+        // Start walking animation
+        this.isWalking = true;
+        this.walkFrame = 0;
+        this.lastWalkToggle = Date.now();
+
         for (const point of path) {
             if (point.x > last.x) this.direction = 'right';
             else if (point.x < last.x) this.direction = 'left';
@@ -47,6 +71,10 @@ export class Player {
 
             await new Promise(resolve => setTimeout(resolve, 100));
         }
+
+        // Stop walking animation
+        this.isWalking = false;
+        this.updatePosition();
 
         // Clear interaction data after movement completes
         this.interactionData = null;

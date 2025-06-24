@@ -1,6 +1,7 @@
 // js/spriteCache.js
 const spriteNames = [
     'character-front.png', 'character-back.png', 'character-left.png', 'character-right.png',
+    'character-left-walk.png', 'character-right-walk.png',
     'chicken-front.png', 'chicken-back.png', 'chicken-left.png', 'chicken-right.png',
     'chicken-peck-right.png', 'chicken-peck-left.png',
     'tile-dirt.png', 'tile-grass.png', 'tile-water.png',

@@ -1,5 +1,7 @@
 import { placeStructures } from './structures.js';
 import { loadMapData, convertMapDataToGameFormat } from './mapLoader.js';
+import { getSpriteUrl } from './spriteCache.js';
+import { drawStructures } from './structures.js';
 
 // Map generation and tile helpers
 export const tileTypes = {
@@ -123,4 +125,102 @@ export function getResourceAt(x, y) {
         return topTile && topTile.resource ? topTile : null;
     }
     return null;
+}
+
+export function getMapDims() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const aspectRatio = w / h;
+
+    // Calculate base tile count based on screen size
+    let baseTiles;
+    if (w < 700) {
+        // Mobile devices - use fewer tiles for better performance
+        baseTiles = 24;
+    } else if (w < 1200) {
+        // Medium screens
+        baseTiles = 36;
+    } else {
+        // Large screens
+        baseTiles = 48;
+    }
+
+    if (aspectRatio > 1.5) {
+        // Very wide landscape - make map wider to fill horizontal space
+        return { width: Math.floor(baseTiles * 1.8), height: baseTiles };
+    } else if (aspectRatio > 1.2) {
+        // Landscape - make map wider
+        return { width: Math.floor(baseTiles * 1.5), height: baseTiles };
+    } else if (aspectRatio < 0.6) {
+        // Very tall portrait - make map taller to fill vertical space
+        return { width: baseTiles, height: Math.floor(baseTiles * 1.8) };
+    } else if (aspectRatio < 0.9) {
+        // Portrait - make map taller
+        return { width: baseTiles, height: Math.floor(baseTiles * 1.5) };
+    } else {
+        // Square-ish - balanced dimensions
+        return { width: baseTiles, height: baseTiles };
+    }
+}
+
+export function drawMap(svg) {
+    svg.innerHTML = '';
+    const offsetX = window.MAP_OFFSET_X || 0;
+    const offsetY = window.MAP_OFFSET_Y || 0;
+    for (let y = 0; y < MAP_HEIGHT_TILES; y++) {
+        for (let x = 0; x < MAP_WIDTH_TILES; x++) {
+            const tiles = map[y][x];
+            let baseTile = tiles.find(t => t === tileTypes.DIRT) ? 'tile-dirt.png'
+                : tiles.find(t => t === tileTypes.GRASS) ? 'tile-grass.png'
+                    : tiles.find(t => t === tileTypes.WATER || (t.color && t.color === '#3bbcff')) ? 'tile-water.png'
+                        : 'tile-grass.png';
+            let basePath = getSpriteUrl(baseTile);
+            const imgBase = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+            imgBase.setAttribute('href', basePath);
+            imgBase.setAttribute('x', offsetX + x * window.TILE_SIZE);
+            imgBase.setAttribute('y', offsetY + y * window.TILE_SIZE);
+            imgBase.setAttribute('width', window.TILE_SIZE);
+            imgBase.setAttribute('height', window.TILE_SIZE);
+            svg.appendChild(imgBase);
+        }
+    }
+
+    // Draw structures using the new module
+    drawStructures(svg, offsetX, offsetY);
+
+    // Draw overlays/resources
+    for (let y = 0; y < MAP_HEIGHT_TILES; y++) {
+        for (let x = 0; x < MAP_WIDTH_TILES; x++) {
+            const tiles = map[y][x];
+            const top = tiles[tiles.length - 1];
+            let overlay = null;
+            if (top === tileTypes.LARGE_TREE || top === tileTypes.SMALL_TREE) {
+                overlay = 'tree.png';
+            } else if (top === tileTypes.ROCK) {
+                overlay = 'stone.png';
+            } else if (top === tileTypes.FLOWER) {
+                overlay = 'flower.png';
+            }
+            if (overlay) {
+                const imgOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                imgOverlay.setAttribute('href', getSpriteUrl(overlay));
+                imgOverlay.setAttribute('x', offsetX + x * window.TILE_SIZE);
+                imgOverlay.setAttribute('y', offsetY + y * window.TILE_SIZE);
+                imgOverlay.setAttribute('width', window.TILE_SIZE);
+                imgOverlay.setAttribute('height', window.TILE_SIZE);
+                svg.appendChild(imgOverlay);
+            }
+        }
+    }
+
+    // Redraw player and NPCs on top
+    if (window.player) {
+        window.player.updatePosition();
+    }
+    if (window.npcs) {
+        window.npcs.forEach(npc => npc.updatePosition());
+    }
+    if (window.chickens) {
+        window.chickens.forEach(chicken => chicken.updatePosition());
+    }
 } 
