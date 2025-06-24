@@ -1,9 +1,10 @@
-import { initializeMap, getTile, randomGrassOrDirt, tileTypes, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, farmhouse, chickenCoop, signObj, setMapSize } from './map.js';
-import { findPath } from './movement.js';
+import { initializeMap, getTile, randomGrassOrDirt, tileTypes, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, setMapSize } from './map.js';
+import { findPath, moveToTarget } from './movement.js';
 import { Player } from './player.js';
 import { Chicken } from './chickens.js';
 import { NPC, npcDefinitions } from './npcs.js';
 import { preloadSprites, getSpriteUrl } from './spriteCache.js';
+import { drawStructures } from './structures.js';
 
 window.TILE_SIZE = 40;
 
@@ -14,9 +15,22 @@ gameContainer.appendChild(svg);
 function updateTileSize() {
     const w = window.innerWidth;
     const h = window.innerHeight;
-    window.TILE_SIZE = Math.floor(Math.min(w / MAP_WIDTH_TILES, h / MAP_HEIGHT_TILES));
-    svg.setAttribute('width', MAP_WIDTH_TILES * window.TILE_SIZE);
-    svg.setAttribute('height', MAP_HEIGHT_TILES * window.TILE_SIZE);
+
+    // Calculate tile size to fill the entire screen
+    const tileSizeX = w / MAP_WIDTH_TILES;
+    const tileSizeY = h / MAP_HEIGHT_TILES;
+
+    // Use the larger tile size to ensure the map fills the screen
+    window.TILE_SIZE = Math.max(tileSizeX, tileSizeY);
+
+    // Set SVG size to fill the entire screen
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+
+    // Reset positioning since we're filling the screen
+    svg.style.position = 'static';
+    svg.style.left = '';
+    svg.style.top = '';
 }
 
 function drawMap() {
@@ -38,36 +52,10 @@ function drawMap() {
             svg.appendChild(imgBase);
         }
     }
-    // Draw farmhouse (as one image)
-    if (farmhouse) {
-        const imgFarm = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        imgFarm.setAttribute('href', getSpriteUrl('farmhouse.png'));
-        imgFarm.setAttribute('x', farmhouse.x * window.TILE_SIZE);
-        imgFarm.setAttribute('y', farmhouse.y * window.TILE_SIZE);
-        imgFarm.setAttribute('width', farmhouse.w * window.TILE_SIZE);
-        imgFarm.setAttribute('height', farmhouse.h * window.TILE_SIZE);
-        svg.appendChild(imgFarm);
-    }
-    // Draw chicken coop (as one image)
-    if (chickenCoop) {
-        const imgCoop = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        imgCoop.setAttribute('href', getSpriteUrl('chicken-coop.png'));
-        imgCoop.setAttribute('x', chickenCoop.x * window.TILE_SIZE);
-        imgCoop.setAttribute('y', chickenCoop.y * window.TILE_SIZE);
-        imgCoop.setAttribute('width', chickenCoop.w * window.TILE_SIZE);
-        imgCoop.setAttribute('height', chickenCoop.h * window.TILE_SIZE);
-        svg.appendChild(imgCoop);
-    }
-    // Draw sign (as one image)
-    if (signObj) {
-        const imgSign = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        imgSign.setAttribute('href', getSpriteUrl('sign-joshuagraham.png'));
-        imgSign.setAttribute('x', signObj.x * window.TILE_SIZE);
-        imgSign.setAttribute('y', signObj.y * window.TILE_SIZE);
-        imgSign.setAttribute('width', signObj.w * window.TILE_SIZE);
-        imgSign.setAttribute('height', signObj.h * window.TILE_SIZE);
-        svg.appendChild(imgSign);
-    }
+
+    // Draw structures using the new module
+    drawStructures(svg);
+
     // Draw overlays/resources
     for (let y = 0; y < MAP_HEIGHT_TILES; y++) {
         for (let x = 0; x < MAP_WIDTH_TILES; x++) {
@@ -108,61 +96,77 @@ function drawMap() {
 // Make drawMap globally accessible
 window.drawMap = drawMap;
 
-function isMobile() {
-    return /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent) || window.innerWidth < 700;
-}
-
 function getMapDims() {
-    if (isMobile()) {
-        return { width: 20, height: 40 };
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const aspectRatio = w / h;
+
+    // Calculate base tile count based on screen size
+    let baseTiles;
+    if (w < 700) {
+        // Mobile devices - use fewer tiles for better performance
+        baseTiles = 24;
+    } else if (w < 1200) {
+        // Medium screens
+        baseTiles = 36;
     } else {
-        return { width: 64, height: 48 };
+        // Large screens
+        baseTiles = 48;
+    }
+
+    if (aspectRatio > 1.5) {
+        // Very wide landscape - make map wider to fill horizontal space
+        return { width: Math.floor(baseTiles * 1.8), height: baseTiles };
+    } else if (aspectRatio > 1.2) {
+        // Landscape - make map wider
+        return { width: Math.floor(baseTiles * 1.5), height: baseTiles };
+    } else if (aspectRatio < 0.7) {
+        // Very tall portrait - make map taller to fill vertical space
+        return { width: baseTiles, height: Math.floor(baseTiles * 1.8) };
+    } else if (aspectRatio < 0.9) {
+        // Portrait - make map taller
+        return { width: baseTiles, height: Math.floor(baseTiles * 1.5) };
+    } else {
+        // Square-ish - balanced dimensions
+        return { width: baseTiles, height: baseTiles };
     }
 }
 
-preloadSprites().then(() => {
+preloadSprites().then(async () => {
     const dims = getMapDims();
     setMapSize(dims.width, dims.height);
     updateTileSize();
-    window.addEventListener('resize', () => {
+    window.addEventListener('resize', async () => {
         const dims = getMapDims();
         setMapSize(dims.width, dims.height);
         updateTileSize();
-        initializeMap();
+        await initializeMap();
         drawMap();
         player.updatePosition();
         chickens.forEach(c => c.updatePosition());
         npcs.forEach(n => n.updatePosition());
     });
 
-    initializeMap();
+    // Initialize map and get loaded data
+    const mapData = await initializeMap();
     drawMap();
 
     // Find a valid player start
     let start = randomGrassOrDirt();
     window.player = new Player(svg, start.x, start.y);
 
-    // Chickens: always guarantee at least one on land
+    // Create chickens from loaded data
     window.chickens = [];
-    let firstChickenPlaced = false;
-    for (let i = 0; i < 3; i++) {
-        let chicken;
-        if (!firstChickenPlaced) {
-            // Force first chicken to a valid land tile
-            const pos = randomGrassOrDirt();
-            chicken = new Chicken(svg);
-            chicken.x = pos.x;
-            chicken.y = pos.y;
-            chicken.updatePosition();
-            firstChickenPlaced = true;
-        } else {
-            chicken = new Chicken(svg);
-        }
+    mapData.chickens.forEach(chickenData => {
+        const chicken = new Chicken(svg);
+        chicken.x = chickenData.x;
+        chicken.y = chickenData.y;
+        chicken.updatePosition();
         window.chickens.push(chicken);
-    }
+    });
 
-    // NPCs
-    window.npcs = npcDefinitions.map(def => new NPC(svg, def.name, def.message));
+    // Create NPCs from loaded data
+    window.npcs = mapData.npcs.map(npcData => new NPC(svg, npcData.name, npcData.message, npcData.x, npcData.y));
 
     // Main animation loop
     setInterval(() => {
@@ -171,7 +175,7 @@ preloadSprites().then(() => {
         window.npcs.forEach(n => n.tick(now));
     }, 50);
 
-    // Player movement and NPC interaction
+    // Player movement and interaction
     svg.addEventListener('click', (e) => {
         const rect = svg.getBoundingClientRect();
         const x = Math.floor((e.clientX - rect.left) / window.TILE_SIZE);
@@ -181,7 +185,7 @@ preloadSprites().then(() => {
             // Check if clicking on an NPC or surrounding tiles
             const clickedNPC = window.npcs.find(npc => npc.isClicked(x, y));
             if (clickedNPC && clickedNPC.isNearPlayer(window.player.x, window.player.y)) {
-                // Dismiss any other NPC messages first
+                // Already adjacent - show message immediately
                 window.npcs.filter(npc => npc !== clickedNPC).forEach(npc => npc.hideMessage());
                 clickedNPC.showMessage();
                 return;
@@ -190,62 +194,19 @@ preloadSprites().then(() => {
             // Check if clicking on a resource
             const tile = getTile(x, y);
             if (tile && tile.resource) {
-                // Move to the resource tile
-                const start = { x: window.player.x, y: window.player.y };
-                const end = { x, y };
-                const path = findPath(start, end, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
-                if (path) {
-                    window.player.moveTo(path.slice(1));
-                }
+                moveToTarget(x, y, window.player, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, 'resource');
                 return;
             }
 
             // Check if clicking on an NPC (not adjacent)
             if (clickedNPC) {
-                // Move to a tile adjacent to the NPC
-                const adjacentTiles = [];
-                for (let dx = -1; dx <= 1; dx++) {
-                    for (let dy = -1; dy <= 1; dy++) {
-                        if (dx === 0 && dy === 0) continue;
-                        const nx = clickedNPC.x + dx;
-                        const ny = clickedNPC.y + dy;
-                        if (nx >= 0 && ny >= 0 && nx < MAP_WIDTH_TILES && ny < MAP_HEIGHT_TILES) {
-                            const adjacentTile = getTile(nx, ny);
-                            if (adjacentTile && adjacentTile.passable) {
-                                adjacentTiles.push({ x: nx, y: ny });
-                            }
-                        }
-                    }
-                }
-
-                if (adjacentTiles.length > 0) {
-                    // Find the closest adjacent tile
-                    let closestTile = adjacentTiles[0];
-                    let closestDistance = Math.abs(window.player.x - closestTile.x) + Math.abs(window.player.y - closestTile.y);
-
-                    adjacentTiles.forEach(tile => {
-                        const distance = Math.abs(window.player.x - tile.x) + Math.abs(window.player.y - tile.y);
-                        if (distance < closestDistance) {
-                            closestDistance = distance;
-                            closestTile = tile;
-                        }
-                    });
-
-                    const start = { x: window.player.x, y: window.player.y };
-                    const path = findPath(start, closestTile, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
-                    if (path) {
-                        window.player.moveTo(path.slice(1));
-                    }
-                }
+                moveToTarget(x, y, window.player, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, 'npc', clickedNPC);
                 return;
             }
 
-            // Otherwise, move player to empty tile
-            const start = { x: window.player.x, y: window.player.y };
-            const end = { x, y };
-            if (tile.passable) {
-                const path = findPath(start, end, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
-                if (path) window.player.moveTo(path.slice(1));
+            // Otherwise, move to empty tile
+            if (tile && tile.passable) {
+                moveToTarget(x, y, window.player, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, 'move');
             }
         }
 

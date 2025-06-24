@@ -70,4 +70,70 @@ export function getNeighbors(node, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, a
         }
     });
     return neighbors;
+}
+
+export function findAdjacentTile(targetX, targetY, playerX, playerY, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES) {
+    const adjacentTiles = [];
+    for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+            if (dx === 0 && dy === 0) continue;
+            const nx = targetX + dx;
+            const ny = targetY + dy;
+            if (nx >= 0 && ny >= 0 && nx < MAP_WIDTH_TILES && ny < MAP_HEIGHT_TILES) {
+                const adjacentTile = getTile(nx, ny);
+                if (adjacentTile && adjacentTile.passable) {
+                    adjacentTiles.push({ x: nx, y: ny });
+                }
+            }
+        }
+    }
+
+    if (adjacentTiles.length > 0) {
+        // Find the closest adjacent tile
+        let closestTile = adjacentTiles[0];
+        let closestDistance = Math.abs(playerX - closestTile.x) + Math.abs(playerY - closestTile.y);
+
+        adjacentTiles.forEach(tile => {
+            const distance = Math.abs(playerX - tile.x) + Math.abs(playerY - tile.y);
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestTile = tile;
+            }
+        });
+
+        return closestTile;
+    }
+    return null;
+}
+
+export function moveToTarget(targetX, targetY, player, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, interactionType, interactionData = null) {
+    const start = { x: player.x, y: player.y };
+    let end = { x: targetX, y: targetY };
+    let path = null;
+
+    // Check if target is passable
+    const targetTile = getTile(targetX, targetY);
+    if (targetTile && targetTile.passable) {
+        // Direct path to target
+        path = findPath(start, end, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
+    } else {
+        // Find adjacent tile and path to it
+        const adjacentTile = findAdjacentTile(targetX, targetY, player.x, player.y, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
+        if (adjacentTile) {
+            end = adjacentTile;
+            path = findPath(start, end, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
+        }
+    }
+
+    if (path) {
+        if (interactionType === 'resource') {
+            player.moveTo(path.slice(1), { x: targetX, y: targetY });
+        } else if (interactionType === 'npc') {
+            player.moveTo(path.slice(1), null, { type: 'npc', data: interactionData });
+        } else {
+            player.moveTo(path.slice(1));
+        }
+    }
+
+    return path;
 } 

@@ -8,9 +8,14 @@ body {
 #game-container {
   width: 100vw;
   height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+#game-container svg {
+  width: 100vw;
+  height: 100vh;
+  display: block;
 }
 
 #ui-container {
@@ -22,6 +27,7 @@ body {
   right: 1rem;
   display: flex;
   gap: 1rem;
+  z-index: 1000;
 }
 
 #ui-container p {
