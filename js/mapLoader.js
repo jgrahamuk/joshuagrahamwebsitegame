@@ -48,7 +48,7 @@ export function convertMapDataToGameFormat(mapData, isLandscape) {
     // For landscape, use map width/height; for portrait, transpose
     let finalWidth = isLandscape ? width : height;
     let finalHeight = isLandscape ? height : width;
-    F
+
     // Convert tile data to game format
     const gameMap = [];
     for (let y = 0; y < finalHeight; y++) {
