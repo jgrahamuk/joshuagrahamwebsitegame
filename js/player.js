@@ -15,7 +15,15 @@ export class Player {
         this.walkFrame = 0;
         this.lastWalkToggle = 0;
         this.walkToggleInterval = 150; // ms between walk frame changes
+
+        // Initialize inventory
+        this.inventory = {
+            wood: 0,
+            stone: 0
+        };
+
         this.updatePosition();
+        this.updateInventoryDisplay();
     }
     updatePosition() {
         let sprite = `character-${this.direction}.png`;
@@ -98,6 +106,16 @@ export class Player {
         const removedResource = removeResource(resourcePos.x, resourcePos.y);
 
         if (removedResource) {
+            // Add to inventory based on resource type
+            if (removedResource.resource === 'wood') {
+                this.inventory.wood++;
+            } else if (removedResource.resource === 'stone') {
+                this.inventory.stone++;
+            }
+
+            // Update the display
+            this.updateInventoryDisplay();
+
             // Remove the visual element from SVG
             this.removeResourceElement(resourcePos);
         }
@@ -137,5 +155,17 @@ export class Player {
         const dx = Math.abs(this.x - npc.x);
         const dy = Math.abs(this.y - npc.y);
         return dx <= 1 && dy <= 1;
+    }
+
+    updateInventoryDisplay() {
+        const woodCountElement = document.getElementById('wood-count');
+        const stoneCountElement = document.getElementById('stone-count');
+
+        if (woodCountElement) {
+            woodCountElement.textContent = this.inventory.wood;
+        }
+        if (stoneCountElement) {
+            stoneCountElement.textContent = this.inventory.stone;
+        }
     }
 } 
