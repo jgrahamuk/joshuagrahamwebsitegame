@@ -1,4 +1,4 @@
-import { initializeMap, getTile, randomGrassOrDirt, tileTypes, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, setMapSize, drawMap, getMapDims } from './map.js';
+import { initializeMap, getTile, randomGrassOrDirt, tileTypes, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, setMapSize, drawMap } from './map.js';
 import { findPath, moveToTarget } from './movement.js';
 import { Player } from './player.js';
 import { Chicken } from './chickens.js';
@@ -53,12 +53,8 @@ function updateTileSize() {
 window.drawMap = drawMap;
 
 preloadSprites().then(async () => {
-    const dims = getMapDims();
-    setMapSize(dims.width, dims.height);
     updateTileSize();
     window.addEventListener('resize', async () => {
-        const dims = getMapDims();
-        setMapSize(dims.width, dims.height);
         updateTileSize();
         await initializeMap();
         drawMap(svg);

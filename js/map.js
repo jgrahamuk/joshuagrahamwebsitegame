@@ -16,12 +16,12 @@ export const tileTypes = {
     BADGE: { color: 'gold', passable: true, resource: 'badge' },
     FARMHOUSE: { color: 'white', passable: false, resource: null },
 };
-export let MAP_WIDTH_TILES = 64;
-export let MAP_HEIGHT_TILES = 48;
+export let MAP_WIDTH_TILES = 60;
+export let MAP_HEIGHT_TILES = 34;
 export let map = [];
 export let farmhouse = null; // {x, y, w, h}
-export let chickenCoop = { x: 18, y: 15, w: 5, h: 3 }; // {x, y, w, h} in tiles
-export let signObj = { x: 29, y: 8, w: 13, h: 7 }; // {x, y, w, h} in tiles
+export let chickenCoop = { x: 11, y: 9, w: 4, h: 3 }; // {x, y, w, h} in tiles
+export let signObj = { x: 44, y: 5, w: 8, h: 4 }; // {x, y, w, h} in tiles
 
 // Resource management
 const respawnTimers = new Map(); // Track respawn timers by position
@@ -32,13 +32,13 @@ export function setMapSize(width, height) {
 }
 
 export async function initializeMap() {
-    // Determine if we should use landscape or portrait map
-    const aspectRatio = MAP_WIDTH_TILES / MAP_HEIGHT_TILES;
-    const isLandscape = aspectRatio > 1.2;
+    // Determine if we should use landscape or portrait orientation
+    const aspectRatio = window.innerWidth / window.innerHeight;
+    const isLandscape = aspectRatio > 1;
 
     // Load map data from JSON
     const mapData = await loadMapData(isLandscape);
-    const gameData = convertMapDataToGameFormat(mapData);
+    const gameData = convertMapDataToGameFormat(mapData, isLandscape);
 
     // Update map dimensions
     MAP_WIDTH_TILES = gameData.width;
@@ -127,42 +127,6 @@ export function getResourceAt(x, y) {
         return topTile && topTile.resource ? topTile : null;
     }
     return null;
-}
-
-export function getMapDims() {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    const aspectRatio = w / h;
-
-    // Calculate base tile count based on screen size
-    let baseTiles;
-    if (w < 700) {
-        // Mobile devices - use fewer tiles for better performance
-        baseTiles = 24;
-    } else if (w < 1200) {
-        // Medium screens
-        baseTiles = 36;
-    } else {
-        // Large screens
-        baseTiles = 48;
-    }
-
-    if (aspectRatio > 1.5) {
-        // Very wide landscape - make map wider to fill horizontal space
-        return { width: Math.floor(baseTiles * 1.8), height: baseTiles };
-    } else if (aspectRatio > 1.2) {
-        // Landscape - make map wider
-        return { width: Math.floor(baseTiles * 1.5), height: baseTiles };
-    } else if (aspectRatio < 0.6) {
-        // Very tall portrait - make map taller to fill vertical space
-        return { width: baseTiles, height: Math.floor(baseTiles * 1.8) };
-    } else if (aspectRatio < 0.9) {
-        // Portrait - make map taller
-        return { width: baseTiles, height: Math.floor(baseTiles * 1.5) };
-    } else {
-        // Square-ish - balanced dimensions
-        return { width: baseTiles, height: baseTiles };
-    }
 }
 
 export function drawMap(svg) {

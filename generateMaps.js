@@ -3,14 +3,19 @@ const path = require('path');
 
 // Tile types
 const tileTypes = {
-    WATER: 'WATER',
+    WATER: { color: 'blue', passable: false, resource: null },
     WATER_BORDER: 'WATER_BORDER',
-    GRASS: 'GRASS',
-    DIRT: 'DIRT',
-    ROCK: 'ROCK',
-    FLOWER: 'FLOWER',
-    SMALL_TREE: 'SMALL_TREE',
-    LARGE_TREE: 'LARGE_TREE'
+    GRASS: { color: 'green', passable: true, resource: null },
+    DIRT: { color: 'brown', passable: true, resource: null },
+    ROCK: { color: 'grey', passable: false, resource: 'stone' },
+    FLOWER: { color: 'pink', passable: true, resource: null },
+    SMALL_TREE: { color: 'darkgreen', passable: false, resource: 'wood' },
+    LARGE_TREE: { color: 'darkgreen', passable: false, resource: 'wood' },
+    EGG: { color: 'white', passable: true, resource: 'egg' },
+    BADGE: { color: 'gold', passable: true, resource: 'badge' },
+    FARMHOUSE: { color: 'white', passable: false, resource: null },
+    CHICKEN_COOP: 'CHICKEN_COOP',
+    SIGN: 'SIGN'
 };
 
 function generateMapData(width, height, isLandscape) {
@@ -124,108 +129,209 @@ function generateMaps() {
         fs.mkdirSync(mapsDir);
     }
 
-    // Generate landscape map
-    const landscapeMap = {
-        width: 96,
-        height: 48,
-        tiles: generateMapData(96, 48, true),
-        structures: [
+    // Create a single map with 16:9 aspect ratio (60x34 tiles)
+    // This will be used for both landscape and portrait (transposed)
+    function generateMap() {
+        const width = 60;
+        const height = 34;
+
+        // Initialize map with water
+        const map = [];
+        for (let y = 0; y < height; y++) {
+            map[y] = [];
+            for (let x = 0; x < width; x++) {
+                map[y][x] = [tileTypes.WATER];
+            }
+        }
+
+        // Create island shape - centered with organic borders
+        const centerX = Math.floor(width / 2);
+        const centerY = Math.floor(height / 2);
+        const maxRadius = Math.min(width, height) / 2 - 2;
+
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+                const noise = Math.sin(x * 0.3) * Math.cos(y * 0.3) * 2;
+
+                if (distance < maxRadius + noise) {
+                    // Determine tile type based on distance and noise
+                    if (distance < maxRadius - 3 + noise) {
+                        // Inner area - mostly grass with some dirt
+                        map[y][x] = [tileTypes.WATER, Math.random() < 0.8 ? tileTypes.GRASS : tileTypes.DIRT];
+                    } else {
+                        // Border area - mix of grass and water
+                        map[y][x] = [tileTypes.WATER, Math.random() < 0.6 ? tileTypes.GRASS : tileTypes.WATER];
+                    }
+                }
+            }
+        }
+
+        // Add some water border tiles for visual appeal
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                if (map[y][x].includes(tileTypes.GRASS)) {
+                    // Check if this grass tile is near water
+                    let nearWater = false;
+                    for (let dy = -1; dy <= 1; dy++) {
+                        for (let dx = -1; dx <= 1; dx++) {
+                            const ny = y + dy;
+                            const nx = x + dx;
+                            if (ny >= 0 && ny < height && nx >= 0 && nx < width) {
+                                if (!map[ny][nx].includes(tileTypes.GRASS)) {
+                                    nearWater = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (nearWater) break;
+                    }
+                    if (nearWater && Math.random() < 0.3) {
+                        map[y][x].push({ ...tileTypes.WATER, color: '#3bbcff' }); // Water border
+                    }
+                }
+            }
+        }
+
+        // Add resources
+        const resources = [];
+
+        // Add trees (increased by 25%)
+        for (let i = 0; i < 19; i++) {
+            const x = Math.floor(Math.random() * width);
+            const y = Math.floor(Math.random() * height);
+            if (map[y][x].includes(tileTypes.GRASS) && !map[y][x].some(t => t.resource)) {
+                const treeType = Math.random() < 0.6 ? 'LARGE_TREE' : 'SMALL_TREE';
+                resources.push({ type: treeType, x, y });
+                map[y][x].push(treeType === 'LARGE_TREE' ? tileTypes.LARGE_TREE : tileTypes.SMALL_TREE);
+            }
+        }
+
+        // Add rocks (increased by 25%)
+        for (let i = 0; i < 10; i++) {
+            const x = Math.floor(Math.random() * width);
+            const y = Math.floor(Math.random() * height);
+            if (map[y][x].includes(tileTypes.GRASS) && !map[y][x].some(t => t.resource)) {
+                resources.push({ type: 'ROCK', x, y });
+                map[y][x].push(tileTypes.ROCK);
+            }
+        }
+
+        // Add flowers (increased by 25%)
+        for (let i = 0; i < 6; i++) {
+            const x = Math.floor(Math.random() * width);
+            const y = Math.floor(Math.random() * height);
+            if (map[y][x].includes(tileTypes.GRASS) && !map[y][x].some(t => t.resource)) {
+                resources.push({ type: 'FLOWER', x, y });
+                map[y][x].push(tileTypes.FLOWER);
+            }
+        }
+
+        // Add eggs (increased by 25%)
+        for (let i = 0; i < 4; i++) {
+            const x = Math.floor(Math.random() * width);
+            const y = Math.floor(Math.random() * height);
+            if (map[y][x].includes(tileTypes.GRASS) && !map[y][x].some(t => t.resource)) {
+                resources.push({ type: 'EGG', x, y });
+                map[y][x].push(tileTypes.EGG);
+            }
+        }
+
+        // Add badges (increased by 25%)
+        for (let i = 0; i < 3; i++) {
+            const x = Math.floor(Math.random() * width);
+            const y = Math.floor(Math.random() * height);
+            if (map[y][x].includes(tileTypes.GRASS) && !map[y][x].some(t => t.resource)) {
+                resources.push({ type: 'BADGE', x, y });
+                map[y][x].push(tileTypes.BADGE);
+            }
+        }
+
+        // Convert map to tile format
+        const tiles = [];
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                const layers = map[y][x].map(tile => {
+                    if (tile === tileTypes.WATER) return 'WATER';
+                    if (tile === tileTypes.GRASS) return 'GRASS';
+                    if (tile === tileTypes.DIRT) return 'DIRT';
+                    if (tile.color === '#3bbcff') return 'WATER_BORDER';
+                    if (tile === tileTypes.LARGE_TREE) return 'LARGE_TREE';
+                    if (tile === tileTypes.SMALL_TREE) return 'SMALL_TREE';
+                    if (tile === tileTypes.ROCK) return 'ROCK';
+                    if (tile === tileTypes.FLOWER) return 'FLOWER';
+                    if (tile === tileTypes.EGG) return 'EGG';
+                    if (tile === tileTypes.BADGE) return 'BADGE';
+                    return 'WATER';
+                });
+                tiles.push({ x, y, layers });
+            }
+        }
+
+        // Add structures (adjusted for new size)
+        const structures = [
             {
-                type: "FARMHOUSE",
-                x: 40,
-                y: 20,
-                width: 8,
-                height: 6
+                type: 'FARMHOUSE',
+                x: 25,
+                y: 15,
+                width: 5,
+                height: 4
             },
             {
-                type: "CHICKEN_COOP",
-                x: 60,
-                y: 25,
-                width: 5,
+                type: 'CHICKEN_COOP',
+                x: 11,
+                y: 9,
+                width: 4,
                 height: 3
             },
             {
-                type: "SIGN",
-                x: 75,
-                y: 15,
-                width: 12,
-                height: 8
-            }
-        ],
-        resources: generateResources(96, 48, true),
-        npcs: [
-            {
-                name: "Joshua",
-                x: 55,
-                y: 22,
-                message: "Welcome to my farm! It looks like the chickens are having a great time."
-            }
-        ],
-        chickens: [
-            { x: 62, y: 26 },
-            { x: 63, y: 27 },
-            { x: 61, y: 27 }
-        ]
-    };
-
-    // Generate portrait map
-    const portraitMap = {
-        width: 48,
-        height: 72,
-        tiles: generateMapData(48, 72, false),
-        structures: [
-            {
-                type: "FARMHOUSE",
-                x: 20,
-                y: 30,
-                width: 6,
-                height: 8
-            },
-            {
-                type: "CHICKEN_COOP",
-                x: 25,
-                y: 45,
-                width: 3,
-                height: 5
-            },
-            {
-                type: "SIGN",
-                x: 15,
-                y: 55,
+                type: 'SIGN',
+                x: 44,
+                y: 5,
                 width: 8,
-                height: 12
+                height: 4
             }
-        ],
-        resources: generateResources(48, 72, false),
-        npcs: [
+        ];
+
+        // Add NPCs (adjusted for new size)
+        const npcs = [
             {
-                name: "Joshua",
-                x: 22,
-                y: 40,
-                message: "Welcome to my farm! It looks like the chickens are having a great time."
+                name: 'Joshua',
+                x: 30,
+                y: 16,
+                message: 'Welcome to my farm! It looks like the chickens are having a great time.'
             }
-        ],
-        chickens: [
-            { x: 26, y: 46 },
-            { x: 27, y: 47 },
-            { x: 27, y: 46 }
-        ]
-    };
+        ];
 
-    // Write files
+        // Add chickens (adjusted for new size)
+        const chickens = [
+            { x: 16, y: 9 },
+            { x: 24, y: 9 },
+            { x: 20, y: 14 }
+        ];
+
+        return {
+            width,
+            height,
+            tiles,
+            structures,
+            resources,
+            npcs,
+            chickens
+        };
+    }
+
+    // Generate the map
+    const mapData = generateMap();
+
+    // Save to a single map file
     fs.writeFileSync(
-        path.join(mapsDir, 'landscape.json'),
-        JSON.stringify(landscapeMap, null, 2)
+        path.join(mapsDir, 'map.json'),
+        JSON.stringify(mapData, null, 2)
     );
 
-    fs.writeFileSync(
-        path.join(mapsDir, 'portrait.json'),
-        JSON.stringify(portraitMap, null, 2)
-    );
-
-    console.log('Map files generated successfully!');
-    console.log(`Landscape map: ${landscapeMap.tiles.length} tiles`);
-    console.log(`Portrait map: ${portraitMap.tiles.length} tiles`);
+    console.log('Generated single map with dimensions:', mapData.width, 'x', mapData.height);
+    console.log('Map saved to maps/map.json');
 }
 
 generateMaps(); 
