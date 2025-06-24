@@ -44,6 +44,13 @@ export class Player {
         this.interactionData = interactionData; // Set interaction data if provided
         let last = { x: this.x, y: this.y };
 
+        // Check if we're already adjacent to the resource (no movement needed)
+        if (this.targetResource && this.isAdjacentToResource(this.targetResource)) {
+            this.gatherResource(this.targetResource);
+            this.targetResource = null;
+            return;
+        }
+
         // Start walking animation
         this.isWalking = true;
         this.walkFrame = 0;
@@ -97,9 +104,9 @@ export class Player {
     }
 
     removeResourceElement(resourcePos) {
-        const resourceX = resourcePos.x * window.TILE_SIZE;
-        const resourceY = resourcePos.y * window.TILE_SIZE;
-        const resourceElements = this.svg.querySelectorAll('image');
+        const resourceX = (window.MAP_OFFSET_X || 0) + resourcePos.x * window.TILE_SIZE;
+        const resourceY = (window.MAP_OFFSET_Y || 0) + resourcePos.y * window.TILE_SIZE;
+        const resourceElements = this.svg.querySelectorAll('image[data-resource]');
 
         resourceElements.forEach(element => {
             const x = parseFloat(element.getAttribute('x'));
@@ -109,10 +116,7 @@ export class Player {
 
             // Check if this element is the resource at the target position
             if (x === resourceX && y === resourceY && width === window.TILE_SIZE && height === window.TILE_SIZE) {
-                const href = element.getAttribute('href');
-                if (href && (href.includes('tree.png') || href.includes('stone.png') || href.includes('flower.png'))) {
-                    element.remove();
-                }
+                element.remove();
             }
         });
     }

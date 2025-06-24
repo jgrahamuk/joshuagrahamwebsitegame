@@ -194,12 +194,16 @@ export function drawMap(svg) {
             const tiles = map[y][x];
             const top = tiles[tiles.length - 1];
             let overlay = null;
+            let resourceType = null;
             if (top === tileTypes.LARGE_TREE || top === tileTypes.SMALL_TREE) {
                 overlay = 'tree.png';
+                resourceType = 'tree';
             } else if (top === tileTypes.ROCK) {
                 overlay = 'stone.png';
+                resourceType = 'stone';
             } else if (top === tileTypes.FLOWER) {
                 overlay = 'flower.png';
+                resourceType = 'flower';
             }
             if (overlay) {
                 const imgOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'image');
@@ -208,6 +212,7 @@ export function drawMap(svg) {
                 imgOverlay.setAttribute('y', offsetY + y * window.TILE_SIZE);
                 imgOverlay.setAttribute('width', window.TILE_SIZE);
                 imgOverlay.setAttribute('height', window.TILE_SIZE);
+                imgOverlay.setAttribute('data-resource', resourceType);
                 svg.appendChild(imgOverlay);
             }
         }
