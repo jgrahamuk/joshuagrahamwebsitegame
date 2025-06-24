@@ -12,6 +12,7 @@ export const tileTypes = {
     FLOWER: { color: 'pink', passable: true, resource: null },
     SMALL_TREE: { color: 'darkgreen', passable: false, resource: 'wood' },
     LARGE_TREE: { color: 'darkgreen', passable: false, resource: 'wood' },
+    EGG: { color: 'white', passable: true, resource: 'egg' },
     FARMHOUSE: { color: 'white', passable: false, resource: null },
 };
 export let MAP_WIDTH_TILES = 64;
@@ -113,7 +114,7 @@ export function respawnResource(x, y, resourceType) {
 }
 
 export function placeResourceAtPosition(x, y, type) {
-    if (x >= 0 && y >= 0 && x < MAP_WIDTH_TILES && y < MAP_HEIGHT_TILES && map[y][x].length > 1) {
+    if (x >= 0 && y >= 0 && x < MAP_WIDTH_TILES && y < MAP_HEIGHT_TILES) {
         map[y][x].push(type);
     }
 }
@@ -204,6 +205,9 @@ export function drawMap(svg) {
             } else if (top === tileTypes.FLOWER) {
                 overlay = 'flower.png';
                 resourceType = 'flower';
+            } else if (top === tileTypes.EGG) {
+                overlay = 'egg.png';
+                resourceType = 'egg';
             }
             if (overlay) {
                 const imgOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'image');

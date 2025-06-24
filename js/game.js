@@ -67,6 +67,9 @@ preloadSprites().then(async () => {
     const mapData = await initializeMap();
     drawMap(svg);
 
+    // Update global map reference to point to the current map data
+    window.map = map;
+
     // Find a valid player start
     let start = randomGrassOrDirt();
     window.player = new Player(svg, start.x, start.y);

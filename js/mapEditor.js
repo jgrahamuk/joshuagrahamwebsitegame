@@ -22,12 +22,13 @@ export class MapEditor {
             { id: 'small_tree', name: 'Small Tree', icon: 'tree.png', type: 'resource', tileType: tileTypes.SMALL_TREE },
             { id: 'rock', name: 'Rock', icon: 'stone.png', type: 'resource', tileType: tileTypes.ROCK },
             { id: 'flower', name: 'Flower', icon: 'flower.png', type: 'resource', tileType: tileTypes.FLOWER },
+            { id: 'egg', name: 'Egg', icon: 'egg.png', type: 'resource', tileType: tileTypes.EGG },
             // Structures
             { id: 'farmhouse', name: 'Farmhouse', icon: 'farmhouse.png', type: 'structure', structureType: 'FARMHOUSE', width: 10, height: 6 },
             { id: 'chicken_coop', name: 'Chicken Coop', icon: 'chicken-coop.png', type: 'structure', structureType: 'CHICKEN_COOP', width: 5, height: 3 },
             { id: 'sign', name: 'Sign', icon: 'sign-joshuagraham.png', type: 'structure', structureType: 'SIGN', width: 5, height: 3 },
             // NPCs
-            { id: 'npc_joshua', name: 'Joshua NPC', icon: 'joshua-front.png', type: 'npc', npcType: 'Joshua', message: 'Welcome to my farm! How are you today?' },
+            { id: 'npc_joshua', name: 'Joshua NPC', icon: 'joshua-front.png', type: 'npc', npcType: 'Joshua', message: 'Welcome to my farm! It looks like the chickens are having a great time.' },
             // Chickens
             { id: 'chicken', name: 'Chicken', icon: 'chicken-front.png', type: 'chicken' }
         ];

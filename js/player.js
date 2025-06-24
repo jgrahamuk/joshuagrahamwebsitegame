@@ -19,7 +19,8 @@ export class Player {
         // Initialize inventory
         this.inventory = {
             wood: 0,
-            stone: 0
+            stone: 0,
+            eggs: 0
         };
 
         this.updatePosition();
@@ -111,6 +112,8 @@ export class Player {
                 this.inventory.wood++;
             } else if (removedResource.resource === 'stone') {
                 this.inventory.stone++;
+            } else if (removedResource.resource === 'egg') {
+                this.inventory.eggs++;
             }
 
             // Update the display
@@ -160,12 +163,16 @@ export class Player {
     updateInventoryDisplay() {
         const woodCountElement = document.getElementById('wood-count');
         const stoneCountElement = document.getElementById('stone-count');
+        const eggsCountElement = document.getElementById('eggs-count');
 
         if (woodCountElement) {
             woodCountElement.textContent = this.inventory.wood;
         }
         if (stoneCountElement) {
             stoneCountElement.textContent = this.inventory.stone;
+        }
+        if (eggsCountElement) {
+            eggsCountElement.textContent = this.inventory.eggs;
         }
     }
 } 

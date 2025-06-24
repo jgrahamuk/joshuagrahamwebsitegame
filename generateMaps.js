@@ -158,7 +158,7 @@ function generateMaps() {
                 name: "Joshua",
                 x: 55,
                 y: 22,
-                message: "Welcome to my farm! How are you today?"
+                message: "Welcome to my farm! It looks like the chickens are having a great time."
             }
         ],
         chickens: [
@@ -202,7 +202,7 @@ function generateMaps() {
                 name: "Joshua",
                 x: 22,
                 y: 40,
-                message: "Welcome to my farm! How are you today?"
+                message: "Welcome to my farm! It looks like the chickens are having a great time."
             }
         ],
         chickens: [

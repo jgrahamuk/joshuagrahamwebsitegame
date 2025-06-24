@@ -1,4 +1,4 @@
-import { tileTypes, getTile, randomGrassOrDirt, MAP_WIDTH_TILES, MAP_HEIGHT_TILES } from './map.js';
+import { tileTypes, getTile, randomGrassOrDirt, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, placeResourceAtPosition } from './map.js';
 import { findPath } from './movement.js';
 import { getSpriteUrl } from './spriteCache.js';
 
@@ -34,6 +34,13 @@ export class Chicken {
         this.moving = false;
         this.moveSpeed = 300; // ms per tile (default slow)
         this.nextStepTime = 0;
+
+        // Egg laying properties
+        this.nextEggLay = Date.now() + 10000 + Math.random() * 10000; // 10-20 seconds for testing
+        this.isLayingEgg = false;
+        this.eggLayStartTime = 0;
+        this.eggLayDuration = 2000; // 2 seconds to lay an egg
+
         this.element = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         this.svg = svg;
         this.svg.appendChild(this.element);
@@ -63,6 +70,55 @@ export class Chicken {
         }
     }
     tick(now) {
+        // Egg laying logic - check this FIRST with higher priority
+        if (this.isLayingEgg) {
+            if (now - this.eggLayStartTime >= this.eggLayDuration) {
+                // Finish laying egg
+                this.isLayingEgg = false;
+                this.state = 'walk';
+                this.updatePosition();
+
+                // Place egg on the map
+                console.log(`Chicken at (${this.x}, ${this.y}) laid an egg!`);
+                placeResourceAtPosition(this.x, this.y, tileTypes.EGG);
+
+                // Debug: Check if egg was placed in map data
+                if (window.map && window.map[this.y] && window.map[this.y][this.x]) {
+                    const tiles = window.map[this.y][this.x];
+                    const topTile = tiles[tiles.length - 1];
+                    console.log(`Egg placement check - Top tile:`, topTile);
+                    console.log(`Egg placement check - Has resource:`, topTile && topTile.resource);
+                } else {
+                    console.log('Map data not available for debugging');
+                }
+
+                // Add egg element to SVG without full redraw
+                this.addEggToSVG(this.x, this.y);
+
+                // Schedule next egg lay
+                this.nextEggLay = now + 10000 + Math.random() * 10000; // 10-20 seconds for testing
+            }
+            return; // Don't do other activities while laying egg
+        }
+
+        // Check if it's time to lay an egg - HIGH PRIORITY
+        if (now >= this.nextEggLay && !this.moving) {
+            console.log(`Chicken at (${this.x}, ${this.y}) starting to lay egg. State: ${this.state}, Time until egg: ${this.nextEggLay - now}`);
+            this.isLayingEgg = true;
+            this.eggLayStartTime = now;
+            this.state = 'peck'; // Use pecking animation for egg laying
+            this.pecksLeft = 1; // Just one "peck" for egg laying
+            this.isPeckingPose = false;
+            this.nextPeckFrame = now + 100;
+            this.updatePosition();
+            return;
+        }
+
+        // Debug: Log chicken state occasionally
+        if (Math.random() < 0.001) { // Very rare logging
+            console.log(`Chicken at (${this.x}, ${this.y}) - State: ${this.state}, Moving: ${this.moving}, Time until egg: ${Math.max(0, this.nextEggLay - now)}`);
+        }
+
         // Pecking animation
         if (this.state === 'peck') {
             if (now >= this.nextPeckFrame) {
@@ -96,7 +152,7 @@ export class Chicken {
                     this.moving = false;
                     if (this.direction === 'right' || this.direction === 'left') {
                         this.state = 'peck';
-                        this.pecksLeft = 3 + Math.floor(Math.random() * 2);
+                        this.pecksLeft = 1 + Math.floor(Math.random() * 2);
                         this.isPeckingPose = false;
                         this.nextPeckFrame = now + 100;
                         this.updatePosition();
@@ -115,7 +171,7 @@ export class Chicken {
             return;
         }
         // Move to a nearby tile if not moving
-        if (!this.moving && now - this.lastMove > 1000 + Math.random() * 2000) {
+        if (!this.moving && now - this.lastMove > 5000 + Math.random() * 5000) { // 5-10 seconds between moves
             let tries = 0;
             while (tries < 10) {
                 const dx = Math.floor(Math.random() * 7) - 3;
@@ -131,5 +187,15 @@ export class Chicken {
                 tries++;
             }
         }
+    }
+    addEggToSVG(x, y) {
+        const eggElement = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        eggElement.setAttribute('href', getSpriteUrl('egg.png'));
+        eggElement.setAttribute('x', (window.MAP_OFFSET_X || 0) + x * window.TILE_SIZE);
+        eggElement.setAttribute('y', (window.MAP_OFFSET_Y || 0) + y * window.TILE_SIZE);
+        eggElement.setAttribute('width', window.TILE_SIZE);
+        eggElement.setAttribute('height', window.TILE_SIZE);
+        eggElement.setAttribute('data-resource', 'egg');
+        this.svg.appendChild(eggElement);
     }
 } 

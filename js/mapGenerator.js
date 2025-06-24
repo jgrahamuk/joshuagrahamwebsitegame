@@ -131,7 +131,7 @@ export function generateMapFiles() {
                 name: "Joshua",
                 x: 40,
                 y: 22,
-                message: "Welcome to my farm! How are you today?"
+                message: "Welcome to my farm! It looks like the chickens are having a great time."
             }
         ],
         chickens: [
@@ -175,7 +175,7 @@ export function generateMapFiles() {
                 name: "Joshua",
                 x: 22,
                 y: 40,
-                message: "Welcome to my farm! How are you today?"
+                message: "Welcome to my farm! It looks like the chickens are having a great time."
             }
         ],
         chickens: [
