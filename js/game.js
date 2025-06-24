@@ -134,8 +134,19 @@ preloadSprites().then(async () => {
         const mapData = await initializeMap();
         updateTileSize();
         drawMap(svg);
-        player.updatePosition();
-        chickens.forEach(c => c.updatePosition());
-        npcs.forEach(n => n.updatePosition());
+
+        // Re-create player at last known position (default to 0,0 if not available)
+        let start = { x: window.player?.x || 0, y: window.player?.y || 0 };
+        window.player = new Player(svg, start.x, start.y);
+
+        // Re-create chickens
+        window.chickens = [];
+        mapData.chickens.forEach(chickenData => {
+            const chicken = new Chicken(svg, chickenData.x, chickenData.y);
+            window.chickens.push(chicken);
+        });
+
+        // Re-create NPCs
+        window.npcs = mapData.npcs.map(npcData => new NPC(svg, npcData.name, npcData.message, npcData.x, npcData.y));
     });
 }); 
