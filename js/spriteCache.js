@@ -10,7 +10,8 @@ const spriteNames = [
     'chicken-coop.png',
     'sign-joshuagraham.png',
     'joshua-front.png', 'joshua-back.png', 'joshua-left.png', 'joshua-right.png',
-    'chatbox.png'
+    'chatbox.png',
+    'chick-front.png', 'chick-back.png', 'chick-left.png', 'chick-right.png',
 ];
 
 const cache = {};

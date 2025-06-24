@@ -86,13 +86,14 @@ preloadSprites().then(async () => {
         const now = Date.now();
         window.chickens.forEach(c => c.tick(now));
         window.npcs.forEach(n => n.tick(now));
+        if (window.chicks) window.chicks.forEach(chick => chick.tick(now));
     }, 50);
 
     // Player movement and interaction
     svg.addEventListener('click', (e) => {
         const rect = svg.getBoundingClientRect();
-        const x = Math.floor((e.clientX - rect.left) / window.TILE_SIZE);
-        const y = Math.floor((e.clientY - rect.top) / window.TILE_SIZE);
+        const x = Math.floor((e.clientX - rect.left - (window.MAP_OFFSET_X || 0)) / window.TILE_SIZE);
+        const y = Math.floor((e.clientY - rect.top - (window.MAP_OFFSET_Y || 0)) / window.TILE_SIZE);
 
         if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
             // Check if clicking on an NPC or surrounding tiles

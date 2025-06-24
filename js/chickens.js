@@ -1,4 +1,4 @@
-import { tileTypes, getTile, randomGrassOrDirt, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, placeResourceAtPosition } from './map.js';
+import { tileTypes, getTile, randomGrassOrDirt, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, placeResourceAtPosition, removeResource } from './map.js';
 import { findPath } from './movement.js';
 import { getSpriteUrl } from './spriteCache.js';
 
@@ -9,6 +9,13 @@ const chickenSprites = {
     right: 'chicken-right.png',
     peckRight: 'chicken-peck-right.png',
     peckLeft: 'chicken-peck-left.png',
+};
+
+const chickSprites = {
+    front: 'chick-front.png',
+    back: 'chick-back.png',
+    left: 'chick-left.png',
+    right: 'chick-right.png',
 };
 
 export class Chicken {
@@ -188,5 +195,146 @@ export class Chicken {
         eggElement.setAttribute('height', window.TILE_SIZE);
         eggElement.setAttribute('data-resource', 'egg');
         this.svg.appendChild(eggElement);
+        window.eggTimers[`${x},${y}`] = Date.now();
     }
-} 
+}
+
+export class Chick {
+    constructor(svg, startX, startY) {
+        if (startX !== undefined && startY !== undefined) {
+            this.x = startX;
+            this.y = startY;
+        } else {
+            const pos = randomGrassOrDirt();
+            this.x = pos.x;
+            this.y = pos.y;
+        }
+        this.direction = 'front';
+        this.state = 'walk';
+        this.lastMove = Date.now();
+        this.nextFarMove = Date.now() + 30000 + Math.random() * 30000;
+        this.path = [];
+        this.moving = false;
+        this.moveSpeed = 300;
+        this.nextStepTime = 0;
+        this.element = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        this.svg = svg;
+        this.svg.appendChild(this.element);
+        this.updatePosition();
+        this.bornTime = Date.now(); // Track when the chick was created
+    }
+    updatePosition() {
+        let sprite = chickSprites[this.direction];
+        this.element.setAttribute('href', getSpriteUrl(sprite));
+        this.element.setAttribute('x', (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE);
+        this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE);
+        this.element.setAttribute('width', window.TILE_SIZE);
+        this.element.setAttribute('height', window.TILE_SIZE);
+    }
+    moveTo(path, isRun = false) {
+        if (path && path.length > 1) {
+            this.path = path.slice(1);
+            this.moving = true;
+            this.moveSpeed = isRun ? 70 + Math.floor(Math.random() * 30) : 300 + Math.floor(Math.random() * 60);
+            this.nextStepTime = Date.now();
+        }
+    }
+    tick(now) {
+        // Mature into a chicken after 5 minutes (300000 ms)
+        if (now - this.bornTime > 300000) {
+            // Remove chick SVG
+            if (this.element && this.element.parentNode) {
+                this.element.parentNode.removeChild(this.element);
+            }
+            // Remove from window.chicks
+            if (window.chicks) {
+                const idx = window.chicks.indexOf(this);
+                if (idx !== -1) window.chicks.splice(idx, 1);
+            }
+            // Add a new Chicken at this position
+            if (window.chickens) {
+                const chicken = new Chicken(window.svg, this.x, this.y);
+                window.chickens.push(chicken);
+            }
+            return;
+        }
+        // Move along path
+        if (this.moving && this.path && this.path.length > 0) {
+            if (now >= this.nextStepTime) {
+                const next = this.path.shift();
+                if (next.x > this.x) this.direction = 'right';
+                else if (next.x < this.x) this.direction = 'left';
+                else if (next.y > this.y) this.direction = 'front';
+                else if (next.y < this.y) this.direction = 'back';
+                this.x = next.x;
+                this.y = next.y;
+                this.lastMove = now;
+                this.updatePosition();
+                this.nextStepTime = now + this.moveSpeed;
+                if (this.path.length === 0) {
+                    this.moving = false;
+                }
+            }
+            return;
+        }
+        // Far move
+        if (now > this.nextFarMove && !this.moving) {
+            const pos = randomGrassOrDirt();
+            const path = findPath({ x: this.x, y: this.y }, pos, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
+            this.moveTo(path, true);
+            this.nextFarMove = now + 30000 + Math.random() * 30000;
+            return;
+        }
+        // Move to a nearby tile if not moving
+        if (!this.moving && now - this.lastMove > 5000 + Math.random() * 5000) {
+            let tries = 0;
+            while (tries < 10) {
+                const dx = Math.floor(Math.random() * 7) - 3;
+                const dy = Math.floor(Math.random() * 7) - 3;
+                if (Math.abs(dx) > 3 || Math.abs(dy) > 3) { tries++; continue; }
+                const nx = this.x + dx;
+                const ny = this.y + dy;
+                if (nx >= 0 && ny >= 0 && nx < MAP_WIDTH_TILES && ny < MAP_HEIGHT_TILES && (getTile(nx, ny) === tileTypes.GRASS || getTile(nx, ny) === tileTypes.DIRT)) {
+                    const path = findPath({ x: this.x, y: this.y }, { x: nx, y: ny }, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
+                    this.moveTo(path, false);
+                    break;
+                }
+                tries++;
+            }
+        }
+    }
+}
+
+// Track egg placement times for hatching
+if (!window.eggTimers) window.eggTimers = {};
+if (!window.chicks) window.chicks = [];
+
+// Global egg hatching tick
+function hatchEggsTick() {
+    const now = Date.now();
+    for (const key in window.eggTimers) {
+        if (window.eggTimers.hasOwnProperty(key)) {
+            const [x, y] = key.split(',').map(Number);
+            if (now - window.eggTimers[key] > 6000) { // 60 seconds
+                // Remove egg from map and SVG
+                removeResource(x, y);
+                // Remove egg SVG element
+                const svg = window.svg;
+                const eggElements = svg.querySelectorAll('image[data-resource="egg"]');
+                eggElements.forEach(el => {
+                    const ex = parseInt(el.getAttribute('x'));
+                    const ey = parseInt(el.getAttribute('y'));
+                    if (Math.round(ex / window.TILE_SIZE) === x && Math.round(ey / window.TILE_SIZE) === y) {
+                        svg.removeChild(el);
+                    }
+                });
+                // Spawn a chick
+                const chick = new Chick(window.svg, x, y);
+                window.chicks.push(chick);
+                // Remove timer
+                delete window.eggTimers[key];
+            }
+        }
+    }
+}
+setInterval(hatchEggsTick, 1000); 
