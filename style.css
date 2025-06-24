@@ -107,3 +107,20 @@ body {
   z-index: 1001;
   pointer-events: none;
 }
+
+/* Chat Box Styles */
+.npc-chatbox {
+  font-family: "Jersey 10", sans-serif;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  fill: black;
+  text-anchor: middle;
+}
+
+.npc-chatbox-text {
+  font-family: "Jersey 10", sans-serif;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  fill: black;
+  text-anchor: middle;
+}

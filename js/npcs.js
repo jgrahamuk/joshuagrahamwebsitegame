@@ -144,15 +144,13 @@ export class NPC {
         this.messageElement.setAttribute('y', (window.MAP_OFFSET_Y || 0) + (this.y - 12) * window.TILE_SIZE);
         this.messageElement.setAttribute('width', window.TILE_SIZE * 24);
         this.messageElement.setAttribute('height', window.TILE_SIZE * 12);
+        this.messageElement.classList.add('npc-chatbox');
 
         // Create message text with wrapping
         this.messageTextElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         this.messageTextElement.setAttribute('x', (window.MAP_OFFSET_X || 0) + (this.x - 2) * window.TILE_SIZE);
         this.messageTextElement.setAttribute('y', (window.MAP_OFFSET_Y || 0) + (this.y + 8) * window.TILE_SIZE);
-        this.messageTextElement.setAttribute('text-anchor', 'middle');
-        this.messageTextElement.setAttribute('font-family', 'Jersey 10, sans-serif');
-        this.messageTextElement.setAttribute('font-size', '16px');
-        this.messageTextElement.setAttribute('fill', 'black');
+        this.messageTextElement.classList.add('npc-chatbox-text');
 
         // Wrap text to fit chatbox width with padding
         const padding = window.TILE_SIZE * 0.5; // More padding
@@ -188,10 +186,7 @@ export class NPC {
             const textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             textElement.setAttribute('x', (window.MAP_OFFSET_X || 0) + (this.x + 2) * window.TILE_SIZE);
             textElement.setAttribute('y', startY + index * lineHeight);
-            textElement.setAttribute('text-anchor', 'middle');
-            textElement.setAttribute('font-family', 'Jersey 10, sans-serif');
-            textElement.setAttribute('font-size', '16px');
-            textElement.setAttribute('fill', 'black');
+            textElement.classList.add('npc-chatbox-text');
             textElement.textContent = line;
             this.svg.appendChild(textElement);
             this.messageTextElements.push(textElement);
