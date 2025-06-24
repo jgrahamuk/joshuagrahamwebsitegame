@@ -1,4 +1,4 @@
-import { tileTypes, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES } from './map.js';
+import { tileTypes, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, map } from './map.js';
 import { findPath } from './movement.js';
 import { getSpriteUrl } from './spriteCache.js';
 
@@ -31,7 +31,34 @@ export class Player {
             this.x = point.x;
             this.y = point.y;
             this.updatePosition();
+
+            // Check for resource gathering
+            this.gatherResource();
+
             await new Promise(resolve => setTimeout(resolve, 100));
+        }
+    }
+
+    gatherResource() {
+        const tiles = map[this.y][this.x];
+        const topTile = tiles[tiles.length - 1];
+
+        if (topTile && topTile.resource) {
+            // Remove the resource from the map
+            tiles.pop();
+
+            // Redraw the map to reflect the change
+            if (window.drawMap) {
+                window.drawMap();
+            }
+
+            // Respawn the resource after 30 seconds
+            setTimeout(() => {
+                tiles.push(topTile);
+                if (window.drawMap) {
+                    window.drawMap();
+                }
+            }, 30000);
         }
     }
 } 

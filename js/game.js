@@ -2,6 +2,7 @@ import { initializeMap, getTile, randomGrassOrDirt, tileTypes, map, MAP_WIDTH_TI
 import { findPath } from './movement.js';
 import { Player } from './player.js';
 import { Chicken } from './chickens.js';
+import { NPC, npcDefinitions } from './npcs.js';
 import { preloadSprites, getSpriteUrl } from './spriteCache.js';
 
 window.TILE_SIZE = 40;
@@ -91,7 +92,21 @@ function drawMap() {
             }
         }
     }
+
+    // Redraw player and NPCs on top
+    if (window.player) {
+        window.player.updatePosition();
+    }
+    if (window.npcs) {
+        window.npcs.forEach(npc => npc.updatePosition());
+    }
+    if (window.chickens) {
+        window.chickens.forEach(chicken => chicken.updatePosition());
+    }
 }
+
+// Make drawMap globally accessible
+window.drawMap = drawMap;
 
 function isMobile() {
     return /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent) || window.innerWidth < 700;
@@ -117,6 +132,7 @@ preloadSprites().then(() => {
         drawMap();
         player.updatePosition();
         chickens.forEach(c => c.updatePosition());
+        npcs.forEach(n => n.updatePosition());
     });
 
     initializeMap();
@@ -145,25 +161,98 @@ preloadSprites().then(() => {
         window.chickens.push(chicken);
     }
 
-    // Main chicken animation loop
+    // NPCs
+    window.npcs = npcDefinitions.map(def => new NPC(svg, def.name, def.message));
+
+    // Main animation loop
     setInterval(() => {
         const now = Date.now();
         window.chickens.forEach(c => c.tick(now));
+        window.npcs.forEach(n => n.tick(now));
     }, 50);
 
-    // Player movement
+    // Player movement and NPC interaction
     svg.addEventListener('click', (e) => {
         const rect = svg.getBoundingClientRect();
         const x = Math.floor((e.clientX - rect.left) / window.TILE_SIZE);
         const y = Math.floor((e.clientY - rect.top) / window.TILE_SIZE);
+
         if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
+            // Check if clicking on an NPC or surrounding tiles
+            const clickedNPC = window.npcs.find(npc => npc.isClicked(x, y));
+            if (clickedNPC && clickedNPC.isNearPlayer(window.player.x, window.player.y)) {
+                // Dismiss any other NPC messages first
+                window.npcs.filter(npc => npc !== clickedNPC).forEach(npc => npc.hideMessage());
+                clickedNPC.showMessage();
+                return;
+            }
+
+            // Check if clicking on a resource
+            const tile = getTile(x, y);
+            if (tile && tile.resource) {
+                // Move to the resource tile
+                const start = { x: window.player.x, y: window.player.y };
+                const end = { x, y };
+                const path = findPath(start, end, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
+                if (path) {
+                    window.player.moveTo(path.slice(1));
+                }
+                return;
+            }
+
+            // Check if clicking on an NPC (not adjacent)
+            if (clickedNPC) {
+                // Move to a tile adjacent to the NPC
+                const adjacentTiles = [];
+                for (let dx = -1; dx <= 1; dx++) {
+                    for (let dy = -1; dy <= 1; dy++) {
+                        if (dx === 0 && dy === 0) continue;
+                        const nx = clickedNPC.x + dx;
+                        const ny = clickedNPC.y + dy;
+                        if (nx >= 0 && ny >= 0 && nx < MAP_WIDTH_TILES && ny < MAP_HEIGHT_TILES) {
+                            const adjacentTile = getTile(nx, ny);
+                            if (adjacentTile && adjacentTile.passable) {
+                                adjacentTiles.push({ x: nx, y: ny });
+                            }
+                        }
+                    }
+                }
+
+                if (adjacentTiles.length > 0) {
+                    // Find the closest adjacent tile
+                    let closestTile = adjacentTiles[0];
+                    let closestDistance = Math.abs(window.player.x - closestTile.x) + Math.abs(window.player.y - closestTile.y);
+
+                    adjacentTiles.forEach(tile => {
+                        const distance = Math.abs(window.player.x - tile.x) + Math.abs(window.player.y - tile.y);
+                        if (distance < closestDistance) {
+                            closestDistance = distance;
+                            closestTile = tile;
+                        }
+                    });
+
+                    const start = { x: window.player.x, y: window.player.y };
+                    const path = findPath(start, closestTile, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
+                    if (path) {
+                        window.player.moveTo(path.slice(1));
+                    }
+                }
+                return;
+            }
+
+            // Otherwise, move player to empty tile
             const start = { x: window.player.x, y: window.player.y };
             const end = { x, y };
-            const tile = getTile(x, y);
             if (tile.passable) {
                 const path = findPath(start, end, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
                 if (path) window.player.moveTo(path.slice(1));
             }
+        }
+
+        // Only dismiss NPC messages when NOT clicking on an NPC
+        const clickedNPC = window.npcs.find(npc => npc.isClicked(x, y));
+        if (!clickedNPC) {
+            window.npcs.forEach(npc => npc.hideMessage());
         }
     });
 }); 

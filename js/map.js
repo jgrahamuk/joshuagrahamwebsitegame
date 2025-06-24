@@ -14,7 +14,7 @@ export let MAP_HEIGHT_TILES = 48;
 export let map = [];
 export let farmhouse = null; // {x, y, w, h}
 export let chickenCoop = { x: 18, y: 15, w: 5, h: 3 }; // {x, y, w, h} in tiles
-export let signObj = { x: 33, y: 8, w: 5, h: 3 }; // {x, y, w, h} in tiles
+export let signObj = { x: 29, y: 8, w: 13, h: 7 }; // {x, y, w, h} in tiles
 
 export function setMapSize(width, height) {
     MAP_WIDTH_TILES = width;

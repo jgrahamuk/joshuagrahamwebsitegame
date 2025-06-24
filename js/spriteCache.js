@@ -7,7 +7,9 @@ const spriteNames = [
     'tree.png', 'stone.png', 'flower.png',
     'farmhouse.png',
     'chicken-coop.png',
-    'sign-joshuagraham.png'
+    'sign-joshuagraham.png',
+    'joshua-front.png', 'joshua-back.png', 'joshua-left.png', 'joshua-right.png',
+    'chatbox.png'
 ];
 
 const cache = {};
