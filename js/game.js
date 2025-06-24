@@ -99,7 +99,7 @@ function isMobile() {
 
 function getMapDims() {
     if (isMobile()) {
-        return { width: 24, height: 36 };
+        return { width: 20, height: 40 };
     } else {
         return { width: 64, height: 48 };
     }

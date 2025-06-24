@@ -25,8 +25,17 @@ export function initializeMap() {
     map.length = 0; // clear any previous map
     const cx = MAP_WIDTH_TILES / 2;
     const cy = MAP_HEIGHT_TILES / 2;
-    // Increase land/sea ratio: bigger island
-    const baseRadius = Math.min(MAP_WIDTH_TILES, MAP_HEIGHT_TILES) / 2.0;
+
+    // Detect mobile for different island shapes
+    const isMobile = MAP_WIDTH_TILES < 30; // Mobile is 20x40, desktop is 64x48
+
+    // Smaller island to ensure water on sides
+    let baseRadius = Math.min(MAP_WIDTH_TILES, MAP_HEIGHT_TILES) / 2.8;
+    if (isMobile) {
+        // Make island much taller on mobile
+        baseRadius = Math.min(MAP_WIDTH_TILES, MAP_HEIGHT_TILES) / 2.2;
+    }
+
     const noise = (x, y) => 0.8 + 0.25 * Math.sin(x * 0.4) * Math.cos(y * 0.3 + x * 0.1);
 
     for (let y = 0; y < MAP_HEIGHT_TILES; y++) {
@@ -42,8 +51,35 @@ export function initializeMap() {
                 // Rippling water
                 map[y][x][0] = { ...tileTypes.WATER, color: '#3bbcff' };
             }
-            // Main island
-            if (dist < baseRadius * n) {
+            // Main island - make it taller on mobile
+            if (isMobile) {
+                // Use elliptical shape for mobile to make it taller
+                const ellipticalDist = Math.sqrt((dx * dx) / 1.5 + (dy * dy) / 0.8);
+                if (ellipticalDist < baseRadius * n) {
+                    map[y][x].push(tileTypes.GRASS);
+                }
+            } else {
+                // Regular circular shape for desktop
+                if (dist < baseRadius * n) {
+                    map[y][x].push(tileTypes.GRASS);
+                }
+            }
+        }
+    }
+
+    // Add second island - positioned more towards center
+    const secondIslandX = Math.floor(MAP_WIDTH_TILES * 0.75);
+    const secondIslandY = Math.floor(MAP_HEIGHT_TILES * 0.65);
+    const secondIslandRadius = Math.min(MAP_WIDTH_TILES, MAP_HEIGHT_TILES) / 5.0;
+    const secondNoise = (x, y) => 0.8 + 0.25 * Math.sin(x * 0.3) * Math.cos(y * 0.4 + x * 0.2);
+
+    for (let y = 0; y < MAP_HEIGHT_TILES; y++) {
+        for (let x = 0; x < MAP_WIDTH_TILES; x++) {
+            const dx = x - secondIslandX;
+            const dy = y - secondIslandY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const n = secondNoise(x, y);
+            if (dist < secondIslandRadius * n) {
                 map[y][x].push(tileTypes.GRASS);
             }
         }
@@ -83,6 +119,27 @@ export function initializeMap() {
     placeResource(tileTypes.SMALL_TREE, 8, 2);
     placeResource(tileTypes.ROCK, 6, 2);
     placeResource(tileTypes.FLOWER, 6, 2);
+
+    // Add resources to second island
+    function placeResourceOnSecondIsland(type, count, clusterSize) {
+        for (let i = 0; i < count; i++) {
+            const px = Math.floor(secondIslandX + (Math.random() - 0.5) * secondIslandRadius * 1.1);
+            const py = Math.floor(secondIslandY + (Math.random() - 0.5) * secondIslandRadius * 1.1);
+            for (let j = 0; j < clusterSize; j++) {
+                const angle = Math.random() * Math.PI * 2;
+                const r = Math.random() * 2;
+                const x = Math.floor(px + Math.cos(angle) * r);
+                const y = Math.floor(py + Math.sin(angle) * r);
+                if (x > 0 && x < MAP_WIDTH_TILES && y > 0 && y < MAP_HEIGHT_TILES && map[y][x].length > 1) {
+                    map[y][x].push(type);
+                }
+            }
+        }
+    }
+    placeResourceOnSecondIsland(tileTypes.LARGE_TREE, 3, 2);
+    placeResourceOnSecondIsland(tileTypes.SMALL_TREE, 4, 2);
+    placeResourceOnSecondIsland(tileTypes.ROCK, 2, 2);
+    placeResourceOnSecondIsland(tileTypes.FLOWER, 3, 2);
 
     // Place farmhouse in the center (10x6)
     const fw = 10, fh = 6;
