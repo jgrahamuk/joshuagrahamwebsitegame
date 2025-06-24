@@ -5,6 +5,8 @@ import { Chicken } from './chickens.js';
 import { NPC, npcDefinitions } from './npcs.js';
 import { preloadSprites, getSpriteUrl } from './spriteCache.js';
 import { drawStructures } from './structures.js';
+import { MapEditor } from './mapEditor.js';
+import { HelpOverlay } from './helpOverlay.js';
 
 window.TILE_SIZE = 40;
 
@@ -167,6 +169,12 @@ preloadSprites().then(async () => {
 
     // Create NPCs from loaded data
     window.npcs = mapData.npcs.map(npcData => new NPC(svg, npcData.name, npcData.message, npcData.x, npcData.y));
+
+    // Initialize map editor (hidden by default)
+    window.mapEditor = new MapEditor(svg, gameContainer);
+
+    // Initialize help overlay
+    window.helpOverlay = new HelpOverlay();
 
     // Main animation loop
     setInterval(() => {
