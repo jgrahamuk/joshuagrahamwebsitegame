@@ -145,8 +145,12 @@ export class MapEditor {
             e.stopPropagation();
 
             const rect = this.svg.getBoundingClientRect();
-            const x = Math.floor((e.clientX - rect.left) / window.TILE_SIZE);
-            const y = Math.floor((e.clientY - rect.top) / window.TILE_SIZE);
+            const offsetX = window.MAP_OFFSET_X || 0;
+            const offsetY = window.MAP_OFFSET_Y || 0;
+
+            // Calculate clicked position relative to map offset
+            const x = Math.floor((e.clientX - rect.left - offsetX) / window.TILE_SIZE);
+            const y = Math.floor((e.clientY - rect.top - offsetY) / window.TILE_SIZE);
 
             if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
                 this.applyTool(x, y);
@@ -191,9 +195,13 @@ export class MapEditor {
     }
 
     updateTileDisplay(x, y) {
-        // Remove existing tile images at this position
-        const tileX = x * window.TILE_SIZE;
-        const tileY = y * window.TILE_SIZE;
+        // Get map offsets
+        const offsetX = window.MAP_OFFSET_X || 0;
+        const offsetY = window.MAP_OFFSET_Y || 0;
+
+        // Calculate tile position with offsets
+        const tileX = offsetX + x * window.TILE_SIZE;
+        const tileY = offsetY + y * window.TILE_SIZE;
 
         // Remove existing images at this position more efficiently
         const imagesToRemove = [];

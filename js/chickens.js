@@ -315,7 +315,7 @@ function hatchEggsTick() {
     for (const key in window.eggTimers) {
         if (window.eggTimers.hasOwnProperty(key)) {
             const [x, y] = key.split(',').map(Number);
-            if (now - window.eggTimers[key] > 6000) { // 60 seconds
+            if (now - window.eggTimers[key] > 60000) { // 60 seconds
                 // Remove egg from map and SVG
                 removeResource(x, y);
                 // Remove egg SVG element
