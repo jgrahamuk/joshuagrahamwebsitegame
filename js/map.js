@@ -131,11 +131,26 @@ export function getResourceAt(x, y) {
 
 export function drawMap(svg) {
     svg.innerHTML = '';
-    const offsetX = window.MAP_OFFSET_X || 0;
-    const offsetY = window.MAP_OFFSET_Y || 0;
     const svgWidth = window.innerWidth;
     const svgHeight = window.innerHeight;
+
+    // Calculate the tile size that would fit the map in both dimensions
+    const horizontalTileSize = svgWidth / MAP_WIDTH_TILES;
+    const verticalTileSize = svgHeight / MAP_HEIGHT_TILES;
+
+    // Use the smaller tile size to ensure the map fits in both dimensions
+    window.TILE_SIZE = Math.min(horizontalTileSize, verticalTileSize);
     const tileSize = window.TILE_SIZE;
+
+    // Calculate the total map dimensions
+    const totalMapWidth = MAP_WIDTH_TILES * tileSize;
+    const totalMapHeight = MAP_HEIGHT_TILES * tileSize;
+
+    // Center the map
+    window.MAP_OFFSET_X = Math.max(0, (svgWidth - totalMapWidth) / 2);
+    window.MAP_OFFSET_Y = Math.max(0, (svgHeight - totalMapHeight) / 2);
+    const offsetX = window.MAP_OFFSET_X;
+    const offsetY = window.MAP_OFFSET_Y;
 
     // Fill the entire SVG area with water tiles (no gaps)
     const numXTiles = Math.ceil(svgWidth / tileSize);
@@ -152,7 +167,7 @@ export function drawMap(svg) {
         }
     }
 
-    // Draw the map tiles (centered vertically)
+    // Draw the map tiles
     for (let y = 0; y < MAP_HEIGHT_TILES; y++) {
         for (let x = 0; x < MAP_WIDTH_TILES; x++) {
             const tiles = map[y][x];
