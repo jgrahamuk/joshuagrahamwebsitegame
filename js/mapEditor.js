@@ -572,7 +572,12 @@ export class MapEditor {
 
                     // Check for resources
                     const topLayer = tileLayers[tileLayers.length - 1];
-                    if (topLayer.resource) {
+                    if (topLayer === tileTypes.LARGE_TREE ||
+                        topLayer === tileTypes.SMALL_TREE ||
+                        topLayer === tileTypes.ROCK ||
+                        topLayer === tileTypes.FLOWER ||
+                        topLayer === tileTypes.EGG ||
+                        topLayer === tileTypes.BADGE) {
                         let resourceType = 'LARGE_TREE';
                         if (topLayer === tileTypes.SMALL_TREE) resourceType = 'SMALL_TREE';
                         else if (topLayer === tileTypes.ROCK) resourceType = 'ROCK';

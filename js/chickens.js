@@ -43,7 +43,7 @@ export class Chicken {
         this.nextStepTime = 0;
 
         // Egg laying properties
-        this.nextEggLay = Date.now() + 10000 + Math.random() * 10000; // 10-20 seconds for testing
+        this.nextEggLay = Date.now() + 60000 + Math.random() * 60000; // 1-2 minutes for testing
         this.isLayingEgg = false;
         this.eggLayStartTime = 0;
         this.eggLayDuration = 2000; // 2 seconds to lay an egg
