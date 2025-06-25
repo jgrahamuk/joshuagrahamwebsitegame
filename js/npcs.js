@@ -48,7 +48,6 @@ export class NPC {
 
     updatePosition() {
         const sprite = `${this.name.toLowerCase()}-${this.direction}.png`;
-        console.log(`NPC ${this.name} loading sprite: ${sprite}`);
         this.element.setAttribute('href', getSpriteUrl(sprite));
         this.element.setAttribute('x', (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE);
         this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE);
