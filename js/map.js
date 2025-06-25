@@ -37,7 +37,7 @@ export async function initializeMap() {
     const isLandscape = aspectRatio > 1;
 
     // Load map data from JSON
-    const mapData = await loadMapData(isLandscape);
+    const mapData = await loadMapData();
     const gameData = convertMapDataToGameFormat(mapData, isLandscape);
 
     // Update map dimensions
@@ -52,12 +52,15 @@ export async function initializeMap() {
         switch (structure.type) {
             case 'FARMHOUSE':
                 farmhouse = { x: structure.x, y: structure.y, w: structure.width, h: structure.height };
+                window.farmhouse = farmhouse;
                 break;
             case 'CHICKEN_COOP':
                 chickenCoop = { x: structure.x, y: structure.y, w: structure.width, h: structure.height };
+                window.chickenCoop = chickenCoop;
                 break;
             case 'SIGN':
                 signObj = { x: structure.x, y: structure.y, w: structure.width, h: structure.height };
+                window.signObj = signObj;
                 break;
         }
     });

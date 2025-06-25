@@ -39,23 +39,38 @@ export function getCurrentMapData() {
     return currentMapData;
 }
 
-export function convertMapDataToGameFormat(mapData) {
+export function convertMapDataToGameFormat(mapData, isLandscape) {
     const { width, height, tiles, structures, resources, npcs, chickens } = mapData;
+
+    // For portrait mode, swap width and height
+    const finalWidth = isLandscape ? width : height;
+    const finalHeight = isLandscape ? height : width;
 
     // Convert tile data to game format
     const gameMap = [];
-    for (let y = 0; y < height; y++) {
+    for (let y = 0; y < finalHeight; y++) {
         gameMap[y] = [];
-        for (let x = 0; x < width; x++) {
+        for (let x = 0; x < finalWidth; x++) {
             gameMap[y][x] = [tileTypes.WATER]; // Default water
         }
     }
 
-    // Apply tile layers
+    // Apply tile layers with transposition for portrait mode
     tiles.forEach(tile => {
-        const { x, y, layers } = tile;
-        if (x >= 0 && x < width && y >= 0 && y < height) {
-            gameMap[y][x] = layers.map(layerType => {
+        let finalX, finalY;
+        if (isLandscape) {
+            finalX = tile.x;
+            finalY = tile.y;
+        } else {
+            // For portrait mode, rotate 90 degrees clockwise:
+            // new_x = old_y
+            // new_y = width - 1 - old_x
+            finalX = tile.y;
+            finalY = width - 1 - tile.x;
+        }
+
+        if (finalX >= 0 && finalX < finalWidth && finalY >= 0 && finalY < finalHeight) {
+            gameMap[finalY][finalX] = tile.layers.map(layerType => {
                 switch (layerType) {
                     case 'WATER': return tileTypes.WATER;
                     case 'WATER_BORDER': return { ...tileTypes.WATER, color: '#3bbcff' };
@@ -67,27 +82,93 @@ export function convertMapDataToGameFormat(mapData) {
         }
     });
 
-    // Apply resources
+    // Apply resources with transposition
     resources.forEach(resource => {
-        const { x, y, type } = resource;
-        if (x >= 0 && x < width && y >= 0 && y < height && gameMap[y] && gameMap[y][x] && gameMap[y][x].length > 1) {
-            switch (type) {
-                case 'LARGE_TREE': gameMap[y][x].push(tileTypes.LARGE_TREE); break;
-                case 'SMALL_TREE': gameMap[y][x].push(tileTypes.SMALL_TREE); break;
-                case 'ROCK': gameMap[y][x].push(tileTypes.ROCK); break;
-                case 'FLOWER': gameMap[y][x].push(tileTypes.FLOWER); break;
-                case 'EGG': gameMap[y][x].push(tileTypes.EGG); break;
-                case 'BADGE': gameMap[y][x].push(tileTypes.BADGE); break;
+        let finalX, finalY;
+        if (isLandscape) {
+            finalX = resource.x;
+            finalY = resource.y;
+        } else {
+            finalX = resource.y;
+            finalY = width - 1 - resource.x;
+        }
+
+        if (finalX >= 0 && finalX < finalWidth && finalY >= 0 && finalY < finalHeight &&
+            gameMap[finalY] && gameMap[finalY][finalX] && gameMap[finalY][finalX].length > 1) {
+            switch (resource.type) {
+                case 'LARGE_TREE': gameMap[finalY][finalX].push(tileTypes.LARGE_TREE); break;
+                case 'SMALL_TREE': gameMap[finalY][finalX].push(tileTypes.SMALL_TREE); break;
+                case 'ROCK': gameMap[finalY][finalX].push(tileTypes.ROCK); break;
+                case 'FLOWER': gameMap[finalY][finalX].push(tileTypes.FLOWER); break;
             }
         }
     });
 
+    // Transform structures with transposition and size swapping
+    const transformedStructures = structures.map(structure => {
+        let finalX, finalY, finalWidth, finalHeight;
+        if (isLandscape) {
+            finalX = structure.x;
+            finalY = structure.y;
+            finalWidth = structure.width;
+            finalHeight = structure.height;
+        } else {
+            finalX = structure.y;
+            finalY = width - 1 - structure.x - structure.width + 1;
+            finalWidth = structure.height;
+            finalHeight = structure.width;
+        }
+
+        return {
+            ...structure,
+            x: finalX,
+            y: finalY,
+            width: finalWidth,
+            height: finalHeight
+        };
+    });
+
+    // Transform NPCs with transposition
+    const transformedNpcs = npcs.map(npc => {
+        let finalX, finalY;
+        if (isLandscape) {
+            finalX = npc.x;
+            finalY = npc.y;
+        } else {
+            finalX = npc.y;
+            finalY = width - 1 - npc.x;
+        }
+
+        return {
+            ...npc,
+            x: finalX,
+            y: finalY
+        };
+    });
+
+    // Transform chickens with transposition
+    const transformedChickens = chickens.map(chicken => {
+        let finalX, finalY;
+        if (isLandscape) {
+            finalX = chicken.x;
+            finalY = chicken.y;
+        } else {
+            finalX = chicken.y;
+            finalY = width - 1 - chicken.x;
+        }
+
+        return {
+            x: finalX,
+            y: finalY
+        };
+    });
+
     return {
         map: gameMap,
-        structures,  // No transformation needed
-        npcs,        // No transformation needed
-        chickens,    // No transformation needed
-        width,
-        height
+        structures: transformedStructures,
+        npcs: transformedNpcs,
+        chickens: transformedChickens,
+        width: finalWidth,
+        height: finalHeight
     };
 } 
