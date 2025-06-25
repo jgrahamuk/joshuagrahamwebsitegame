@@ -1,6 +1,5 @@
 import { tileTypes, placeResourceAtPosition, removeResource, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES } from './map.js';
 import { getSpriteUrl } from './spriteCache.js';
-import { structures } from './structures.js';
 import { NPC } from './npcs.js';
 import { Chicken } from './chickens.js';
 

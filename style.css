@@ -114,3 +114,11 @@ body {
   fill: #08301e;
   text-anchor: middle;
 }
+
+@media (orientation: portrait) {
+  #map-editor-toolbar {
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+}

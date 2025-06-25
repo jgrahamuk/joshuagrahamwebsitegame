@@ -20,8 +20,8 @@ export let MAP_WIDTH_TILES = 60;
 export let MAP_HEIGHT_TILES = 34;
 export let map = [];
 export let farmhouse = null; // {x, y, w, h}
-export let chickenCoop = { x: 11, y: 9, w: 4, h: 3 }; // {x, y, w, h} in tiles
-export let signObj = { x: 44, y: 5, w: 8, h: 4 }; // {x, y, w, h} in tiles
+export let chickenCoop = null; // {x, y, w, h} in tiles
+export let signObj = null; // {x, y, w, h} in tiles
 
 // Resource management
 const respawnTimers = new Map(); // Track respawn timers by position

@@ -89,6 +89,7 @@ export function convertMapDataToGameFormat(mapData, isLandscape) {
             finalX = resource.x;
             finalY = resource.y;
         } else {
+            // For portrait mode, rotate 90 degrees clockwise:
             finalX = resource.y;
             finalY = width - 1 - resource.x;
         }
@@ -107,16 +108,18 @@ export function convertMapDataToGameFormat(mapData, isLandscape) {
     // Transform structures with transposition and size swapping
     const transformedStructures = structures.map(structure => {
         let finalX, finalY, finalWidth, finalHeight;
+
         if (isLandscape) {
             finalX = structure.x;
             finalY = structure.y;
             finalWidth = structure.width;
             finalHeight = structure.height;
         } else {
-            finalX = structure.y;
-            finalY = width - 1 - structure.x - structure.width + 1;
-            finalWidth = structure.height;
-            finalHeight = structure.width;
+            finalX = structure.y - 1;
+            finalY = width - structure.x - structure.width;
+            finalWidth = structure.width;
+            finalHeight = structure.height;
+
         }
 
         return {

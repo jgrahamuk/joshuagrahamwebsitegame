@@ -275,6 +275,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -300,6 +301,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -325,6 +327,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "ROCK"
       ]
     },
@@ -400,6 +403,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -474,6 +478,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -483,6 +488,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -492,6 +498,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -517,7 +524,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -551,6 +558,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -560,6 +568,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -654,6 +663,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -729,6 +739,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -746,6 +757,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "ROCK"
       ]
     },
@@ -755,6 +767,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -789,6 +802,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -798,6 +812,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -809,6 +824,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -818,6 +834,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -935,6 +952,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -945,6 +963,7 @@
         "WATER",
         "GRASS",
         "WATER_BORDER",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -1036,6 +1055,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -1053,6 +1073,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -1070,6 +1091,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "ROCK"
       ]
     },
@@ -1096,6 +1118,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -1105,6 +1128,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -1212,6 +1236,7 @@
         "WATER",
         "GRASS",
         "WATER_BORDER",
+        "WATER",
         "WATER",
         "SMALL_TREE"
       ]
@@ -1223,6 +1248,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -1234,6 +1260,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -1243,6 +1270,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -1254,6 +1282,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -1263,6 +1292,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -1275,6 +1305,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -1285,6 +1316,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -1294,6 +1326,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -1306,6 +1339,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -1315,6 +1349,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -1365,7 +1400,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -1374,6 +1409,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -1391,7 +1427,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -1424,7 +1460,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -1482,6 +1518,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -1492,6 +1529,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -1501,6 +1539,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -1528,6 +1567,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -1546,6 +1586,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -1555,6 +1596,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -1566,6 +1608,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -1575,6 +1618,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -1586,6 +1630,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -1595,6 +1640,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -1606,6 +1652,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -1615,6 +1662,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -1626,6 +1674,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -1636,6 +1685,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -1645,6 +1695,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -1713,6 +1764,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -1836,6 +1888,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "ROCK"
       ]
     },
@@ -1910,6 +1963,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -1920,7 +1974,9 @@
         "WATER",
         "GRASS",
         "WATER",
-        "LARGE_TREE"
+        "WATER",
+        "LARGE_TREE",
+        "WATER"
       ]
     },
     {
@@ -1929,6 +1985,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "WATER"
       ]
@@ -1939,6 +1996,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER"
       ]
     },
@@ -1949,6 +2007,7 @@
         "WATER",
         "GRASS",
         "WATER_BORDER",
+        "WATER",
         "WATER"
       ]
     },
@@ -1958,6 +2017,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER"
       ]
     },
@@ -1970,7 +2030,8 @@
         "WATER_BORDER",
         "WATER",
         "WATER",
-        "FLOWER",
+        "WATER",
+        "WATER",
         "WATER"
       ]
     },
@@ -1981,7 +2042,9 @@
         "WATER",
         "GRASS",
         "WATER",
-        "LARGE_TREE"
+        "WATER",
+        "LARGE_TREE",
+        "WATER"
       ]
     },
     {
@@ -1989,7 +2052,8 @@
       "y": 8,
       "layers": [
         "WATER",
-        "GRASS"
+        "GRASS",
+        "WATER"
       ]
     },
     {
@@ -2144,6 +2208,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -2161,6 +2226,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "ROCK"
       ]
@@ -2277,6 +2343,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -2287,7 +2354,9 @@
         "WATER",
         "GRASS",
         "WATER",
-        "LARGE_TREE"
+        "WATER",
+        "LARGE_TREE",
+        "WATER"
       ]
     },
     {
@@ -2298,7 +2367,8 @@
         "GRASS",
         "WATER",
         "WATER",
-        "FLOWER",
+        "WATER",
+        "WATER",
         "WATER"
       ]
     },
@@ -2309,6 +2379,7 @@
         "WATER",
         "GRASS",
         "WATER_BORDER",
+        "WATER",
         "WATER"
       ]
     },
@@ -2319,6 +2390,7 @@
         "WATER",
         "GRASS",
         "WATER_BORDER",
+        "WATER",
         "WATER"
       ]
     },
@@ -2328,6 +2400,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER"
       ]
     },
@@ -2339,7 +2412,8 @@
         "GRASS",
         "WATER",
         "WATER",
-        "FLOWER",
+        "WATER",
+        "WATER",
         "WATER"
       ]
     },
@@ -2350,7 +2424,9 @@
         "WATER",
         "GRASS",
         "WATER",
-        "LARGE_TREE"
+        "WATER",
+        "LARGE_TREE",
+        "WATER"
       ]
     },
     {
@@ -2360,7 +2436,9 @@
         "WATER",
         "GRASS",
         "WATER",
-        "LARGE_TREE"
+        "WATER",
+        "LARGE_TREE",
+        "WATER"
       ]
     },
     {
@@ -2506,7 +2584,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -2532,6 +2610,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -2543,6 +2622,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -2552,6 +2632,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -2596,6 +2677,7 @@
         "WATER",
         "GRASS",
         "WATER_BORDER",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -2649,6 +2731,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -2683,7 +2766,8 @@
       "layers": [
         "WATER",
         "GRASS",
-        "WATER_BORDER"
+        "WATER_BORDER",
+        "WATER"
       ]
     },
     {
@@ -2693,6 +2777,7 @@
         "WATER",
         "GRASS",
         "WATER_BORDER",
+        "WATER",
         "WATER"
       ]
     },
@@ -2702,6 +2787,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER"
       ]
     },
@@ -2711,6 +2797,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER"
       ]
     },
@@ -2720,6 +2807,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER"
       ]
     },
@@ -2729,6 +2817,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER"
       ]
     },
@@ -2737,7 +2826,8 @@
       "y": 10,
       "layers": [
         "WATER",
-        "GRASS"
+        "GRASS",
+        "WATER"
       ]
     },
     {
@@ -2746,7 +2836,8 @@
       "layers": [
         "WATER",
         "GRASS",
-        "WATER_BORDER"
+        "WATER_BORDER",
+        "WATER"
       ]
     },
     {
@@ -2811,6 +2902,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -2828,6 +2920,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -2910,6 +3003,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -2919,6 +3013,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -2930,6 +3025,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -2939,6 +3035,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -2998,6 +3095,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "ROCK"
       ]
     },
@@ -3007,6 +3105,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "ROCK"
       ]
@@ -3056,7 +3155,8 @@
       "y": 11,
       "layers": [
         "WATER",
-        "GRASS"
+        "GRASS",
+        "WATER"
       ]
     },
     {
@@ -3064,7 +3164,8 @@
       "y": 11,
       "layers": [
         "WATER",
-        "GRASS"
+        "GRASS",
+        "WATER"
       ]
     },
     {
@@ -3073,7 +3174,8 @@
       "layers": [
         "WATER",
         "GRASS",
-        "WATER_BORDER"
+        "WATER_BORDER",
+        "WATER"
       ]
     },
     {
@@ -3082,7 +3184,8 @@
       "layers": [
         "WATER",
         "GRASS",
-        "WATER_BORDER"
+        "WATER_BORDER",
+        "WATER"
       ]
     },
     {
@@ -3090,7 +3193,8 @@
       "y": 11,
       "layers": [
         "WATER",
-        "GRASS"
+        "GRASS",
+        "WATER"
       ]
     },
     {
@@ -3099,7 +3203,8 @@
       "layers": [
         "WATER",
         "GRASS",
-        "WATER_BORDER"
+        "WATER_BORDER",
+        "WATER"
       ]
     },
     {
@@ -3108,7 +3213,8 @@
       "layers": [
         "WATER",
         "GRASS",
-        "WATER_BORDER"
+        "WATER_BORDER",
+        "WATER"
       ]
     },
     {
@@ -3116,7 +3222,8 @@
       "y": 11,
       "layers": [
         "WATER",
-        "GRASS"
+        "GRASS",
+        "WATER"
       ]
     },
     {
@@ -3197,6 +3304,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -3262,7 +3370,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -3273,6 +3381,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -3282,6 +3391,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -3294,6 +3404,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -3303,6 +3414,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -3314,6 +3426,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -3324,6 +3437,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -3333,6 +3447,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -3376,6 +3491,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "ROCK"
       ]
@@ -3484,6 +3600,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -3558,6 +3675,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -3567,6 +3685,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -3576,6 +3695,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -3609,6 +3729,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "ROCK"
       ]
     },
@@ -3644,6 +3765,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -3653,6 +3775,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -3664,6 +3787,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -3673,6 +3797,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -3684,6 +3809,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -3694,6 +3820,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -3703,6 +3830,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -3780,6 +3908,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -3896,6 +4025,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -3921,6 +4051,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -3930,6 +4061,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -3955,6 +4087,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -4166,6 +4299,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -4223,6 +4357,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "ROCK"
       ]
     },
@@ -4280,7 +4415,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -4297,6 +4432,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -4322,6 +4458,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -4364,6 +4501,7 @@
         "WATER",
         "GRASS",
         "DIRT",
+        "WATER",
         "WATER"
       ]
     },
@@ -4374,6 +4512,7 @@
         "WATER",
         "GRASS",
         "DIRT",
+        "WATER",
         "WATER"
       ]
     },
@@ -4384,6 +4523,7 @@
         "WATER",
         "GRASS",
         "DIRT",
+        "WATER",
         "WATER"
       ]
     },
@@ -4393,6 +4533,7 @@
       "layers": [
         "WATER",
         "DIRT",
+        "WATER",
         "WATER"
       ]
     },
@@ -4457,6 +4598,7 @@
         "WATER",
         "GRASS",
         "WATER_BORDER",
+        "WATER",
         "WATER"
       ]
     },
@@ -4467,6 +4609,7 @@
         "WATER",
         "GRASS",
         "WATER_BORDER",
+        "WATER",
         "WATER"
       ]
     },
@@ -4476,6 +4619,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER"
       ]
     },
@@ -4485,6 +4629,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER"
       ]
     },
@@ -4494,6 +4639,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER"
       ]
     },
@@ -4628,6 +4774,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "ROCK"
       ]
     },
@@ -4637,6 +4784,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -4678,6 +4826,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "ROCK"
       ]
     },
@@ -4712,6 +4861,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -4731,6 +4881,7 @@
         "WATER",
         "GRASS",
         "DIRT",
+        "WATER",
         "WATER"
       ]
     },
@@ -4740,6 +4891,7 @@
       "layers": [
         "WATER",
         "DIRT",
+        "WATER",
         "WATER"
       ]
     },
@@ -4750,6 +4902,7 @@
         "WATER",
         "GRASS",
         "WATER_BORDER",
+        "WATER",
         "WATER"
       ]
     },
@@ -4761,6 +4914,7 @@
         "GRASS",
         "WATER_BORDER",
         "DIRT",
+        "WATER",
         "WATER"
       ]
     },
@@ -4827,6 +4981,7 @@
         "WATER",
         "GRASS",
         "WATER_BORDER",
+        "WATER",
         "WATER"
       ]
     },
@@ -4836,6 +4991,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER"
       ]
     },
@@ -4846,6 +5002,7 @@
         "WATER",
         "GRASS",
         "WATER_BORDER",
+        "WATER",
         "WATER"
       ]
     },
@@ -4854,7 +5011,8 @@
       "y": 16,
       "layers": [
         "WATER",
-        "WATER"
+        "WATER",
+        "GRASS"
       ]
     },
     {
@@ -4863,6 +5021,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER"
       ]
     },
@@ -4908,6 +5067,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "ROCK"
       ]
     },
@@ -4935,6 +5095,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "ROCK"
       ]
     },
@@ -4944,6 +5105,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "ROCK"
       ]
@@ -4971,6 +5133,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -4989,6 +5152,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -5030,6 +5194,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -5047,6 +5212,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -5105,6 +5271,7 @@
         "WATER",
         "GRASS",
         "DIRT",
+        "WATER",
         "WATER"
       ]
     },
@@ -5114,6 +5281,7 @@
       "layers": [
         "WATER",
         "DIRT",
+        "WATER",
         "WATER"
       ]
     },
@@ -5123,6 +5291,7 @@
       "layers": [
         "WATER",
         "DIRT",
+        "WATER",
         "WATER"
       ]
     },
@@ -5133,6 +5302,7 @@
         "WATER",
         "GRASS",
         "DIRT",
+        "WATER",
         "WATER"
       ]
     },
@@ -5154,7 +5324,7 @@
         "GRASS",
         "DIRT",
         "WATER",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -5183,7 +5353,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
-        "FLOWER",
+        "WATER",
         "WATER"
       ]
     },
@@ -5194,7 +5364,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "FLOWER",
+        "WATER",
         "WATER"
       ]
     },
@@ -5205,6 +5375,7 @@
         "WATER",
         "GRASS",
         "WATER_BORDER",
+        "WATER",
         "WATER"
       ]
     },
@@ -5213,7 +5384,8 @@
       "y": 17,
       "layers": [
         "WATER",
-        "WATER"
+        "WATER",
+        "GRASS"
       ]
     },
     {
@@ -5222,6 +5394,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER"
       ]
     },
@@ -5231,6 +5404,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER"
       ]
     },
@@ -5240,6 +5414,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER"
       ]
     },
@@ -5276,7 +5451,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -5302,6 +5477,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "ROCK"
       ]
     },
@@ -5311,6 +5487,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "ROCK"
       ]
@@ -5378,6 +5555,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -5486,7 +5664,7 @@
         "GRASS",
         "DIRT",
         "WATER",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -5524,7 +5702,7 @@
         "GRASS",
         "DIRT",
         "WATER",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -5552,7 +5730,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "FLOWER",
+        "WATER",
         "WATER"
       ]
     },
@@ -5563,7 +5741,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "FLOWER",
+        "WATER",
         "WATER"
       ]
     },
@@ -5573,6 +5751,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER"
       ]
     },
@@ -5582,6 +5761,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER"
       ]
     },
@@ -5590,7 +5770,8 @@
       "y": 18,
       "layers": [
         "WATER",
-        "WATER"
+        "WATER",
+        "GRASS"
       ]
     },
     {
@@ -5599,6 +5780,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER"
       ]
     },
@@ -5609,7 +5791,8 @@
         "WATER",
         "GRASS",
         "WATER",
-        "FLOWER",
+        "WATER",
+        "WATER",
         "WATER"
       ]
     },
@@ -5620,7 +5803,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "FLOWER",
+        "WATER",
         "WATER"
       ]
     },
@@ -5731,6 +5914,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -5821,7 +6005,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -5839,7 +6023,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -5890,7 +6074,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "FLOWER",
+        "WATER",
         "WATER"
       ]
     },
@@ -5901,7 +6085,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "FLOWER",
+        "WATER",
         "WATER"
       ]
     },
@@ -5948,7 +6132,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "FLOWER",
+        "WATER",
         "WATER"
       ]
     },
@@ -5959,7 +6143,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "FLOWER",
+        "WATER",
         "WATER"
       ]
     },
@@ -6002,6 +6186,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "ROCK"
       ]
@@ -6046,6 +6231,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -6089,6 +6275,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -6114,6 +6301,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -6188,6 +6376,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -6205,6 +6394,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -6234,6 +6424,7 @@
         "GRASS",
         "WATER",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -6260,7 +6451,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -6302,7 +6493,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -6320,6 +6511,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -6329,6 +6521,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -6341,6 +6534,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -6350,6 +6544,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -6361,7 +6556,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -6386,6 +6581,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -6395,6 +6591,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -6462,6 +6659,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -6479,6 +6677,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -6523,6 +6722,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -6533,6 +6733,7 @@
         "WATER",
         "GRASS",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -6602,6 +6803,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -6612,6 +6814,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -6621,6 +6824,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -6641,7 +6845,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -6691,6 +6895,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -6741,6 +6946,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -6759,6 +6965,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -6769,6 +6976,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -6778,6 +6986,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -6790,6 +6999,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -6799,6 +7009,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -6811,6 +7022,7 @@
         "GRASS",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -6821,6 +7033,7 @@
         "WATER",
         "GRASS",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -6889,6 +7102,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -6898,6 +7112,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -6909,6 +7124,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -6918,8 +7134,8 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG",
-        "EGG"
+        "WATER",
+        "WATER"
       ]
     },
     {
@@ -6928,6 +7144,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -6938,7 +7155,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -7070,7 +7287,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -7079,6 +7296,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -7089,6 +7307,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -7101,6 +7320,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -7111,6 +7331,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -7120,6 +7341,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -7171,6 +7393,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -7180,6 +7403,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -7191,6 +7415,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -7200,6 +7425,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -7211,6 +7437,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -7221,6 +7448,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -7230,7 +7458,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -7240,7 +7468,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -7250,7 +7478,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -7307,6 +7535,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "ROCK"
       ]
     },
@@ -7324,6 +7553,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -7407,6 +7637,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -7416,6 +7647,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "WATER",
         "FLOWER"
@@ -7428,7 +7660,9 @@
         "WATER",
         "GRASS",
         "WATER",
-        "FLOWER"
+        "WATER",
+        "FLOWER",
+        "BADGE"
       ]
     },
     {
@@ -7453,7 +7687,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -7495,6 +7729,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -7504,6 +7739,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -7515,6 +7751,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -7524,6 +7761,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -7542,7 +7780,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -7552,7 +7790,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -7609,6 +7847,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "ROCK"
       ]
     },
@@ -7626,6 +7865,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -7635,6 +7875,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -7644,6 +7885,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -7653,7 +7895,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -7662,7 +7904,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -7673,6 +7915,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -7682,6 +7925,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -7718,7 +7962,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -7727,6 +7971,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -7781,6 +8026,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -7790,7 +8036,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -7827,6 +8073,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -7836,6 +8083,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -7847,6 +8095,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -7856,6 +8105,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -7882,7 +8132,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -7891,7 +8141,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -7948,6 +8198,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -7973,7 +8224,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -7982,7 +8233,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -7991,7 +8242,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -8000,6 +8251,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -8010,6 +8262,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -8079,7 +8332,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -8089,7 +8342,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -8156,6 +8409,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -8173,7 +8427,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -8338,6 +8592,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "ROCK"
       ]
     },
@@ -8348,7 +8603,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -8391,6 +8646,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -8401,6 +8657,7 @@
         "WATER",
         "GRASS",
         "WATER_BORDER",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -8421,6 +8678,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "LARGE_TREE"
       ]
     },
@@ -8430,6 +8688,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -8472,7 +8731,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -8481,6 +8740,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -8492,6 +8752,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -8501,6 +8762,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -8519,7 +8781,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -8528,7 +8790,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -8571,7 +8833,7 @@
         "WATER",
         "GRASS",
         "WATER",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -8596,6 +8858,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "LARGE_TREE"
       ]
@@ -8623,6 +8886,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -8632,6 +8896,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -8651,7 +8916,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -8660,6 +8925,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -8686,7 +8952,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -8695,6 +8961,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -8713,6 +8980,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "ROCK"
       ]
@@ -8805,6 +9073,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -8815,6 +9084,7 @@
         "WATER",
         "GRASS",
         "WATER_BORDER",
+        "WATER",
         "WATER",
         "ROCK"
       ]
@@ -8834,6 +9104,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -8852,6 +9123,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -8879,6 +9151,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -8896,6 +9169,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -8955,6 +9229,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -8964,6 +9239,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -8975,6 +9251,7 @@
         "WATER",
         "GRASS",
         "WATER_BORDER",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -8993,6 +9270,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -9013,6 +9291,7 @@
         "WATER",
         "GRASS",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -9030,7 +9309,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -9039,7 +9318,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -9048,6 +9327,7 @@
       "layers": [
         "WATER",
         "GRASS",
+        "WATER",
         "WATER",
         "FLOWER"
       ]
@@ -9102,6 +9382,7 @@
         "GRASS",
         "WATER_BORDER",
         "WATER",
+        "WATER",
         "FLOWER"
       ]
     },
@@ -9119,7 +9400,7 @@
       "layers": [
         "WATER",
         "GRASS",
-        "EGG"
+        "WATER"
       ]
     },
     {
@@ -9164,7 +9445,29 @@
       ]
     }
   ],
-  "structures": [],
+  "structures": [
+    {
+      "type": "FARMHOUSE",
+      "x": 28,
+      "y": 15,
+      "width": 5,
+      "height": 4
+    },
+    {
+      "type": "CHICKEN_COOP",
+      "x": 18,
+      "y": 15,
+      "width": 4,
+      "height": 3
+    },
+    {
+      "type": "SIGN",
+      "x": 32,
+      "y": 8,
+      "width": 8,
+      "height": 4
+    }
+  ],
   "resources": [
     {
       "type": "FLOWER",
@@ -9199,11 +9502,6 @@
     {
       "type": "FLOWER",
       "x": 7,
-      "y": 4
-    },
-    {
-      "type": "EGG",
-      "x": 10,
       "y": 4
     },
     {
@@ -9347,23 +9645,8 @@
       "y": 6
     },
     {
-      "type": "EGG",
-      "x": 8,
-      "y": 7
-    },
-    {
       "type": "FLOWER",
       "x": 9,
-      "y": 7
-    },
-    {
-      "type": "EGG",
-      "x": 11,
-      "y": 7
-    },
-    {
-      "type": "EGG",
-      "x": 15,
       "y": 7
     },
     {
@@ -9458,16 +9741,6 @@
     },
     {
       "type": "LARGE_TREE",
-      "x": 32,
-      "y": 8
-    },
-    {
-      "type": "LARGE_TREE",
-      "x": 38,
-      "y": 8
-    },
-    {
-      "type": "LARGE_TREE",
       "x": 15,
       "y": 9
     },
@@ -9480,26 +9753,6 @@
       "type": "LARGE_TREE",
       "x": 31,
       "y": 9
-    },
-    {
-      "type": "LARGE_TREE",
-      "x": 32,
-      "y": 9
-    },
-    {
-      "type": "LARGE_TREE",
-      "x": 38,
-      "y": 9
-    },
-    {
-      "type": "LARGE_TREE",
-      "x": 39,
-      "y": 9
-    },
-    {
-      "type": "EGG",
-      "x": 12,
-      "y": 10
     },
     {
       "type": "LARGE_TREE",
@@ -9570,11 +9823,6 @@
       "type": "LARGE_TREE",
       "x": 53,
       "y": 11
-    },
-    {
-      "type": "EGG",
-      "x": 14,
-      "y": 12
     },
     {
       "type": "LARGE_TREE",
@@ -9712,11 +9960,6 @@
       "y": 14
     },
     {
-      "type": "EGG",
-      "x": 50,
-      "y": 14
-    },
-    {
       "type": "LARGE_TREE",
       "x": 52,
       "y": 14
@@ -9782,16 +10025,6 @@
       "y": 16
     },
     {
-      "type": "EGG",
-      "x": 23,
-      "y": 17
-    },
-    {
-      "type": "EGG",
-      "x": 36,
-      "y": 17
-    },
-    {
       "type": "ROCK",
       "x": 39,
       "y": 17
@@ -9807,29 +10040,9 @@
       "y": 17
     },
     {
-      "type": "EGG",
-      "x": 19,
-      "y": 18
-    },
-    {
-      "type": "EGG",
-      "x": 23,
-      "y": 18
-    },
-    {
       "type": "FLOWER",
       "x": 46,
       "y": 18
-    },
-    {
-      "type": "EGG",
-      "x": 17,
-      "y": 19
-    },
-    {
-      "type": "EGG",
-      "x": 19,
-      "y": 19
     },
     {
       "type": "ROCK",
@@ -9867,16 +10080,6 @@
       "y": 20
     },
     {
-      "type": "EGG",
-      "x": 34,
-      "y": 20
-    },
-    {
-      "type": "EGG",
-      "x": 39,
-      "y": 20
-    },
-    {
       "type": "LARGE_TREE",
       "x": 41,
       "y": 20
@@ -9894,11 +10097,6 @@
     {
       "type": "LARGE_TREE",
       "x": 44,
-      "y": 20
-    },
-    {
-      "type": "EGG",
-      "x": 45,
       "y": 20
     },
     {
@@ -9947,11 +10145,6 @@
       "y": 21
     },
     {
-      "type": "EGG",
-      "x": 45,
-      "y": 21
-    },
-    {
       "type": "FLOWER",
       "x": 51,
       "y": 21
@@ -10012,24 +10205,9 @@
       "y": 22
     },
     {
-      "type": "EGG",
-      "x": 43,
-      "y": 22
-    },
-    {
       "type": "FLOWER",
       "x": 44,
       "y": 22
-    },
-    {
-      "type": "EGG",
-      "x": 45,
-      "y": 22
-    },
-    {
-      "type": "EGG",
-      "x": 26,
-      "y": 23
     },
     {
       "type": "LARGE_TREE",
@@ -10084,21 +10262,6 @@
     {
       "type": "LARGE_TREE",
       "x": 42,
-      "y": 23
-    },
-    {
-      "type": "EGG",
-      "x": 43,
-      "y": 23
-    },
-    {
-      "type": "EGG",
-      "x": 44,
-      "y": 23
-    },
-    {
-      "type": "EGG",
-      "x": 45,
       "y": 23
     },
     {
@@ -10122,13 +10285,8 @@
       "y": 24
     },
     {
-      "type": "FLOWER",
+      "type": "BADGE",
       "x": 30,
-      "y": 24
-    },
-    {
-      "type": "EGG",
-      "x": 33,
       "y": 24
     },
     {
@@ -10152,16 +10310,6 @@
       "y": 24
     },
     {
-      "type": "EGG",
-      "x": 43,
-      "y": 24
-    },
-    {
-      "type": "EGG",
-      "x": 44,
-      "y": 24
-    },
-    {
       "type": "ROCK",
       "x": 51,
       "y": 24
@@ -10182,16 +10330,6 @@
       "y": 24
     },
     {
-      "type": "EGG",
-      "x": 18,
-      "y": 25
-    },
-    {
-      "type": "EGG",
-      "x": 19,
-      "y": 25
-    },
-    {
       "type": "LARGE_TREE",
       "x": 20,
       "y": 25
@@ -10202,11 +10340,6 @@
       "y": 25
     },
     {
-      "type": "EGG",
-      "x": 25,
-      "y": 25
-    },
-    {
       "type": "FLOWER",
       "x": 26,
       "y": 25
@@ -10214,11 +10347,6 @@
     {
       "type": "FLOWER",
       "x": 32,
-      "y": 25
-    },
-    {
-      "type": "EGG",
-      "x": 33,
       "y": 25
     },
     {
@@ -10242,34 +10370,9 @@
       "y": 25
     },
     {
-      "type": "EGG",
-      "x": 43,
-      "y": 25
-    },
-    {
-      "type": "EGG",
-      "x": 44,
-      "y": 25
-    },
-    {
       "type": "FLOWER",
       "x": 54,
       "y": 25
-    },
-    {
-      "type": "EGG",
-      "x": 17,
-      "y": 26
-    },
-    {
-      "type": "EGG",
-      "x": 18,
-      "y": 26
-    },
-    {
-      "type": "EGG",
-      "x": 19,
-      "y": 26
     },
     {
       "type": "LARGE_TREE",
@@ -10282,33 +10385,13 @@
       "y": 26
     },
     {
-      "type": "EGG",
-      "x": 29,
-      "y": 26
-    },
-    {
-      "type": "EGG",
-      "x": 30,
-      "y": 26
-    },
-    {
       "type": "LARGE_TREE",
       "x": 38,
       "y": 26
     },
     {
-      "type": "EGG",
-      "x": 40,
-      "y": 26
-    },
-    {
       "type": "ROCK",
       "x": 27,
-      "y": 27
-    },
-    {
-      "type": "EGG",
-      "x": 28,
       "y": 27
     },
     {
@@ -10330,11 +10413,6 @@
       "type": "LARGE_TREE",
       "x": 37,
       "y": 27
-    },
-    {
-      "type": "EGG",
-      "x": 15,
-      "y": 28
     },
     {
       "type": "FLOWER",
@@ -10349,21 +10427,6 @@
     {
       "type": "FLOWER",
       "x": 18,
-      "y": 28
-    },
-    {
-      "type": "EGG",
-      "x": 20,
-      "y": 28
-    },
-    {
-      "type": "EGG",
-      "x": 21,
-      "y": 28
-    },
-    {
-      "type": "EGG",
-      "x": 28,
       "y": 28
     },
     {
@@ -10382,19 +10445,9 @@
       "y": 28
     },
     {
-      "type": "EGG",
-      "x": 37,
-      "y": 28
-    },
-    {
       "type": "FLOWER",
       "x": 38,
       "y": 28
-    },
-    {
-      "type": "EGG",
-      "x": 15,
-      "y": 29
     },
     {
       "type": "FLOWER",
@@ -10462,16 +10515,6 @@
       "y": 30
     },
     {
-      "type": "EGG",
-      "x": 15,
-      "y": 31
-    },
-    {
-      "type": "EGG",
-      "x": 16,
-      "y": 31
-    },
-    {
       "type": "FLOWER",
       "x": 17,
       "y": 31
@@ -10479,34 +10522,29 @@
     {
       "type": "FLOWER",
       "x": 34,
-      "y": 31
-    },
-    {
-      "type": "EGG",
-      "x": 36,
       "y": 31
     }
   ],
   "npcs": [
     {
       "name": "Joshua",
-      "x": 38,
-      "y": 21,
+      "x": 37,
+      "y": 19,
       "message": "Welcome to my farm! It looks like the chickens are having a great time."
     }
   ],
   "chickens": [
     {
-      "x": 50,
-      "y": 9
+      "x": 48,
+      "y": 12
     },
     {
       "x": 51,
-      "y": 25
+      "y": 22
     },
     {
-      "x": 21,
-      "y": 29
+      "x": 19,
+      "y": 30
     }
   ]
 }
