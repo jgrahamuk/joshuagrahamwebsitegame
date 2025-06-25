@@ -195,7 +195,7 @@ export class NPC {
         // Auto-hide after 5 seconds
         this.messageTimeout = setTimeout(() => {
             this.hideMessage();
-        }, 5000);
+        }, 10000);
     }
 
     hideMessage() {
