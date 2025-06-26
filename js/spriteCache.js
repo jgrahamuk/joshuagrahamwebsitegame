@@ -4,6 +4,8 @@ const spriteNames = [
     'character-left-walk.png', 'character-right-walk.png',
     'chicken-front.png', 'chicken-back.png', 'chicken-left.png', 'chicken-right.png',
     'chicken-peck-right.png', 'chicken-peck-left.png',
+    'cockerel-front.png', 'cockerel-back.png', 'cockerel-left.png', 'cockerel-right.png',
+    'cockerel-peck-right.png', 'cockerel-peck-left.png',
     'tile-dirt.png', 'tile-grass.png', 'tile-water.png',
     'tree.png', 'stone.png', 'flower.png', 'egg.png', 'badge.png',
     'farmhouse.png',

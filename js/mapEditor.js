@@ -1,7 +1,7 @@
 import { tileTypes, placeResourceAtPosition, removeResource, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES } from './map.js';
 import { getSpriteUrl } from './spriteCache.js';
 import { NPC } from './npcs.js';
-import { Chicken } from './chickens.js';
+import { Chicken, Cockerel } from './chickens.js';
 
 export class MapEditor {
     constructor(svg, gameContainer) {
@@ -29,8 +29,9 @@ export class MapEditor {
             { id: 'sign', name: 'Sign', icon: 'sign-joshuagraham.png', type: 'structure', structureType: 'SIGN', width: 5, height: 3 },
             // NPCs
             { id: 'npc_joshua', name: 'Joshua NPC', icon: 'joshua-front.png', type: 'npc', npcType: 'Joshua', message: 'Welcome to my farm! It looks like the chickens are having a great time.' },
-            // Chickens
-            { id: 'chicken', name: 'Chicken', icon: 'chicken-front.png', type: 'chicken' }
+            // Chickens and Cockerels
+            { id: 'chicken', name: 'Chicken', icon: 'chicken-front.png', type: 'chicken' },
+            { id: 'cockerel', name: 'Cockerel', icon: 'chicken-front.png', type: 'cockerel' }
         ];
 
         this.setupKeyboardShortcuts();
@@ -185,6 +186,11 @@ export class MapEditor {
         } else if (this.selectedTool.type === 'chicken') {
             this.placeChicken(x, y);
             // Redraw the entire map to ensure chickens are properly displayed
+            window.drawMap();
+            return;
+        } else if (this.selectedTool.type === 'cockerel') {
+            this.placeCockerel(x, y);
+            // Redraw the entire map to ensure cockerels are properly displayed
             window.drawMap();
             return;
         }
@@ -425,6 +431,31 @@ export class MapEditor {
         window.chickens.push(chicken);
 
         console.log(`Chicken placed at (${x}, ${y}). Total chickens: ${window.chickens.length}`);
+    }
+
+    placeCockerel(x, y) {
+        // Check if the tile is passable
+        const tiles = map[y][x];
+        const topTile = tiles[tiles.length - 1];
+        if (!topTile.passable) {
+            console.log('Cannot place cockerel on impassable tile');
+            return;
+        }
+
+        // Check if there's already a cockerel at this position
+        if (window.cockerels && window.cockerels.find(cockerel => cockerel.x === x && cockerel.y === y)) {
+            console.log('Cockerel already exists at this position');
+            return;
+        }
+
+        // Create cockerel at the specified position
+        const cockerel = new Cockerel(this.svg, x, y);
+
+        // Add to global cockerels array
+        if (!window.cockerels) window.cockerels = [];
+        window.cockerels.push(cockerel);
+
+        console.log(`Cockerel placed at (${x}, ${y}). Total cockerels: ${window.cockerels.length}`);
     }
 
     removeStructureAt(x, y) {

@@ -1,7 +1,7 @@
 import { initializeMap, getTile, randomGrassOrDirt, tileTypes, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, setMapSize, drawMap } from './map.js';
 import { findPath, moveToTarget } from './movement.js';
 import { Player } from './player.js';
-import { Chicken } from './chickens.js';
+import { Chicken, Cockerel } from './chickens.js';
 import { NPC, npcDefinitions } from './npcs.js';
 import { preloadSprites, getSpriteUrl } from './spriteCache.js';
 import { drawStructures } from './structures.js';
@@ -19,6 +19,14 @@ gameContainer.appendChild(svg);
 
 // Make SVG globally accessible
 window.svg = svg;
+
+// Game loop timing constants
+const FRAME_TIME = 1000 / 60; // Target 60 FPS
+const TICK_INTERVAL = 50; // 50ms between game logic updates
+
+// Game loop timing variables
+let lastFrameTime = 0;
+let lastTickTime = 0;
 
 function updateTileSize() {
     const w = window.innerWidth;
@@ -49,6 +57,29 @@ function updateTileSize() {
 // Make drawMap globally accessible
 window.drawMap = drawMap;
 
+function gameLoop(timestamp) {
+    // Request next frame first
+    requestAnimationFrame(gameLoop);
+
+    // Calculate time since last frame
+    const deltaTime = timestamp - lastFrameTime;
+
+    // If enough time has passed, run the frame
+    if (deltaTime >= FRAME_TIME) {
+        lastFrameTime = timestamp - (deltaTime % FRAME_TIME);
+
+        // Update game logic at fixed intervals
+        if (timestamp - lastTickTime >= TICK_INTERVAL) {
+            const now = Date.now();
+            window.chickens.forEach(c => c.tick(now));
+            window.npcs.forEach(n => n.tick(now));
+            if (window.chicks) window.chicks.forEach(chick => chick.tick(now));
+            if (window.cockerels) window.cockerels.forEach(cockerel => cockerel.tick(now));
+            lastTickTime = timestamp;
+        }
+    }
+}
+
 preloadSprites().then(async () => {
     // Initialize map and get loaded data
     const mapData = await initializeMap();
@@ -69,6 +100,15 @@ preloadSprites().then(async () => {
         window.chickens.push(chicken);
     });
 
+    // Create cockerels from loaded data (if any)
+    window.cockerels = [];
+    if (mapData.cockerels) {
+        mapData.cockerels.forEach(cockerelData => {
+            const cockerel = new Cockerel(svg, cockerelData.x, cockerelData.y);
+            window.cockerels.push(cockerel);
+        });
+    }
+
     // Create NPCs from loaded data
     window.npcs = mapData.npcs.map(npcData => new NPC(svg, npcData.name, npcData.message, npcData.x, npcData.y));
 
@@ -81,13 +121,8 @@ preloadSprites().then(async () => {
     // Initialize badge system
     badgeSystem.initialize();
 
-    // Main animation loop
-    setInterval(() => {
-        const now = Date.now();
-        window.chickens.forEach(c => c.tick(now));
-        window.npcs.forEach(n => n.tick(now));
-        if (window.chicks) window.chicks.forEach(chick => chick.tick(now));
-    }, 50);
+    // Start the game loop
+    requestAnimationFrame(gameLoop);
 
     // Player movement and interaction
     svg.addEventListener('click', (e) => {
@@ -146,6 +181,15 @@ preloadSprites().then(async () => {
             const chicken = new Chicken(svg, chickenData.x, chickenData.y);
             window.chickens.push(chicken);
         });
+
+        // Re-create cockerels
+        window.cockerels = [];
+        if (mapData.cockerels) {
+            mapData.cockerels.forEach(cockerelData => {
+                const cockerel = new Cockerel(svg, cockerelData.x, cockerelData.y);
+                window.cockerels.push(cockerel);
+            });
+        }
 
         // Re-create NPCs
         window.npcs = mapData.npcs.map(npcData => new NPC(svg, npcData.name, npcData.message, npcData.x, npcData.y));

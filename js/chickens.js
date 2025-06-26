@@ -11,6 +11,15 @@ const chickenSprites = {
     peckLeft: 'chicken-peck-left.png',
 };
 
+const cockerelSprites = {
+    front: 'cockerel-front.png',
+    back: 'cockerel-back.png',
+    left: 'cockerel-left.png',
+    right: 'cockerel-right.png',
+    peckLeft: 'cockerel-left-peck.png',
+    peckRight: 'cockerel-right-peck.png'
+};
+
 const chickSprites = {
     front: 'chick-front.png',
     back: 'chick-back.png',
@@ -21,15 +30,17 @@ const chickSprites = {
 // Track egg placement times for hatching
 if (!window.eggTimers) window.eggTimers = {};
 if (!window.chicks) window.chicks = [];
+if (!window.cockerels) window.cockerels = [];
 
 // Population control
 const MAX_TOTAL_POPULATION = 50;
 
 function getCurrentPopulation() {
     const numChickens = window.chickens ? window.chickens.length : 0;
+    const numCockerels = window.cockerels ? window.cockerels.length : 0;
     const numChicks = window.chicks ? window.chicks.length : 0;
     const numEggs = Object.keys(window.eggTimers).length;
-    return numChickens + numChicks + numEggs;
+    return numChickens + numCockerels + numChicks + numEggs;
 }
 
 export class Chicken {
@@ -62,7 +73,7 @@ export class Chicken {
         this.nextStepTime = 0;
 
         // Egg laying properties
-        this.nextEggLay = Date.now() + 60000 + Math.random() * 60000; // 1-2 minutes for testing
+        this.nextEggLay = Date.now() + 30000 + Math.random() * 60000; // 30-90 seconds
         this.isLayingEgg = false;
         this.eggLayStartTime = 0;
         this.eggLayDuration = 2000; // 2 seconds to lay an egg
@@ -228,6 +239,142 @@ export class Chicken {
     }
 }
 
+export class Cockerel {
+    constructor(svg, startX, startY) {
+        // Check population limit before creating new cockerel
+        if (getCurrentPopulation() >= MAX_TOTAL_POPULATION) {
+            return null;
+        }
+
+        // Use provided coordinates or get random position
+        if (startX !== undefined && startY !== undefined) {
+            this.x = startX;
+            this.y = startY;
+        } else {
+            const pos = randomGrassOrDirt();
+            this.x = pos.x;
+            this.y = pos.y;
+        }
+
+        this.direction = 'front';
+        this.state = 'walk';
+        this.pecksLeft = 0;
+        this.isPeckingPose = false;
+        this.nextPeckFrame = 0;
+        this.lastMove = Date.now();
+        this.nextFarMove = Date.now() + 30000 + Math.random() * 30000;
+        this.path = [];
+        this.moving = false;
+        this.moveSpeed = 300; // ms per tile (default slow)
+        this.nextStepTime = 0;
+
+        this.element = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        this.svg = svg;
+        this.svg.appendChild(this.element);
+        this.updatePosition();
+    }
+
+    updatePosition() {
+        let sprite;
+        if (this.state === 'peck' && this.isPeckingPose) {
+            if (this.direction === 'right') sprite = cockerelSprites.peckRight;
+            else if (this.direction === 'left') sprite = cockerelSprites.peckLeft;
+            else sprite = cockerelSprites[this.direction];
+        } else {
+            sprite = cockerelSprites[this.direction];
+        }
+        this.element.setAttribute('href', getSpriteUrl(sprite));
+        this.element.setAttribute('x', (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE);
+        this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE);
+        this.element.setAttribute('width', window.TILE_SIZE * 1.5);
+        this.element.setAttribute('height', window.TILE_SIZE * 1.5);
+        this.element.style.imageRendering = 'pixelated';
+    }
+
+    moveTo(path, isRun = false) {
+        if (path && path.length > 1) {
+            this.path = path.slice(1);
+            this.moving = true;
+            this.moveSpeed = isRun ? 70 + Math.floor(Math.random() * 30) : 300 + Math.floor(Math.random() * 60);
+            this.nextStepTime = Date.now();
+        }
+    }
+
+    tick(now) {
+        // Pecking animation
+        if (this.state === 'peck') {
+            if (now >= this.nextPeckFrame) {
+                if (this.pecksLeft > 0) {
+                    this.isPeckingPose = !this.isPeckingPose;
+                    this.updatePosition();
+                    this.nextPeckFrame = now + 150 + Math.floor(Math.random() * 100);
+                    if (!this.isPeckingPose) this.pecksLeft--;
+                } else {
+                    this.state = 'walk';
+                    this.isPeckingPose = false;
+                    this.updatePosition();
+                }
+            }
+            return;
+        }
+
+        // Move along path
+        if (this.moving && this.path && this.path.length > 0) {
+            if (now >= this.nextStepTime) {
+                const next = this.path.shift();
+                if (next.x > this.x) this.direction = 'right';
+                else if (next.x < this.x) this.direction = 'left';
+                else if (next.y > this.y) this.direction = 'front';
+                else if (next.y < this.y) this.direction = 'back';
+                this.x = next.x;
+                this.y = next.y;
+                this.lastMove = now;
+                this.updatePosition();
+                this.nextStepTime = now + this.moveSpeed;
+                if (this.path.length === 0) {
+                    this.moving = false;
+                    if (this.direction === 'right' || this.direction === 'left') {
+                        this.state = 'peck';
+                        this.pecksLeft = 1 + Math.floor(Math.random() * 2);
+                        this.isPeckingPose = false;
+                        this.nextPeckFrame = now + 100;
+                        this.updatePosition();
+                        return;
+                    }
+                }
+            }
+            return;
+        }
+
+        // Far move
+        if (now > this.nextFarMove && !this.moving && this.state !== 'peck') {
+            const pos = randomGrassOrDirt();
+            const path = findPath({ x: this.x, y: this.y }, pos, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
+            this.moveTo(path, true); // running
+            this.nextFarMove = now + 30000 + Math.random() * 30000;
+            return;
+        }
+
+        // Move to a nearby tile if not moving
+        if (!this.moving && now - this.lastMove > 5000 + Math.random() * 5000) { // 5-10 seconds between moves
+            let tries = 0;
+            while (tries < 10) {
+                const dx = Math.floor(Math.random() * 7) - 3;
+                const dy = Math.floor(Math.random() * 7) - 3;
+                if (Math.abs(dx) > 3 || Math.abs(dy) > 3) { tries++; continue; }
+                const nx = this.x + dx;
+                const ny = this.y + dy;
+                if (nx >= 0 && ny >= 0 && nx < MAP_WIDTH_TILES && ny < MAP_HEIGHT_TILES && (getTile(nx, ny) === tileTypes.GRASS || getTile(nx, ny) === tileTypes.DIRT)) {
+                    const path = findPath({ x: this.x, y: this.y }, { x: nx, y: ny }, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
+                    this.moveTo(path, false); // normal walk
+                    break;
+                }
+                tries++;
+            }
+        }
+    }
+}
+
 export class Chick {
     constructor(svg, startX, startY) {
         // Check population limit before creating new chick
@@ -275,8 +422,8 @@ export class Chick {
         }
     }
     tick(now) {
-        // Mature into a chicken after 5 minutes (300000 ms)
-        if (now - this.bornTime > 300000) {
+        // Mature into a chicken after 2 minutes (120000 ms)
+        if (now - this.bornTime > 120000) {
             // Remove chick SVG
             if (this.element && this.element.parentNode) {
                 this.element.parentNode.removeChild(this.element);
@@ -286,7 +433,7 @@ export class Chick {
                 const idx = window.chicks.indexOf(this);
                 if (idx !== -1) window.chicks.splice(idx, 1);
             }
-            // Add a new Chicken at this position only if under population limit
+            // Add a new Chicken (hen) at this position only if under population limit
             if (window.chickens && getCurrentPopulation() < MAX_TOTAL_POPULATION) {
                 const chicken = new Chicken(window.svg, this.x, this.y);
                 if (chicken) {  // Only add if constructor succeeded

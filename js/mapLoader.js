@@ -31,7 +31,8 @@ function generateFallbackMap() {
         structures: [],
         resources: [],
         npcs: [],
-        chickens: []
+        chickens: [],
+        cockerels: []
     };
 }
 
@@ -40,7 +41,7 @@ export function getCurrentMapData() {
 }
 
 export function convertMapDataToGameFormat(mapData, isLandscape) {
-    const { width, height, tiles, structures, resources, npcs, chickens } = mapData;
+    const { width, height, tiles, structures, resources, npcs, chickens, cockerels } = mapData;
 
     // For portrait mode, swap width and height
     const finalWidth = isLandscape ? width : height;
@@ -166,12 +167,56 @@ export function convertMapDataToGameFormat(mapData, isLandscape) {
         };
     });
 
+    // Transform cockerels with transposition
+    const transformedCockerels = cockerels ? cockerels.map(cockerel => {
+        let finalX, finalY;
+        if (isLandscape) {
+            finalX = cockerel.x;
+            finalY = cockerel.y;
+        } else {
+            finalX = cockerel.y;
+            finalY = width - 1 - cockerel.x;
+        }
+
+        return {
+            x: finalX,
+            y: finalY
+        };
+    }) : [];
+
     return {
         map: gameMap,
         structures: transformedStructures,
         npcs: transformedNpcs,
         chickens: transformedChickens,
+        cockerels: transformedCockerels,
         width: finalWidth,
         height: finalHeight
     };
+}
+
+export function saveMap() {
+    const mapData = {
+        map: map,
+        chickens: window.chickens.map(chicken => ({ x: chicken.x, y: chicken.y })),
+        cockerels: window.cockerels.map(cockerel => ({ x: cockerel.x, y: cockerel.y })),
+        npcs: window.npcs.map(npc => ({
+            name: npc.name,
+            message: npc.message,
+            x: npc.x,
+            y: npc.y
+        }))
+    };
+
+    // Save to local storage
+    localStorage.setItem('map', JSON.stringify(mapData));
+
+    // Save to file
+    const blob = new Blob([JSON.stringify(mapData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'map.json';
+    a.click();
+    URL.revokeObjectURL(url);
 } 
