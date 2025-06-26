@@ -166,6 +166,7 @@ export function drawMap(svg) {
             imgWater.setAttribute('y', y * tileSize);
             imgWater.setAttribute('width', tileSize);
             imgWater.setAttribute('height', tileSize);
+            imgWater.style.imageRendering = 'pixelated';
             svg.appendChild(imgWater);
         }
     }
@@ -185,6 +186,7 @@ export function drawMap(svg) {
             imgBase.setAttribute('y', offsetY + y * tileSize);
             imgBase.setAttribute('width', tileSize);
             imgBase.setAttribute('height', tileSize);
+            imgBase.style.imageRendering = 'pixelated';
             svg.appendChild(imgBase);
         }
     }
@@ -223,6 +225,7 @@ export function drawMap(svg) {
                 imgOverlay.setAttribute('width', tileSize);
                 imgOverlay.setAttribute('height', tileSize);
                 imgOverlay.setAttribute('data-resource', resourceType);
+                imgOverlay.style.imageRendering = 'pixelated';
                 svg.appendChild(imgOverlay);
             }
         }

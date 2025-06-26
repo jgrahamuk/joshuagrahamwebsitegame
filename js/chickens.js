@@ -18,8 +18,27 @@ const chickSprites = {
     right: 'chick-right.png',
 };
 
+// Track egg placement times for hatching
+if (!window.eggTimers) window.eggTimers = {};
+if (!window.chicks) window.chicks = [];
+
+// Population control
+const MAX_TOTAL_POPULATION = 50;
+
+function getCurrentPopulation() {
+    const numChickens = window.chickens ? window.chickens.length : 0;
+    const numChicks = window.chicks ? window.chicks.length : 0;
+    const numEggs = Object.keys(window.eggTimers).length;
+    return numChickens + numChicks + numEggs;
+}
+
 export class Chicken {
     constructor(svg, startX, startY) {
+        // Check population limit before creating new chicken
+        if (getCurrentPopulation() >= MAX_TOTAL_POPULATION) {
+            return null;
+        }
+
         // Use provided coordinates or get random position
         if (startX !== undefined && startY !== undefined) {
             this.x = startX;
@@ -67,6 +86,7 @@ export class Chicken {
         this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE);
         this.element.setAttribute('width', window.TILE_SIZE);
         this.element.setAttribute('height', window.TILE_SIZE);
+        this.element.style.imageRendering = 'pixelated';
     }
     moveTo(path, isRun = false) {
         if (path && path.length > 1) {
@@ -80,24 +100,32 @@ export class Chicken {
         // Egg laying logic - check this FIRST with higher priority
         if (this.isLayingEgg) {
             if (now - this.eggLayStartTime >= this.eggLayDuration) {
-                // Finish laying egg
-                this.isLayingEgg = false;
-                this.state = 'walk';
-                this.updatePosition();
+                // Check population limit before laying egg
+                if (getCurrentPopulation() < MAX_TOTAL_POPULATION) {
+                    // Finish laying egg
+                    this.isLayingEgg = false;
+                    this.state = 'walk';
+                    this.updatePosition();
 
-                // Place egg on the map
-                placeResourceAtPosition(this.x, this.y, tileTypes.EGG);
+                    // Place egg on the map
+                    placeResourceAtPosition(this.x, this.y, tileTypes.EGG);
 
-                // Debug: Check if egg was placed in map data
-                if (window.map && window.map[this.y] && window.map[this.y][this.x]) {
-                    const tiles = window.map[this.y][this.x];
-                    const topTile = tiles[tiles.length - 1];
+                    // Debug: Check if egg was placed in map data
+                    if (window.map && window.map[this.y] && window.map[this.y][this.x]) {
+                        const tiles = window.map[this.y][this.x];
+                        const topTile = tiles[tiles.length - 1];
+                    } else {
+                        console.log('Map data not available for debugging');
+                    }
+
+                    // Add egg element to SVG without full redraw
+                    this.addEggToSVG(this.x, this.y);
                 } else {
-                    console.log('Map data not available for debugging');
+                    // Cancel egg laying if population limit reached
+                    this.isLayingEgg = false;
+                    this.state = 'walk';
+                    this.updatePosition();
                 }
-
-                // Add egg element to SVG without full redraw
-                this.addEggToSVG(this.x, this.y);
 
                 // Schedule next egg lay
                 this.nextEggLay = now + 10000 + Math.random() * 10000; // 10-20 seconds for testing
@@ -194,6 +222,7 @@ export class Chicken {
         eggElement.setAttribute('width', window.TILE_SIZE);
         eggElement.setAttribute('height', window.TILE_SIZE);
         eggElement.setAttribute('data-resource', 'egg');
+        eggElement.style.imageRendering = 'pixelated';
         this.svg.appendChild(eggElement);
         window.eggTimers[`${x},${y}`] = Date.now();
     }
@@ -201,6 +230,11 @@ export class Chicken {
 
 export class Chick {
     constructor(svg, startX, startY) {
+        // Check population limit before creating new chick
+        if (getCurrentPopulation() >= MAX_TOTAL_POPULATION) {
+            return null;
+        }
+
         if (startX !== undefined && startY !== undefined) {
             this.x = startX;
             this.y = startY;
@@ -230,6 +264,7 @@ export class Chick {
         this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE);
         this.element.setAttribute('width', window.TILE_SIZE);
         this.element.setAttribute('height', window.TILE_SIZE);
+        this.element.style.imageRendering = 'pixelated';
     }
     moveTo(path, isRun = false) {
         if (path && path.length > 1) {
@@ -251,10 +286,12 @@ export class Chick {
                 const idx = window.chicks.indexOf(this);
                 if (idx !== -1) window.chicks.splice(idx, 1);
             }
-            // Add a new Chicken at this position
-            if (window.chickens) {
+            // Add a new Chicken at this position only if under population limit
+            if (window.chickens && getCurrentPopulation() < MAX_TOTAL_POPULATION) {
                 const chicken = new Chicken(window.svg, this.x, this.y);
-                window.chickens.push(chicken);
+                if (chicken) {  // Only add if constructor succeeded
+                    window.chickens.push(chicken);
+                }
             }
             return;
         }
@@ -305,10 +342,6 @@ export class Chick {
     }
 }
 
-// Track egg placement times for hatching
-if (!window.eggTimers) window.eggTimers = {};
-if (!window.chicks) window.chicks = [];
-
 // Global egg hatching tick
 function hatchEggsTick() {
     const now = Date.now();
@@ -328,9 +361,15 @@ function hatchEggsTick() {
                         svg.removeChild(el);
                     }
                 });
-                // Spawn a chick
-                const chick = new Chick(window.svg, x, y);
-                window.chicks.push(chick);
+
+                // Only spawn a chick if under population limit
+                if (getCurrentPopulation() < MAX_TOTAL_POPULATION) {
+                    const chick = new Chick(window.svg, x, y);
+                    if (chick) {  // Only add if constructor succeeded
+                        window.chicks.push(chick);
+                    }
+                }
+
                 // Remove timer
                 delete window.eggTimers[key];
             }

@@ -49,6 +49,7 @@ export class Player {
         this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE);
         this.element.setAttribute('width', window.TILE_SIZE * 2);
         this.element.setAttribute('height', window.TILE_SIZE * 2);
+        this.element.style.imageRendering = 'pixelated';
     }
     async moveTo(path, targetResource = null, interactionData = null) {
         this.targetResource = targetResource; // Set the target resource if provided

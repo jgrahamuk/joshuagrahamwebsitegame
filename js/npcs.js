@@ -47,12 +47,13 @@ export class NPC {
     }
 
     updatePosition() {
-        const sprite = `${this.name.toLowerCase()}-${this.direction}.png`;
+        let sprite = `${this.name.toLowerCase()}-${this.direction}.png`;
         this.element.setAttribute('href', getSpriteUrl(sprite));
         this.element.setAttribute('x', (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE);
         this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE);
         this.element.setAttribute('width', window.TILE_SIZE * 2);
         this.element.setAttribute('height', window.TILE_SIZE * 2);
+        this.element.style.imageRendering = 'pixelated';
     }
 
     moveTo(path) {
@@ -144,6 +145,7 @@ export class NPC {
         this.messageElement.setAttribute('width', window.TILE_SIZE * 24);
         this.messageElement.setAttribute('height', window.TILE_SIZE * 12);
         this.messageElement.classList.add('npc-chatbox');
+        this.messageElement.style.imageRendering = 'pixelated';
 
         // Create message text with wrapping
         this.messageTextElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
