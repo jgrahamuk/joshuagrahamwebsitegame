@@ -16,8 +16,8 @@ const cockerelSprites = {
     back: 'cockerel-back.png',
     left: 'cockerel-left.png',
     right: 'cockerel-right.png',
-    peckLeft: 'cockerel-left-peck.png',
-    peckRight: 'cockerel-right-peck.png'
+    peckLeft: 'cockerel-peck-left.png',
+    peckRight: 'cockerel-peck-right.png'
 };
 
 const chickSprites = {
