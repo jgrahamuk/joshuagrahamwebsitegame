@@ -5,8808 +5,5277 @@
     {
       "x": 4,
       "y": 1,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 5,
       "y": 1,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 8,
       "y": 1,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 9,
       "y": 1,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 10,
       "y": 1,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 11,
       "y": 1,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 12,
       "y": 1,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 1,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 1,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 3,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 4,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 5,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 6,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 7,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 8,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 9,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 10,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 11,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 12,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 13,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 14,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 15,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 16,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 24,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 25,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 28,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 29,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 30,
       "y": 2,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 3,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 4,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 5,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 6,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 7,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 8,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 9,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 10,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 11,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 12,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 13,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 14,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 15,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 16,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 17,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 24,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 25,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 28,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 29,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 30,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 33,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 38,
       "y": 3,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 3,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 4,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 5,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 6,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 7,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 8,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 9,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 10,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 11,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 12,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 13,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 14,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 15,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 16,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 17,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 24,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 25,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 28,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 29,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 30,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 32,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "FLOWER"]
     },
     {
       "x": 33,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 34,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 37,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 38,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 39,
       "y": 4,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 3,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 4,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 5,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 6,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 7,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 8,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 9,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 10,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 11,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 12,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 13,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 14,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 15,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 16,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 17,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 18,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 22,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 23,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 24,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 25,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 28,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 29,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 30,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 32,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 33,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 34,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "LARGE_TREE"]
     },
     {
       "x": 35,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 36,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 38,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 39,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 40,
       "y": 5,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 3,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 4,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 5,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 6,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 7,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 8,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 9,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 10,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 11,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 12,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 13,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 14,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 15,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 16,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 17,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 18,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 19,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 20,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 21,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 22,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 23,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 24,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 25,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 28,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "SMALL_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "SMALL_TREE"]
     },
     {
       "x": 29,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 30,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "LARGE_TREE"]
     },
     {
       "x": 31,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 32,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 33,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 34,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "LARGE_TREE"]
     },
     {
       "x": 35,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 36,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 37,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "LARGE_TREE"]
     },
     {
       "x": 38,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 39,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 40,
       "y": 6,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 5,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 6,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 7,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 8,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 9,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 10,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 11,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 12,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 13,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 14,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 15,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 16,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 17,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 18,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 19,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 20,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 21,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 22,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 23,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 24,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 25,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 28,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 29,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 30,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 31,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 32,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 33,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 34,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 35,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 36,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 37,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 38,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 39,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 40,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 41,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 54,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 55,
       "y": 7,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 4,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 5,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 6,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 7,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 8,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 9,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 10,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 11,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 12,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 13,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 14,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 15,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 16,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 17,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 18,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 19,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 20,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 21,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 22,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 23,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 24,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 25,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 28,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 29,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 30,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 32,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 33,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 34,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 35,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 36,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 38,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 39,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 40,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 41,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 52,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 53,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 54,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 55,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 56,
       "y": 8,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 4,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 5,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 6,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 7,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 8,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 9,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 10,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 11,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 12,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 13,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 14,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 15,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 16,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 17,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 18,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 19,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 20,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 21,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 22,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 23,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 24,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 25,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 28,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 29,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 30,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 32,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 33,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 34,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 35,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 36,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 38,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 39,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 40,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 41,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 42,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 49,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 50,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 51,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 52,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 53,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 54,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 55,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 56,
       "y": 9,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 6,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 7,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 8,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 9,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 10,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 11,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 12,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 13,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 14,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 15,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 16,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "LARGE_TREE"]
     },
     {
       "x": 17,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 18,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 19,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 20,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 21,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 22,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "FLOWER"]
     },
     {
       "x": 23,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 24,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 25,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 26,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 28,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "FLOWER"]
     },
     {
       "x": 29,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 30,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 32,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 33,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 34,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 35,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 36,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 38,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 39,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 40,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 41,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 48,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 49,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 50,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 51,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 52,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 53,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 54,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 55,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 56,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 57,
       "y": 10,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 8,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 9,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 10,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 11,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 12,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 13,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 14,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 15,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 16,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 17,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 18,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 19,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 20,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 21,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 22,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 23,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 24,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 25,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 26,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 27,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 28,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 29,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 30,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 32,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 33,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 34,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 35,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 36,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 38,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 39,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 40,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 45,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 46,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 47,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 48,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 49,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 50,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 51,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 52,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 53,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 54,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 55,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 56,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 57,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 58,
       "y": 11,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 12,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 13,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 14,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 15,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "LARGE_TREE"]
     },
     {
       "x": 16,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 17,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "LARGE_TREE"]
     },
     {
       "x": 18,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 19,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 20,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 21,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 22,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 23,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 24,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 25,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 27,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 28,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 29,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 30,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 31,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 32,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 33,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 34,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 35,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 36,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 38,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 39,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 40,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 41,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 43,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 44,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 45,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 46,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 47,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 48,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 49,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 50,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 51,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 52,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 53,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 54,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 55,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 56,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 57,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 58,
       "y": 12,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 16,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "LARGE_TREE"]
     },
     {
       "x": 17,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 18,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 19,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 20,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 21,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 22,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 23,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 24,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 25,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 28,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 29,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 30,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 32,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 33,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 34,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 35,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 36,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 38,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 39,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 40,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 41,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 43,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 44,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 45,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 46,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 47,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 48,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 49,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 50,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 51,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 52,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 53,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 54,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 55,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 56,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 57,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 58,
       "y": 13,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 17,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 18,
       "y": 14,
-      "layers": [
-        "WATER",
-        "DIRT",
-        "GRASS"
-      ]
+      "layers": ["WATER", "DIRT", "GRASS"]
     },
     {
       "x": 19,
       "y": 14,
-      "layers": [
-        "WATER",
-        "DIRT",
-        "GRASS"
-      ]
+      "layers": ["WATER", "DIRT", "GRASS"]
     },
     {
       "x": 20,
       "y": 14,
-      "layers": [
-        "WATER",
-        "DIRT",
-        "GRASS"
-      ]
+      "layers": ["WATER", "DIRT", "GRASS"]
     },
     {
       "x": 21,
       "y": 14,
-      "layers": [
-        "WATER",
-        "DIRT"
-      ]
+      "layers": ["WATER", "DIRT"]
     },
     {
       "x": 22,
       "y": 14,
-      "layers": [
-        "WATER",
-        "DIRT",
-        "GRASS"
-      ]
+      "layers": ["WATER", "DIRT", "GRASS"]
     },
     {
       "x": 23,
       "y": 14,
-      "layers": [
-        "WATER",
-        "DIRT"
-      ]
+      "layers": ["WATER", "DIRT"]
     },
     {
       "x": 24,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 25,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 26,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 28,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 29,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 30,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 32,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 33,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 34,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 35,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 36,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 38,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 39,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 40,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 41,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 43,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 44,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 45,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 46,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 47,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 48,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 49,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 50,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 51,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 52,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 53,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 54,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 55,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 56,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 57,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 58,
       "y": 14,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 15,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 18,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "DIRT"
-      ]
+      "layers": ["WATER", "GRASS", "DIRT"]
     },
     {
       "x": 19,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "DIRT"
-      ]
+      "layers": ["WATER", "GRASS", "DIRT"]
     },
     {
       "x": 20,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "DIRT"
-      ]
+      "layers": ["WATER", "GRASS", "DIRT"]
     },
     {
       "x": 21,
       "y": 15,
-      "layers": [
-        "WATER",
-        "DIRT"
-      ]
+      "layers": ["WATER", "DIRT"]
     },
     {
       "x": 22,
       "y": 15,
-      "layers": [
-        "WATER",
-        "DIRT"
-      ]
+      "layers": ["WATER", "DIRT"]
     },
     {
       "x": 23,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "DIRT"
-      ]
+      "layers": ["WATER", "GRASS", "DIRT"]
     },
     {
       "x": 24,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 25,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 28,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 29,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 30,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 32,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 33,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 34,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 35,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 36,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 37,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 38,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 39,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 40,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 41,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 42,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 43,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 44,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 45,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 46,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 47,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 48,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 49,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 50,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 51,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 52,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 53,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 54,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 55,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 56,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 57,
       "y": 15,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 15,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 16,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 18,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "DIRT"
-      ]
+      "layers": ["WATER", "GRASS", "DIRT"]
     },
     {
       "x": 19,
       "y": 16,
-      "layers": [
-        "WATER",
-        "DIRT"
-      ]
+      "layers": ["WATER", "DIRT"]
     },
     {
       "x": 20,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 21,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "DIRT"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "DIRT"]
     },
     {
       "x": 22,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "DIRT"
-      ]
+      "layers": ["WATER", "GRASS", "DIRT"]
     },
     {
       "x": 23,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "DIRT"
-      ]
+      "layers": ["WATER", "GRASS", "DIRT"]
     },
     {
       "x": 24,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 25,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 28,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 29,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 30,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 31,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 32,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 33,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 34,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 35,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 36,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 38,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 39,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 40,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 41,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 42,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 43,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 44,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 45,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 46,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 47,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 48,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 49,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 50,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 51,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 52,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 53,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 54,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 55,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 56,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 57,
       "y": 16,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 15,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 16,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 18,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "DIRT"
-      ]
+      "layers": ["WATER", "GRASS", "DIRT"]
     },
     {
       "x": 19,
       "y": 17,
-      "layers": [
-        "WATER",
-        "DIRT"
-      ]
+      "layers": ["WATER", "DIRT"]
     },
     {
       "x": 20,
       "y": 17,
-      "layers": [
-        "WATER",
-        "DIRT"
-      ]
+      "layers": ["WATER", "DIRT"]
     },
     {
       "x": 21,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "DIRT"
-      ]
+      "layers": ["WATER", "GRASS", "DIRT"]
     },
     {
       "x": 22,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "DIRT"
-      ]
+      "layers": ["WATER", "GRASS", "DIRT"]
     },
     {
       "x": 23,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "DIRT"
-      ]
+      "layers": ["WATER", "GRASS", "DIRT"]
     },
     {
       "x": 24,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 25,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 27,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 28,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 29,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 30,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 32,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 33,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 34,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 35,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 36,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 38,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 39,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 40,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 41,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 42,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 43,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 44,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 45,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 46,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 47,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 48,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 49,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 50,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 51,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 52,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 53,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 54,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 55,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 56,
       "y": 17,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 15,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 16,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 17,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 18,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "DIRT"
-      ]
+      "layers": ["WATER", "GRASS", "DIRT"]
     },
     {
       "x": 19,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "DIRT"
-      ]
+      "layers": ["WATER", "GRASS", "DIRT"]
     },
     {
       "x": 20,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "DIRT"
-      ]
+      "layers": ["WATER", "GRASS", "DIRT"]
     },
     {
       "x": 21,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "DIRT"
-      ]
+      "layers": ["WATER", "GRASS", "DIRT"]
     },
     {
       "x": 22,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "DIRT"
-      ]
+      "layers": ["WATER", "GRASS", "DIRT"]
     },
     {
       "x": 23,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "DIRT"
-      ]
+      "layers": ["WATER", "GRASS", "DIRT"]
     },
     {
       "x": 24,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 25,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 28,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 29,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 30,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 32,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 33,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 34,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 35,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 36,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 38,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 39,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 40,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 41,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 42,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 43,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 44,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 45,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 46,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 47,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 48,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 49,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 50,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 51,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 52,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 53,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 54,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 55,
       "y": 18,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 16,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 17,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 18,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 19,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 20,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 22,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 23,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 24,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 25,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 28,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 29,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 30,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 32,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 33,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 34,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 35,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 36,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 38,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 39,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 40,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 41,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 42,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 43,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "LARGE_TREE"]
     },
     {
       "x": 44,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 45,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 46,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 47,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 48,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 49,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 50,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 51,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 52,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 53,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 54,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 55,
       "y": 19,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 18,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 19,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 24,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 25,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 27,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 28,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 29,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 30,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 31,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 32,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 33,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 34,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 35,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 36,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 38,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 39,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 40,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 41,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 42,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 43,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "LARGE_TREE"]
     },
     {
       "x": 44,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 45,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 46,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 47,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 48,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 49,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 50,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 51,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 52,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 53,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 54,
       "y": 20,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 17,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 18,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 25,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "LARGE_TREE"]
     },
     {
       "x": 26,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 28,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 29,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 30,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 31,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 32,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 33,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 34,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 35,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 36,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 38,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 39,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 40,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 41,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "LARGE_TREE"]
     },
     {
       "x": 42,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 43,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 44,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 45,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 46,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 47,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 48,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 49,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 50,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 51,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 52,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 53,
       "y": 21,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 16,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 17,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 18,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 19,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 25,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 27,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 28,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 29,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "LARGE_TREE"]
     },
     {
       "x": 30,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 31,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 32,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 33,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 34,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 35,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 36,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 38,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 39,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 40,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "LARGE_TREE"]
     },
     {
       "x": 41,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 42,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 43,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 44,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 45,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 46,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 47,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 48,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 49,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 50,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 51,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 52,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 53,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 54,
       "y": 22,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 16,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 17,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 18,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 19,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 20,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 25,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 26,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 28,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 29,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "LARGE_TREE"]
     },
     {
       "x": 30,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 31,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 32,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 33,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 34,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 35,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 36,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 38,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 39,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 40,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 41,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 42,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 43,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 44,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 45,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 46,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 47,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 48,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 49,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 50,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 51,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 52,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 53,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 54,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 55,
       "y": 23,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 18,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 19,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 20,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 21,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 24,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 25,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 28,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 29,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 30,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER",
-        "BADGE"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER", "BADGE"]
     },
     {
       "x": 31,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 32,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 33,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 34,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 35,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 36,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 38,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 39,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 40,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 41,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 42,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 43,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 44,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 45,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 46,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 47,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 48,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 49,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 50,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 51,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 52,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 53,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 54,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 55,
       "y": 24,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 18,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 19,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 20,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "LARGE_TREE"]
     },
     {
       "x": 21,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 22,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 23,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 24,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 25,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 27,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 28,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 29,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 30,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 32,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "FLOWER"]
     },
     {
       "x": 33,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 34,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 35,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 36,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 37,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 38,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 39,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 40,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 41,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 42,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 43,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 44,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 45,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 46,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 47,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 51,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 52,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 53,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 54,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 55,
       "y": 25,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 16,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 17,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 18,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 19,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 20,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 21,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 22,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 23,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 24,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 25,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 28,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 29,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 30,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 32,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 33,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 34,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 35,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 36,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 38,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "LARGE_TREE"]
     },
     {
       "x": 39,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 40,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 41,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 42,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 43,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 44,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 45,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 46,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 53,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 54,
       "y": 26,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 16,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 17,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 18,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 19,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 20,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 21,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 22,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 23,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 24,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 25,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 26,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 28,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 29,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 30,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 32,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 33,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 34,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "FLOWER"]
     },
     {
       "x": 35,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 36,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 37,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 38,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 39,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 40,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 41,
       "y": 27,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 15,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 16,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 17,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 18,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 19,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 20,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 21,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 22,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 23,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 28,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 29,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 30,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "LARGE_TREE"
-      ]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 32,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 33,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 34,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 35,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 36,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 37,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 38,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 39,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 40,
       "y": 28,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 15,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 16,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 17,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 18,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "ROCK"]
     },
     {
       "x": 19,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 20,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 21,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 23,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 26,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 27,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 28,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 29,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 30,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 32,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 33,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "ROCK"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "ROCK"]
     },
     {
       "x": 34,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 35,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 36,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 37,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 38,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 39,
       "y": 29,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 15,
       "y": 30,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 16,
       "y": 30,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 17,
       "y": 30,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 18,
       "y": 30,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 19,
       "y": 30,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 20,
       "y": 30,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 29,
       "y": 30,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 30,
       "y": 30,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 31,
       "y": 30,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 32,
       "y": 30,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 33,
       "y": 30,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 34,
       "y": 30,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "FLOWER"]
     },
     {
       "x": 35,
       "y": 30,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 36,
       "y": 30,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 37,
       "y": 30,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 38,
       "y": 30,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 39,
       "y": 30,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 15,
       "y": 31,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 16,
       "y": 31,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 17,
       "y": 31,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 18,
       "y": 31,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 19,
       "y": 31,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 30,
       "y": 31,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 31,
       "y": 31,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 33,
       "y": 31,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 34,
       "y": 31,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER",
-        "FLOWER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "FLOWER"]
     },
     {
       "x": 35,
       "y": 31,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 36,
       "y": 31,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 31,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 38,
       "y": 31,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 34,
       "y": 32,
-      "layers": [
-        "WATER",
-        "GRASS",
-        "WATER_BORDER"
-      ]
+      "layers": ["WATER", "GRASS", "WATER_BORDER"]
     },
     {
       "x": 36,
       "y": 32,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 37,
       "y": 32,
-      "layers": [
-        "WATER",
-        "GRASS"
-      ]
+      "layers": ["WATER", "GRASS"]
     }
   ],
   "structures": [
@@ -9894,7 +6363,7 @@
       "name": "Joshua",
       "x": 37,
       "y": 19,
-      "message": "Welcome to my farm! It looks like the chickens are having a great time."
+      "message": "Hey! I'm Joshua! I'm a technical leader and polyglot full-stack developer with 25+ years of experience. I've delivered over 200 technical projects for large and small businesses alike and I have helped over a dozen startups develop and ship their ideas. I've talked on and hosted podcasts about building software and shared my perspective on growing as a developer through public speaking, working with university courses and mentoring developer cohorts. I love growing people, but I'm still an engineer at heart. \n\nI don't suppose you could give me a hand. I seem to have lost my badge to get into work.\n\nIf you could find it, that'd be awesome!"
     }
   ],
   "chickens": [
