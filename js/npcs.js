@@ -47,7 +47,7 @@ export class NPC {
     }
 
     updatePosition() {
-        let sprite = `${this.name.toLowerCase()}-${this.direction}.png`;
+        let sprite = `${this.name.toLowerCase()}-${this.direction}.gif`;
         this.element.setAttribute('href', getSpriteUrl(sprite));
         this.element.setAttribute('x', (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE);
         this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE);
@@ -139,7 +139,7 @@ export class NPC {
 
         // Create chatbox background
         this.messageElement = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        this.messageElement.setAttribute('href', getSpriteUrl('chatbox.png'));
+        this.messageElement.setAttribute('href', getSpriteUrl('chatbox.gif'));
         this.messageElement.setAttribute('x', (window.MAP_OFFSET_X || 0) + (this.x - 10) * window.TILE_SIZE);
         this.messageElement.setAttribute('y', (window.MAP_OFFSET_Y || 0) + (this.y - 12) * window.TILE_SIZE);
         this.messageElement.setAttribute('width', window.TILE_SIZE * 24);

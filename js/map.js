@@ -161,7 +161,7 @@ export function drawMap(svg) {
     for (let y = 0; y < numYTiles; y++) {
         for (let x = 0; x < numXTiles; x++) {
             const imgWater = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-            imgWater.setAttribute('href', getSpriteUrl('tile-water.png'));
+            imgWater.setAttribute('href', getSpriteUrl('tile-water.gif'));
             imgWater.setAttribute('x', x * tileSize);
             imgWater.setAttribute('y', y * tileSize);
             imgWater.setAttribute('width', tileSize);
@@ -175,10 +175,10 @@ export function drawMap(svg) {
     for (let y = 0; y < MAP_HEIGHT_TILES; y++) {
         for (let x = 0; x < MAP_WIDTH_TILES; x++) {
             const tiles = map[y][x];
-            let baseTile = tiles.find(t => t === tileTypes.DIRT) ? 'tile-dirt.png'
-                : tiles.find(t => t === tileTypes.GRASS) ? 'tile-grass.png'
-                    : tiles.find(t => t === tileTypes.WATER || (t.color && t.color === '#3bbcff')) ? 'tile-water.png'
-                        : 'tile-grass.png';
+            let baseTile = tiles.find(t => t === tileTypes.DIRT) ? 'tile-dirt.gif'
+                : tiles.find(t => t === tileTypes.GRASS) ? 'tile-grass.gif'
+                    : tiles.find(t => t === tileTypes.WATER || (t.color && t.color === '#3bbcff')) ? 'tile-water.gif'
+                        : 'tile-grass.gif';
             let basePath = getSpriteUrl(baseTile);
             const imgBase = document.createElementNS('http://www.w3.org/2000/svg', 'image');
             imgBase.setAttribute('href', basePath);
@@ -202,19 +202,19 @@ export function drawMap(svg) {
             let overlay = null;
             let resourceType = null;
             if (top === tileTypes.LARGE_TREE || top === tileTypes.SMALL_TREE) {
-                overlay = 'tree.png';
+                overlay = 'tree.gif';
                 resourceType = 'tree';
             } else if (top === tileTypes.ROCK) {
-                overlay = 'stone.png';
+                overlay = 'stone.gif';
                 resourceType = 'stone';
             } else if (top === tileTypes.FLOWER) {
-                overlay = 'flower.png';
+                overlay = 'flower.gif';
                 resourceType = 'flower';
             } else if (top === tileTypes.EGG) {
-                overlay = 'egg.png';
+                overlay = 'egg.gif';
                 resourceType = 'egg';
             } else if (top === tileTypes.BADGE) {
-                overlay = 'badge.png';
+                overlay = 'badge.gif';
                 resourceType = 'badge';
             }
             if (overlay) {

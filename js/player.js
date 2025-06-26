@@ -29,7 +29,7 @@ export class Player {
         this.updateInventoryDisplay();
     }
     updatePosition() {
-        let sprite = `character-${this.direction}.png`;
+        let sprite = `character-${this.direction}.gif`;
 
         // Add walking animation for left/right movement
         if (this.isWalking && (this.direction === 'left' || this.direction === 'right')) {
@@ -40,7 +40,7 @@ export class Player {
             }
 
             if (this.walkFrame === 1) {
-                sprite = `character-${this.direction}-walk.png`;
+                sprite = `character-${this.direction}-walk.gif`;
             }
         }
 

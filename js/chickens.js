@@ -3,28 +3,28 @@ import { findPath } from './movement.js';
 import { getSpriteUrl } from './spriteCache.js';
 
 const chickenSprites = {
-    front: 'chicken-front.png',
-    back: 'chicken-back.png',
-    left: 'chicken-left.png',
-    right: 'chicken-right.png',
-    peckRight: 'chicken-peck-right.png',
-    peckLeft: 'chicken-peck-left.png',
+    front: 'chicken-front.gif',
+    back: 'chicken-back.gif',
+    left: 'chicken-left.gif',
+    right: 'chicken-right.gif',
+    peckRight: 'chicken-peck-right.gif',
+    peckLeft: 'chicken-peck-left.gif',
 };
 
 const cockerelSprites = {
-    front: 'cockerel-front.png',
-    back: 'cockerel-back.png',
-    left: 'cockerel-left.png',
-    right: 'cockerel-right.png',
-    peckLeft: 'cockerel-peck-left.png',
-    peckRight: 'cockerel-peck-right.png'
+    front: 'cockerel-front.gif',
+    back: 'cockerel-back.gif',
+    left: 'cockerel-left.gif',
+    right: 'cockerel-right.gif',
+    peckLeft: 'cockerel-peck-left.gif',
+    peckRight: 'cockerel-peck-right.gif'
 };
 
 const chickSprites = {
-    front: 'chick-front.png',
-    back: 'chick-back.png',
-    left: 'chick-left.png',
-    right: 'chick-right.png',
+    front: 'chick-front.gif',
+    back: 'chick-back.gif',
+    left: 'chick-left.gif',
+    right: 'chick-right.gif',
 };
 
 // Track egg placement times for hatching
@@ -227,7 +227,7 @@ export class Chicken {
     }
     addEggToSVG(x, y) {
         const eggElement = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        eggElement.setAttribute('href', getSpriteUrl('egg.png'));
+        eggElement.setAttribute('href', getSpriteUrl('egg.gif'));
         eggElement.setAttribute('x', (window.MAP_OFFSET_X || 0) + x * window.TILE_SIZE);
         eggElement.setAttribute('y', (window.MAP_OFFSET_Y || 0) + y * window.TILE_SIZE);
         eggElement.setAttribute('width', window.TILE_SIZE);

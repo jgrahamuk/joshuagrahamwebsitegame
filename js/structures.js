@@ -70,7 +70,7 @@ export function drawStructures(svg, offsetX = 0, offsetY = 0) {
     // Draw farmhouse
     if (window.farmhouse) {
         const imgFarm = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        imgFarm.setAttribute('href', getSpriteUrl('farmhouse.png'));
+        imgFarm.setAttribute('href', getSpriteUrl('farmhouse.gif'));
         imgFarm.setAttribute('x', offsetX + window.farmhouse.x * tileSize);
         imgFarm.setAttribute('y', offsetY + window.farmhouse.y * tileSize);
         imgFarm.setAttribute('width', window.farmhouse.w * tileSize);
@@ -81,7 +81,7 @@ export function drawStructures(svg, offsetX = 0, offsetY = 0) {
     // Draw chicken coop
     if (window.chickenCoop) {
         const imgCoop = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        imgCoop.setAttribute('href', getSpriteUrl('chicken-coop.png'));
+        imgCoop.setAttribute('href', getSpriteUrl('chicken-coop.gif'));
         imgCoop.setAttribute('x', offsetX + window.chickenCoop.x * tileSize);
         imgCoop.setAttribute('y', offsetY + window.chickenCoop.y * tileSize);
         imgCoop.setAttribute('width', window.chickenCoop.w * tileSize);
@@ -92,7 +92,7 @@ export function drawStructures(svg, offsetX = 0, offsetY = 0) {
     // Draw sign
     if (window.signObj) {
         const imgSign = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        imgSign.setAttribute('href', getSpriteUrl('sign-joshuagraham.png'));
+        imgSign.setAttribute('href', getSpriteUrl('sign-joshuagraham.gif'));
         imgSign.setAttribute('x', offsetX + window.signObj.x * tileSize);
         imgSign.setAttribute('y', offsetY + window.signObj.y * tileSize);
         imgSign.setAttribute('width', window.signObj.w * tileSize);

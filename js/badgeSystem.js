@@ -69,7 +69,7 @@ class BadgeSystem {
         const offsetY = window.MAP_OFFSET_Y || 0;
 
         const badgeElement = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        badgeElement.setAttribute('href', getSpriteUrl('badge.png'));
+        badgeElement.setAttribute('href', getSpriteUrl('badge.gif'));
         badgeElement.setAttribute('x', offsetX + position.x * window.TILE_SIZE);
         badgeElement.setAttribute('y', offsetY + position.y * window.TILE_SIZE);
         badgeElement.setAttribute('width', window.TILE_SIZE);

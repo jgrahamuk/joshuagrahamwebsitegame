@@ -14,24 +14,24 @@ export class MapEditor {
 
         this.tools = [
             { id: 'delete', name: 'Delete', icon: '🗑️', type: 'delete' },
-            { id: 'grass', name: 'Grass', icon: 'tile-grass.png', type: 'tile', tileType: tileTypes.GRASS },
-            { id: 'dirt', name: 'Dirt', icon: 'tile-dirt.png', type: 'tile', tileType: tileTypes.DIRT },
-            { id: 'water', name: 'Water', icon: 'tile-water.png', type: 'tile', tileType: tileTypes.WATER },
-            { id: 'large_tree', name: 'Large Tree', icon: 'tree.png', type: 'resource', tileType: tileTypes.LARGE_TREE },
-            { id: 'small_tree', name: 'Small Tree', icon: 'tree.png', type: 'resource', tileType: tileTypes.SMALL_TREE },
-            { id: 'rock', name: 'Rock', icon: 'stone.png', type: 'resource', tileType: tileTypes.ROCK },
-            { id: 'flower', name: 'Flower', icon: 'flower.png', type: 'resource', tileType: tileTypes.FLOWER },
-            { id: 'egg', name: 'Egg', icon: 'egg.png', type: 'resource', tileType: tileTypes.EGG },
-            { id: 'badge', name: 'Badge', icon: 'badge.png', type: 'resource', tileType: tileTypes.BADGE },
+            { id: 'grass', name: 'Grass', icon: 'tile-grass.gif', type: 'tile', tileType: tileTypes.GRASS },
+            { id: 'dirt', name: 'Dirt', icon: 'tile-dirt.gif', type: 'tile', tileType: tileTypes.DIRT },
+            { id: 'water', name: 'Water', icon: 'tile-water.gif', type: 'tile', tileType: tileTypes.WATER },
+            { id: 'large_tree', name: 'Large Tree', icon: 'tree.gif', type: 'resource', tileType: tileTypes.LARGE_TREE },
+            { id: 'small_tree', name: 'Small Tree', icon: 'tree.gif', type: 'resource', tileType: tileTypes.SMALL_TREE },
+            { id: 'rock', name: 'Rock', icon: 'stone.gif', type: 'resource', tileType: tileTypes.ROCK },
+            { id: 'flower', name: 'Flower', icon: 'flower.gif', type: 'resource', tileType: tileTypes.FLOWER },
+            { id: 'egg', name: 'Egg', icon: 'egg.gif', type: 'resource', tileType: tileTypes.EGG },
+            { id: 'badge', name: 'Badge', icon: 'badge.gif', type: 'resource', tileType: tileTypes.BADGE },
             // Structures
-            { id: 'farmhouse', name: 'Farmhouse', icon: 'farmhouse.png', type: 'structure', structureType: 'FARMHOUSE', width: 10, height: 6 },
-            { id: 'chicken_coop', name: 'Chicken Coop', icon: 'chicken-coop.png', type: 'structure', structureType: 'CHICKEN_COOP', width: 5, height: 3 },
-            { id: 'sign', name: 'Sign', icon: 'sign-joshuagraham.png', type: 'structure', structureType: 'SIGN', width: 5, height: 3 },
+            { id: 'farmhouse', name: 'Farmhouse', icon: 'farmhouse.gif', type: 'structure', structureType: 'FARMHOUSE', width: 10, height: 6 },
+            { id: 'chicken_coop', name: 'Chicken Coop', icon: 'chicken-coop.gif', type: 'structure', structureType: 'CHICKEN_COOP', width: 5, height: 3 },
+            { id: 'sign', name: 'Sign', icon: 'sign-joshuagraham.gif', type: 'structure', structureType: 'SIGN', width: 5, height: 3 },
             // NPCs
-            { id: 'npc_joshua', name: 'Joshua NPC', icon: 'joshua-front.png', type: 'npc', npcType: 'Joshua', message: 'Welcome to my farm! It looks like the chickens are having a great time.' },
+            { id: 'npc_joshua', name: 'Joshua NPC', icon: 'joshua-front.gif', type: 'npc', npcType: 'Joshua', message: 'Welcome to my farm! It looks like the chickens are having a great time.' },
             // Chickens and Cockerels
-            { id: 'chicken', name: 'Chicken', icon: 'chicken-front.png', type: 'chicken' },
-            { id: 'cockerel', name: 'Cockerel', icon: 'chicken-front.png', type: 'cockerel' }
+            { id: 'chicken', name: 'Chicken', icon: 'chicken-front.gif', type: 'chicken' },
+            { id: 'cockerel', name: 'Cockerel', icon: 'chicken-front.gif', type: 'cockerel' }
         ];
 
         this.setupKeyboardShortcuts();
@@ -87,7 +87,7 @@ export class MapEditor {
             const toolButton = document.createElement('button');
 
             // Check if the icon is an image file or emoji
-            if (tool.icon.endsWith('.png')) {
+            if (tool.icon.endsWith('.gif')) {
                 // Create an image element for sprite icons
                 const img = document.createElement('img');
                 img.src = getSpriteUrl(tool.icon);
@@ -227,10 +227,10 @@ export class MapEditor {
 
         // Redraw the specific tile
         const tiles = map[y][x];
-        let baseTile = tiles.find(t => t === tileTypes.DIRT) ? 'tile-dirt.png'
-            : tiles.find(t => t === tileTypes.GRASS) ? 'tile-grass.png'
-                : tiles.find(t => t === tileTypes.WATER || (t.color && t.color === '#3bbcff')) ? 'tile-water.png'
-                    : 'tile-grass.png';
+        let baseTile = tiles.find(t => t === tileTypes.DIRT) ? 'tile-dirt.gif'
+            : tiles.find(t => t === tileTypes.GRASS) ? 'tile-grass.gif'
+                : tiles.find(t => t === tileTypes.WATER || (t.color && t.color === '#3bbcff')) ? 'tile-water.gif'
+                    : 'tile-grass.gif';
 
         const basePath = getSpriteUrl(baseTile);
         const imgBase = document.createElementNS('http://www.w3.org/2000/svg', 'image');
@@ -245,11 +245,11 @@ export class MapEditor {
         const top = tiles[tiles.length - 1];
         let overlay = null;
         if (top === tileTypes.LARGE_TREE || top === tileTypes.SMALL_TREE) {
-            overlay = 'tree.png';
+            overlay = 'tree.gif';
         } else if (top === tileTypes.ROCK) {
-            overlay = 'stone.png';
+            overlay = 'stone.gif';
         } else if (top === tileTypes.FLOWER) {
-            overlay = 'flower.png';
+            overlay = 'flower.gif';
         }
 
         if (overlay) {
@@ -524,7 +524,7 @@ export class MapEditor {
         // Redraw structures
         if (window.farmhouse) {
             const imgFarm = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-            imgFarm.setAttribute('href', getSpriteUrl('farmhouse.png'));
+            imgFarm.setAttribute('href', getSpriteUrl('farmhouse.gif'));
             imgFarm.setAttribute('x', window.farmhouse.x * window.TILE_SIZE);
             imgFarm.setAttribute('y', window.farmhouse.y * window.TILE_SIZE);
             imgFarm.setAttribute('width', window.farmhouse.w * window.TILE_SIZE);
@@ -534,7 +534,7 @@ export class MapEditor {
 
         if (window.chickenCoop) {
             const imgCoop = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-            imgCoop.setAttribute('href', getSpriteUrl('chicken-coop.png'));
+            imgCoop.setAttribute('href', getSpriteUrl('chicken-coop.gif'));
             imgCoop.setAttribute('x', window.chickenCoop.x * window.TILE_SIZE);
             imgCoop.setAttribute('y', window.chickenCoop.y * window.TILE_SIZE);
             imgCoop.setAttribute('width', window.chickenCoop.w * window.TILE_SIZE);
@@ -544,7 +544,7 @@ export class MapEditor {
 
         if (window.signObj) {
             const imgSign = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-            imgSign.setAttribute('href', getSpriteUrl('sign-joshuagraham.png'));
+            imgSign.setAttribute('href', getSpriteUrl('sign-joshuagraham.gif'));
             imgSign.setAttribute('x', window.signObj.x * window.TILE_SIZE);
             imgSign.setAttribute('y', window.signObj.y * window.TILE_SIZE);
             imgSign.setAttribute('width', window.signObj.w * window.TILE_SIZE);
