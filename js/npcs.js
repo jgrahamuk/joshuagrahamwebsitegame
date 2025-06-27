@@ -146,6 +146,10 @@ export class NPC {
         this.messageElement.setAttribute('height', window.TILE_SIZE * 12);
         this.messageElement.classList.add('npc-chatbox');
         this.messageElement.style.imageRendering = 'pixelated';
+        this.messageElement.style.shapeRendering = 'crispEdges';
+        this.messageElement.style.webkitImageRendering = 'pixelated';
+        this.messageElement.style.mozImageRendering = 'pixelated';
+        this.messageElement.style.msImageRendering = 'pixelated';
 
         // Create message text with wrapping
         this.messageTextElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');

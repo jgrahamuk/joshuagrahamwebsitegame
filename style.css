@@ -25,7 +25,7 @@ body {
   background-color: #fff;
   top: 1rem;
   right: 1rem;
-  display: flex;
+  display: none;
   gap: 1rem;
   z-index: 1000;
 }
