@@ -48,26 +48,40 @@ export async function initializeMap(forcePortrait = false) {
     // Set the map data
     map = gameData.map;
 
-    // Update structure references
-    gameData.structures.forEach(structure => {
-        switch (structure.type) {
-            case 'FARMHOUSE':
-                farmhouse = { x: structure.x, y: structure.y, w: structure.width, h: structure.height };
-                window.farmhouse = farmhouse;
-                break;
-            case 'CHICKEN_COOP':
-                chickenCoop = { x: structure.x, y: structure.y, w: structure.width, h: structure.height };
-                window.chickenCoop = chickenCoop;
-                break;
-            case 'SIGN':
-                signObj = { x: structure.x, y: structure.y, w: structure.width, h: structure.height };
-                window.signObj = signObj;
-                break;
-        }
-    });
+    // Reset structure references
+    farmhouse = null;
+    chickenCoop = null;
+    signObj = null;
+    window.farmhouse = null;
+    window.chickenCoop = null;
+    window.signObj = null;
 
-    // Place structures using the existing module
-    placeStructures(map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
+    // Update structure references
+    if (gameData.structures) {
+        gameData.structures.forEach(structure => {
+            const structureObj = {
+                x: structure.x,
+                y: structure.y,
+                w: structure.width,
+                h: structure.height
+            };
+
+            switch (structure.type) {
+                case 'FARMHOUSE':
+                    farmhouse = structureObj;
+                    window.farmhouse = farmhouse;
+                    break;
+                case 'CHICKEN_COOP':
+                    chickenCoop = structureObj;
+                    window.chickenCoop = chickenCoop;
+                    break;
+                case 'SIGN':
+                    signObj = structureObj;
+                    window.signObj = signObj;
+                    break;
+            }
+        });
+    }
 
     return gameData;
 }
@@ -262,6 +276,50 @@ export function drawMap(svg) {
                 svg.appendChild(imgOverlay);
             }
         }
+    }
+
+    // If map editor is active, draw grid and border
+    if (window.mapEditor && window.mapEditor.isActive) {
+        // Create a group for editor overlay elements
+        const editorGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        editorGroup.setAttribute('pointer-events', 'none');
+
+        // Draw border around actual map area
+        const border = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        border.setAttribute('x', offsetX);
+        border.setAttribute('y', offsetY);
+        border.setAttribute('width', MAP_WIDTH_TILES * tileSize);
+        border.setAttribute('height', MAP_HEIGHT_TILES * tileSize);
+        border.setAttribute('fill', 'none');
+        border.setAttribute('stroke', '#ff4444');
+        border.setAttribute('stroke-width', '2');
+        editorGroup.appendChild(border);
+
+        // Draw vertical grid lines
+        for (let x = 0; x <= MAP_WIDTH_TILES; x++) {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', offsetX + x * tileSize);
+            line.setAttribute('y1', offsetY);
+            line.setAttribute('x2', offsetX + x * tileSize);
+            line.setAttribute('y2', offsetY + MAP_HEIGHT_TILES * tileSize);
+            line.setAttribute('stroke', 'rgba(255, 255, 255, 0.2)');
+            line.setAttribute('stroke-width', '1');
+            editorGroup.appendChild(line);
+        }
+
+        // Draw horizontal grid lines
+        for (let y = 0; y <= MAP_HEIGHT_TILES; y++) {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', offsetX);
+            line.setAttribute('y1', offsetY + y * tileSize);
+            line.setAttribute('x2', offsetX + MAP_WIDTH_TILES * tileSize);
+            line.setAttribute('y2', offsetY + y * tileSize);
+            line.setAttribute('stroke', 'rgba(255, 255, 255, 0.2)');
+            line.setAttribute('stroke-width', '1');
+            editorGroup.appendChild(line);
+        }
+
+        svg.appendChild(editorGroup);
     }
 
     // Redraw player and NPCs on top

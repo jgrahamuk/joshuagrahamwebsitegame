@@ -77,6 +77,24 @@ export function convertMapDataToGameFormat(mapData) {
                 case 'PINE_TREE': gameMap[resource.y][resource.x].push(tileTypes.PINE_TREE); break;
                 case 'ROCK': gameMap[resource.y][resource.x].push(tileTypes.ROCK); break;
                 case 'FLOWER': gameMap[resource.y][resource.x].push(tileTypes.FLOWER); break;
+                case 'EGG': gameMap[resource.y][resource.x].push(tileTypes.EGG); break;
+                case 'BADGE': gameMap[resource.y][resource.x].push(tileTypes.BADGE); break;
+            }
+        }
+    });
+
+    // Apply structures to the map tiles
+    structures.forEach(structure => {
+        for (let y = structure.y; y < structure.y + structure.height; y++) {
+            for (let x = structure.x; x < structure.x + structure.width; x++) {
+                if (x >= 0 && x < width && y >= 0 && y < height) {
+                    // Make sure we have a valid base tile first
+                    if (!gameMap[y][x].some(tile => tile === tileTypes.GRASS || tile === tileTypes.DIRT)) {
+                        gameMap[y][x].push(tileTypes.GRASS);
+                    }
+                    // Add the structure tile
+                    gameMap[y][x].push({ color: 'white', passable: false, resource: null });
+                }
             }
         }
     });

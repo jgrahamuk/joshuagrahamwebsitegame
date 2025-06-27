@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 // Read the map file
-const mapData = fs.readFileSync('maps/map.json', 'utf8');
+const mapData = fs.readFileSync('maps/map-portrait.json', 'utf8');
 
 // Fix missing commas first
 const fixedCommas = mapData.replace(/"\n\s*"/g, '",\n        "');
@@ -37,4 +37,4 @@ map.tiles = map.tiles.map(tile => {
 });
 
 // Write the cleaned map back to file
-fs.writeFileSync('maps/map.json', JSON.stringify(map, null, 2)); 
+fs.writeFileSync('maps/map-portrait.json', JSON.stringify(map, null, 2)); 
