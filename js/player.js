@@ -25,10 +25,220 @@ export class Player {
             badges: 0
         };
 
+        // Intro sequence state
+        this.isInIntro = true;
+        this.introScale = 2;
+        this.introMessageElement = null;
+        this.introTextElements = [];
+        this.introTimeout = null;
+
         this.updatePosition();
         this.updateInventoryDisplay();
+
+        if (this.isInIntro) {
+            this.showIntroSequence();
+        }
     }
+
+    showIntroSequence() {
+        // Create blur overlay
+        this.blurOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        this.blurOverlay.setAttribute('x', 0);
+        this.blurOverlay.setAttribute('y', 0);
+        this.blurOverlay.setAttribute('width', window.innerWidth);
+        this.blurOverlay.setAttribute('height', window.innerHeight);
+        this.blurOverlay.setAttribute('fill', 'rgba(0, 0, 0, 0.3)');
+
+        // Create and apply blur filter
+        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        const filter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+        filter.setAttribute('id', 'blur-filter');
+        const gaussianBlur = document.createElementNS('http://www.w3.org/2000/svg', 'feGaussianBlur');
+        gaussianBlur.setAttribute('stdDeviation', '4');
+        filter.appendChild(gaussianBlur);
+        defs.appendChild(filter);
+        this.svg.appendChild(defs);
+
+        this.blurOverlay.style.filter = 'url(#blur-filter)';
+        this.svg.appendChild(this.blurOverlay);
+
+        // Create a group for intro elements to ensure proper z-ordering
+        this.introGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        this.introGroup.style.zIndex = '10';
+        this.svg.appendChild(this.introGroup);
+
+        // Position in center of screen
+        const screenCenterX = window.innerWidth / 2;
+        const screenCenterY = window.innerHeight / 2;
+
+        // Position character in center
+        const characterWidth = window.TILE_SIZE * 2 * this.introScale;
+        const characterHeight = window.TILE_SIZE * 2 * this.introScale;
+        const characterX = screenCenterX - (characterWidth / 2);
+        const characterY = screenCenterY - (characterHeight / 2);
+
+        // Ensure character sprite is set correctly
+        this.element.setAttribute('href', getSpriteUrl('character-front.gif'));
+        this.element.setAttribute('x', characterX);
+        this.element.setAttribute('y', characterY);
+        this.element.setAttribute('width', characterWidth);
+        this.element.setAttribute('height', characterHeight);
+        this.element.style.imageRendering = 'pixelated';
+
+        // Move character to intro group
+        if (this.element.parentNode) {
+            this.element.parentNode.removeChild(this.element);
+        }
+        this.introGroup.appendChild(this.element);
+
+        // Create chatbox background
+        this.introMessageElement = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        this.introMessageElement.setAttribute('href', getSpriteUrl('chatbox.gif'));
+
+        // Position chatbox above character with proper spacing
+        const chatboxWidth = window.TILE_SIZE * 24;
+        const chatboxHeight = window.TILE_SIZE * 12;
+        const chatboxX = screenCenterX - chatboxWidth / 2;
+        const chatboxY = characterY - chatboxHeight - window.TILE_SIZE;
+
+        this.introMessageElement.setAttribute('x', chatboxX);
+        this.introMessageElement.setAttribute('y', chatboxY);
+        this.introMessageElement.setAttribute('width', chatboxWidth);
+        this.introMessageElement.setAttribute('height', chatboxHeight);
+        this.introMessageElement.style.imageRendering = 'pixelated';
+        this.introMessageElement.style.shapeRendering = 'crispEdges';
+        this.introMessageElement.style.webkitImageRendering = 'pixelated';
+        this.introMessageElement.style.mozImageRendering = 'pixelated';
+        this.introMessageElement.style.msImageRendering = 'pixelated';
+        this.introGroup.appendChild(this.introMessageElement);
+
+        // Create and position text with proper wrapping
+        const message = "Hey! Check out this website. Isn't it snazzy?! Just click anywhere on the map and I'll go there. There are lots of items to pick up and things to do. Maybe you should go talk to Joshua, as this is his website. you'll find him somewhere on the island. He's wearing a flannel shirt.";
+        const padding = window.TILE_SIZE * 1;
+        const maxWidth = chatboxWidth - padding * 4;
+        const words = message.split(' ');
+        const lines = [];
+        let currentLine = '';
+
+        words.forEach(word => {
+            const testLine = currentLine + (currentLine ? ' ' : '') + word;
+            const estimatedWidth = testLine.length * 8;
+            if (estimatedWidth > maxWidth && currentLine) {
+                lines.push(currentLine);
+                currentLine = word;
+            } else {
+                currentLine = testLine;
+            }
+        });
+        if (currentLine) {
+            lines.push(currentLine);
+        }
+
+        // Create text elements for each line
+        const lineHeight = window.TILE_SIZE * 0.7;
+        const textStartY = chatboxY + padding * 2;
+
+        lines.forEach((line, index) => {
+            const textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            textElement.setAttribute('x', chatboxX * 1.5 + padding);
+            textElement.setAttribute('y', textStartY + index * lineHeight);
+            textElement.classList.add('npc-chatbox-text');
+            textElement.textContent = line;
+            this.introGroup.appendChild(textElement);
+            this.introTextElements.push(textElement);
+        });
+
+        // Add click handler to end intro
+        const clickHandler = () => this.endIntroSequence();
+        this.svg.addEventListener('click', clickHandler, { once: true });
+
+        // Auto-end intro after 10 seconds
+        this.introTimeout = setTimeout(() => {
+            if (this.isInIntro) {
+                this.endIntroSequence();
+            }
+        }, 10000);
+    }
+
+    endIntroSequence() {
+        if (!this.isInIntro) return;
+
+        this.isInIntro = false;
+
+        // Clear timeout if it exists
+        if (this.introTimeout) {
+            clearTimeout(this.introTimeout);
+            this.introTimeout = null;
+        }
+
+        // Fade out intro elements
+        const fadeOut = (element) => {
+            let opacity = 1;
+            const fadeInterval = setInterval(() => {
+                opacity -= 0.1;
+                if (opacity <= 0) {
+                    clearInterval(fadeInterval);
+                    if (element.parentNode) {
+                        element.parentNode.removeChild(element);
+                    }
+                } else {
+                    if (element === this.introGroup) {
+                        element.style.opacity = opacity;
+                    } else {
+                        element.setAttribute('fill-opacity', opacity);
+                    }
+                }
+            }, 50);
+        };
+
+        // Fade out all elements
+        if (this.blurOverlay) {
+            fadeOut(this.blurOverlay);
+        }
+        if (this.introGroup) {
+            fadeOut(this.introGroup);
+        }
+
+        // Animate character scale down and move to position
+        let scale = this.introScale;
+        const targetX = (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE;
+        const targetY = (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE;
+        const startX = parseFloat(this.element.getAttribute('x'));
+        const startY = parseFloat(this.element.getAttribute('y'));
+        const dx = targetX - startX;
+        const dy = targetY - startY;
+
+        const animate = () => {
+            scale -= 0.1;
+            if (scale <= 1) {
+                scale = 1;
+                // Move character back to main SVG
+                if (this.element.parentNode) {
+                    this.element.parentNode.removeChild(this.element);
+                }
+                this.svg.appendChild(this.element);
+                this.updatePosition();
+                return;
+            }
+
+            const progress = (this.introScale - scale) / (this.introScale - 1);
+            const currentX = startX + dx * progress;
+            const currentY = startY + dy * progress;
+
+            this.element.setAttribute('x', currentX);
+            this.element.setAttribute('y', currentY);
+            this.element.setAttribute('width', window.TILE_SIZE * 2 * scale);
+            this.element.setAttribute('height', window.TILE_SIZE * 2 * scale);
+
+            requestAnimationFrame(animate);
+        };
+
+        animate();
+    }
+
     updatePosition() {
+        if (this.isInIntro) return;
+
         let sprite = `character-${this.direction}.gif`;
 
         // Add walking animation for left/right movement

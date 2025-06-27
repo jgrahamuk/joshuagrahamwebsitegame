@@ -4285,7 +4285,7 @@
     {
       "x": 30,
       "y": 24,
-      "layers": ["WATER", "GRASS", "FLOWER", "BADGE"]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 31,
@@ -6115,11 +6115,6 @@
     {
       "type": "FLOWER",
       "x": 29,
-      "y": 24
-    },
-    {
-      "type": "BADGE",
-      "x": 30,
       "y": 24
     },
     {

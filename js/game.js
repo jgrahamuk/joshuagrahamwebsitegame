@@ -268,6 +268,9 @@ preloadSprites().then(async () => {
 
     // Player movement and interaction
     svg.addEventListener('click', (e) => {
+        // If player is in intro sequence, ignore map clicks
+        if (window.player.isInIntro) return;
+
         const rect = svg.getBoundingClientRect();
         const x = Math.floor((e.clientX - rect.left - (window.MAP_OFFSET_X || 0)) / window.TILE_SIZE);
         const y = Math.floor((e.clientY - rect.top - (window.MAP_OFFSET_Y || 0)) / window.TILE_SIZE);
