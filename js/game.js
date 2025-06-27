@@ -9,6 +9,24 @@ import { MapEditor } from './mapEditor.js';
 import { HelpOverlay } from './helpOverlay.js';
 import { badgeSystem } from './badgeSystem.js';
 
+// Add at the start of the file, before any other code
+function updateOrientation() {
+    const isPortrait = window.innerHeight > window.innerWidth;
+    const viewport = document.querySelector('meta[name="viewport"]');
+    const orientation = isPortrait ? 'portrait' : 'landscape';
+
+    // Update viewport meta tag
+    viewport.setAttribute('content', `width=device-width, initial-scale=1.0, viewport-fit=cover, orientation=${orientation}`);
+
+    // Update body class
+    document.body.classList.remove('portrait', 'landscape');
+    document.body.classList.add(orientation);
+}
+
+// Call on load and resize
+window.addEventListener('load', updateOrientation);
+window.addEventListener('resize', updateOrientation);
+
 // Game objectives system
 class ObjectiveSystem {
     constructor(svg) {

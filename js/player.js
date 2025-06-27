@@ -28,8 +28,7 @@ export class Player {
         // Intro sequence state
         this.isInIntro = true;
         this.introScale = 2;
-        this.introMessageElement = null;
-        this.introTextElements = [];
+        this.introMessageContainer = null;
         this.introTimeout = null;
 
         this.updatePosition();
@@ -60,12 +59,13 @@ export class Player {
         this.svg.appendChild(defs);
 
         this.blurOverlay.style.filter = 'url(#blur-filter)';
-        this.svg.appendChild(this.blurOverlay);
 
-        // Create a group for intro elements to ensure proper z-ordering
-        this.introGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        this.introGroup.style.zIndex = '10';
-        this.svg.appendChild(this.introGroup);
+        // Ensure proper layering
+        if (this.element.parentNode) {
+            this.element.parentNode.removeChild(this.element);
+        }
+        this.svg.appendChild(this.blurOverlay);
+        this.svg.appendChild(this.element);
 
         // Position in center of screen
         const screenCenterX = window.innerWidth / 2;
@@ -85,79 +85,26 @@ export class Player {
         this.element.setAttribute('height', characterHeight);
         this.element.style.imageRendering = 'pixelated';
 
-        // Move character to intro group
-        if (this.element.parentNode) {
-            this.element.parentNode.removeChild(this.element);
-        }
-        this.introGroup.appendChild(this.element);
+        // Create chatbox container
+        this.introMessageContainer = document.createElement('div');
+        this.introMessageContainer.className = 'chatbox-container';
+        this.introMessageContainer.style.left = '50%';
+        this.introMessageContainer.style.top = `${characterY - window.TILE_SIZE * 12}px`;
+        this.introMessageContainer.style.transform = 'translateX(-50%)';
 
-        // Create chatbox background
-        this.introMessageElement = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        this.introMessageElement.setAttribute('href', getSpriteUrl('chatbox.gif'));
+        // Create chatbox
+        const chatbox = document.createElement('div');
+        chatbox.className = 'chatbox';
 
-        // Adjust chatbox size based on orientation
-        const isPortrait = window.innerHeight > window.innerWidth;
-        const scaleFactor = isPortrait ? 0.8 : 1; // 20% smaller in portrait mode
+        // Create text element
+        const textElement = document.createElement('div');
+        textElement.className = 'chatbox-text';
+        textElement.innerHTML = "Hey! Check out this website. Isn't it snazzy?! Just click anywhere on the map and I'll go there. There are lots of items to pick up and things to do.<br /><br />Maybe you should go talk to Joshua, as this is his website. you'll find him somewhere on the island. He's wearing a flannel shirt.";
 
-        // Position chatbox above character with proper spacing
-        const chatboxWidth = window.TILE_SIZE * 24 * scaleFactor;
-        const chatboxHeight = window.TILE_SIZE * 12 * scaleFactor;
-        const chatboxX = screenCenterX - chatboxWidth / 2;
-        const chatboxY = characterY - chatboxHeight - window.TILE_SIZE;
-
-        this.introMessageElement.setAttribute('x', chatboxX);
-        this.introMessageElement.setAttribute('y', chatboxY);
-        this.introMessageElement.setAttribute('width', chatboxWidth);
-        this.introMessageElement.setAttribute('height', chatboxHeight);
-        this.introMessageElement.style.imageRendering = 'pixelated';
-        this.introMessageElement.style.shapeRendering = 'crispEdges';
-        this.introMessageElement.style.webkitImageRendering = 'pixelated';
-        this.introMessageElement.style.mozImageRendering = 'pixelated';
-        this.introMessageElement.style.msImageRendering = 'pixelated';
-        this.introGroup.appendChild(this.introMessageElement);
-
-        // Create and position text with proper wrapping
-        const message = "Hey! Check out this website. Isn't it snazzy?! Just click anywhere on the map and I'll go there. There are lots of items to pick up and things to do. Maybe you should go talk to Joshua, as this is his website. you'll find him somewhere on the island. He's wearing a flannel shirt.";
-        const padding = window.TILE_SIZE * 1 * scaleFactor;
-        const maxWidth = chatboxWidth - padding * 4;
-        const words = message.split(' ');
-        const lines = [];
-        let currentLine = '';
-
-        words.forEach(word => {
-            const testLine = currentLine + (currentLine ? ' ' : '') + word;
-            const estimatedWidth = testLine.length * 8 + 40; // Rough estimate of width based on character count
-            if (estimatedWidth > maxWidth && currentLine) {
-                lines.push(currentLine);
-                currentLine = word;
-            } else {
-                currentLine = testLine;
-            }
-        });
-        if (currentLine) {
-            lines.push(currentLine);
-        }
-
-        // Create text elements for each line
-        const lineHeight = window.TILE_SIZE * 0.8;
-        const textStartY = chatboxY + padding * 2;
-        const textStartX = chatboxX + padding * 12;
-
-        // Create a text container group
-        const textGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        textGroup.classList.add('npc-chatbox-text');
-        this.introGroup.appendChild(textGroup);
-
-        lines.forEach((line, index) => {
-            const textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            textElement.setAttribute('x', textStartX);
-            textElement.setAttribute('y', textStartY + index * lineHeight);
-            textElement.setAttribute('width', 50);
-            textElement.textContent = line;
-            textElement.style.fontSize = `${Math.floor(window.TILE_SIZE * 0.8)}px`;
-            textGroup.appendChild(textElement);
-            this.introTextElements.push(textElement);
-        });
+        // Assemble the chatbox
+        chatbox.appendChild(textElement);
+        this.introMessageContainer.appendChild(chatbox);
+        document.body.appendChild(this.introMessageContainer);
 
         // Add click handler to end intro
         const clickHandler = () => this.endIntroSequence();
@@ -168,7 +115,7 @@ export class Player {
             if (this.isInIntro) {
                 this.endIntroSequence();
             }
-        }, 10000);
+        }, 20000);
     }
 
     endIntroSequence() {
@@ -183,31 +130,34 @@ export class Player {
         }
 
         // Fade out intro elements
-        const fadeOut = (element) => {
+        if (this.blurOverlay) {
             let opacity = 1;
             const fadeInterval = setInterval(() => {
                 opacity -= 0.1;
                 if (opacity <= 0) {
                     clearInterval(fadeInterval);
-                    if (element.parentNode) {
-                        element.parentNode.removeChild(element);
+                    if (this.blurOverlay.parentNode) {
+                        this.blurOverlay.parentNode.removeChild(this.blurOverlay);
                     }
                 } else {
-                    if (element === this.introGroup) {
-                        element.style.opacity = opacity;
-                    } else {
-                        element.setAttribute('fill-opacity', opacity);
-                    }
+                    this.blurOverlay.setAttribute('fill-opacity', opacity);
                 }
             }, 50);
-        };
-
-        // Fade out all elements
-        if (this.blurOverlay) {
-            fadeOut(this.blurOverlay);
         }
-        if (this.introGroup) {
-            fadeOut(this.introGroup);
+
+        // Fade out chatbox
+        if (this.introMessageContainer) {
+            let opacity = 1;
+            const fadeInterval = setInterval(() => {
+                opacity -= 0.1;
+                if (opacity <= 0) {
+                    clearInterval(fadeInterval);
+                    this.introMessageContainer.remove();
+                    this.introMessageContainer = null;
+                } else {
+                    this.introMessageContainer.style.opacity = opacity;
+                }
+            }, 50);
         }
 
         // Animate character scale down and move to position
@@ -223,11 +173,6 @@ export class Player {
             scale -= 0.1;
             if (scale <= 1) {
                 scale = 1;
-                // Move character back to main SVG
-                if (this.element.parentNode) {
-                    this.element.parentNode.removeChild(this.element);
-                }
-                this.svg.appendChild(this.element);
                 this.updatePosition();
                 return;
             }

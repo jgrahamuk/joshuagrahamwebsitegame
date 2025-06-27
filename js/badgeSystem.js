@@ -6,15 +6,15 @@ import { getSpriteUrl } from './spriteCache.js';
 export const badges = [
     {
         id: 1,
-        message: "Hey! That's my IBM badge. I've been looking for it everywhere! That was one of my first jobs back in 2000! That's not the one I was looking for, though."
+        message: "Hey! That's my IBM badge. I've been looking for it everywhere! That was one of my first jobs back in 2000!<br /><br />That's not the one I was looking for, though."
     },
     {
         id: 2,
-        message: "Ahh! CCQ. I worked there for 13 years. I helped a lot of startups there! I managed several independent development teams (up to 20 devs in total), both in-house and client-side. During this time I was the principal engineer on 30+ software products."
+        message: "Ahh! CCQ. I worked there for 13 years. I helped a lot of startups there!<br /><br />I managed several independent development teams (up to 20 devs in total), both in-house and client-side. During this time I was the principal engineer on 30+ software products."
     },
     {
         id: 3,
-        message: "Hey! Brickflow! I helped them build their prop-tech platform! I was responsible for designing and building the initial platform as well as recruiting, training and managing developers to make it the go-to place for property development loan sourcing."
+        message: "Hey! Brickflow! I helped them build their prop-tech platform!<br /><br />I was responsible for designing and building the initial platform as well as recruiting, training and managing developers to make it the go-to place for property development loan sourcing."
     },
     {
         id: 4,
@@ -22,7 +22,7 @@ export const badges = [
     },
     {
         id: 5,
-        message: "Aha! Optimise! That's the one! I should keep track of this one. I'm the Director of Software Engineering. At Optimise Guernsey, I've been responsible for building and leading a software engineering team of 5-10. We've been an integral part of a large-scale government project and I've successfully led not only our team, but a number of initiatives with other vendors."
+        message: "Aha! Optimise! That's the one! I should keep track of this one. I'm the Director of Software Engineering.<br /><br />At Optimise Guernsey, I've been responsible for building and leading a software engineering team of 5-10. We've been an integral part of a large-scale government project and I've successfully led not only our team, but a number of initiatives with other vendors."
     }
 ];
 

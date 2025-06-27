@@ -38,10 +38,9 @@ export class NPC {
         this.nextStepTime = 0;
 
         // Message display
-        this.messageElement = null;
-        this.messageTextElement = null;
-        this.messageTimeout = null;
+        this.messageContainer = null;
         this.isShowingMessage = false;
+        this.messageTimeout = null;
 
         this.updatePosition();
         console.log(`NPC ${this.name} positioned at (${this.x}, ${this.y})`);
@@ -139,88 +138,44 @@ export class NPC {
             }
         }
 
-        // Create chatbox background
-        this.messageElement = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        this.messageElement.setAttribute('href', getSpriteUrl('chatbox.gif'));
-        this.messageElement.setAttribute('x', (window.MAP_OFFSET_X || 0) + (this.x - 10) * window.TILE_SIZE);
-        this.messageElement.setAttribute('y', (window.MAP_OFFSET_Y || 0) + (this.y - 12) * window.TILE_SIZE);
-        this.messageElement.setAttribute('width', window.TILE_SIZE * 24);
-        this.messageElement.setAttribute('height', window.TILE_SIZE * 12);
-        this.messageElement.classList.add('npc-chatbox');
-        this.messageElement.style.imageRendering = 'pixelated';
-        this.messageElement.style.shapeRendering = 'crispEdges';
-        this.messageElement.style.webkitImageRendering = 'pixelated';
-        this.messageElement.style.mozImageRendering = 'pixelated';
-        this.messageElement.style.msImageRendering = 'pixelated';
+        // Create chatbox container
+        this.messageContainer = document.createElement('div');
+        this.messageContainer.className = 'chatbox-container';
 
-        // Create message text with wrapping
-        this.messageTextElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        this.messageTextElement.setAttribute('x', (window.MAP_OFFSET_X || 0) + (this.x - 2) * window.TILE_SIZE);
-        this.messageTextElement.setAttribute('y', (window.MAP_OFFSET_Y || 0) + (this.y + 8) * window.TILE_SIZE);
-        this.messageTextElement.classList.add('npc-chatbox-text');
+        // Position the chatbox above the NPC
+        const npcScreenX = (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE + window.TILE_SIZE; // Center on NPC (2 tiles wide)
+        const npcScreenY = (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE;
+        const isLandscape = window.innerWidth > window.innerHeight;
+        const chatboxHeight = isLandscape ? 310 : 192; // Match the CSS heights
 
-        // Wrap text to fit chatbox width with padding
-        const padding = window.TILE_SIZE * 0.5; // More padding
-        const maxWidth = window.TILE_SIZE * 16; // Chatbox width minus padding
-        const words = messageToShow.split(' ');
-        const lines = [];
-        let currentLine = '';
+        this.messageContainer.style.left = `${npcScreenX}px`;
+        this.messageContainer.style.top = `${npcScreenY - chatboxHeight}px`; // Position directly above NPC
+        this.messageContainer.style.transform = 'translateX(-50%)'; // Center horizontally
 
-        words.forEach(word => {
-            const testLine = currentLine + (currentLine ? ' ' : '') + word;
-            // Rough estimate: each character is about 8px wide
-            const estimatedWidth = testLine.length * 8;
-            if (estimatedWidth > maxWidth && currentLine) {
-                lines.push(currentLine);
-                currentLine = word;
-            } else {
-                currentLine = testLine;
-            }
-        });
-        if (currentLine) {
-            lines.push(currentLine);
-        }
+        // Create chatbox
+        const chatbox = document.createElement('div');
+        chatbox.className = 'chatbox';
 
-        // Create multiple text elements for each line
-        this.messageTextElements = [];
-        const lineHeight = window.TILE_SIZE * 0.7; // Line spacing
-        const startY = (window.MAP_OFFSET_Y || 0) + (this.y - 10.4) * window.TILE_SIZE + padding; // Start from top of chatbox with padding
+        // Create text element
+        const textElement = document.createElement('div');
+        textElement.className = 'chatbox-text';
+        textElement.innerHTML = messageToShow;
 
-        // Append chatbox first
-        this.svg.appendChild(this.messageElement);
+        // Assemble the chatbox
+        chatbox.appendChild(textElement);
+        this.messageContainer.appendChild(chatbox);
+        document.body.appendChild(this.messageContainer);
 
-        lines.forEach((line, index) => {
-            const textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            textElement.setAttribute('x', (window.MAP_OFFSET_X || 0) + (this.x + 2) * window.TILE_SIZE);
-            textElement.setAttribute('y', startY + index * lineHeight);
-            textElement.classList.add('npc-chatbox-text');
-            textElement.textContent = line;
-            this.svg.appendChild(textElement);
-            this.messageTextElements.push(textElement);
-        });
-
-        // Auto-hide after 5 seconds
+        // Auto-hide after 10 seconds
         this.messageTimeout = setTimeout(() => {
             this.hideMessage();
         }, 10000);
     }
 
     hideMessage() {
-        if (this.messageElement && this.svg.contains(this.messageElement)) {
-            this.svg.removeChild(this.messageElement);
-            this.messageElement = null;
-        }
-        if (this.messageTextElements) {
-            this.messageTextElements.forEach(element => {
-                if (this.svg.contains(element)) {
-                    this.svg.removeChild(element);
-                }
-            });
-            this.messageTextElements = null;
-        }
-        if (this.messageTextElement && this.svg.contains(this.messageTextElement)) {
-            this.svg.removeChild(this.messageTextElement);
-            this.messageTextElement = null;
+        if (this.messageContainer) {
+            this.messageContainer.remove();
+            this.messageContainer = null;
         }
         if (this.messageTimeout) {
             clearTimeout(this.messageTimeout);
