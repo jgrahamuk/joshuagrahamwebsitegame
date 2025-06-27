@@ -32,10 +32,10 @@ export function setMapSize(width, height) {
     MAP_HEIGHT_TILES = height;
 }
 
-export async function initializeMap() {
+export async function initializeMap(forcePortrait = false) {
     // Determine if we should use landscape or portrait orientation
     const aspectRatio = window.innerWidth / window.innerHeight;
-    const isLandscape = aspectRatio > 1;
+    const isLandscape = aspectRatio > 1 && !forcePortrait;
 
     // Load map data from JSON
     const mapData = await loadMapData(isLandscape);

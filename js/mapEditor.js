@@ -2,6 +2,8 @@ import { tileTypes, placeResourceAtPosition, removeResource, map, MAP_WIDTH_TILE
 import { getSpriteUrl } from './spriteCache.js';
 import { NPC } from './npcs.js';
 import { Chicken, Cockerel } from './chickens.js';
+import { loadMapData, convertMapDataToGameFormat } from './mapLoader.js';
+import { initializeMap } from './map.js';
 
 export class MapEditor {
     constructor(svg, gameContainer) {
@@ -11,6 +13,8 @@ export class MapEditor {
         this.selectedTool = null;
         this.toolbar = null;
         this.toolbarContainer = null;
+        this.isEditingPortrait = false;
+        this.originalMapData = null;
 
         this.tools = [
             { id: 'delete', name: 'Delete', icon: '🗑️', type: 'delete' },
@@ -32,7 +36,7 @@ export class MapEditor {
             { id: 'npc_joshua', name: 'Joshua NPC', icon: 'joshua-front.gif', type: 'npc', npcType: 'Joshua', message: 'Welcome to my farm! It looks like the chickens are having a great time.' },
             // Chickens and Cockerels
             { id: 'chicken', name: 'Chicken', icon: 'chicken-front.gif', type: 'chicken' },
-            { id: 'cockerel', name: 'Cockerel', icon: 'chicken-front.gif', type: 'cockerel' }
+            { id: 'cockerel', name: 'Cockerel', icon: 'cockerel-front.gif', type: 'cockerel' }
         ];
 
         this.setupKeyboardShortcuts();
@@ -78,32 +82,50 @@ export class MapEditor {
         }
         this.removeMapClickHandler();
         this.hideEditorIndicator();
+
+        // If we were editing the portrait map, switch back to landscape if appropriate
+        if (this.isEditingPortrait) {
+            const aspectRatio = window.innerWidth / window.innerHeight;
+            if (aspectRatio > 1) {  // If we're in landscape orientation
+                this.restoreOriginalMap();
+            }
+        }
+
+        // Clear saved state
+        this.originalMapData = null;
+        this.isEditingPortrait = false;
     }
 
     createToolbar() {
         this.toolbarContainer = document.createElement('div');
         this.toolbarContainer.id = 'map-editor-toolbar';
 
+        // Add map mode toggle button first
+        const modeToggleButton = document.createElement('button');
+        modeToggleButton.innerHTML = '📱';
+        modeToggleButton.title = 'Toggle Portrait/Landscape Map';
+        modeToggleButton.className = 'mode-toggle-button' + (this.isEditingPortrait ? ' selected' : '');
+        modeToggleButton.addEventListener('click', () => {
+            this.toggleMapMode();
+        });
+        this.toolbarContainer.appendChild(modeToggleButton);
+
+        // Add existing tools
         this.tools.forEach(tool => {
             const toolButton = document.createElement('button');
 
-            // Check if the icon is an image file or emoji
             if (tool.icon.endsWith('.gif')) {
-                // Create an image element for sprite icons
                 const img = document.createElement('img');
                 img.src = getSpriteUrl(tool.icon);
                 toolButton.appendChild(img);
             } else {
-                // Use emoji for delete button
                 toolButton.innerHTML = tool.icon;
             }
 
             toolButton.title = tool.name;
-
             toolButton.addEventListener('click', () => {
                 this.selectTool(tool);
             });
-
             this.toolbarContainer.appendChild(toolButton);
         });
 
@@ -112,11 +134,9 @@ export class MapEditor {
         exportButton.innerHTML = '💾';
         exportButton.title = 'Export Map (Ctrl+Shift+S)';
         exportButton.className = 'export-button';
-
         exportButton.addEventListener('click', () => {
             this.exportMap();
         });
-
         this.toolbarContainer.appendChild(exportButton);
 
         this.gameContainer.appendChild(this.toolbarContainer);
@@ -581,6 +601,116 @@ export class MapEditor {
         }
     }
 
+    async toggleMapMode() {
+        const modeButton = this.toolbarContainer.querySelector('.mode-toggle-button');
+        this.isEditingPortrait = !this.isEditingPortrait;
+        modeButton.classList.toggle('selected', this.isEditingPortrait);
+
+        try {
+            await initializeMap(this.isEditingPortrait);
+            window.drawMap(this.svg);
+
+        } catch (error) {
+            console.error('Error loading map:', error);
+            alert('Failed to load map. Check console for details.');
+        }
+    }
+
+    convertMapDataToGameFormat(mapData) {
+        // Initialize empty map array
+        const gameMap = Array(mapData.height).fill().map(() =>
+            Array(mapData.width).fill().map(() => [tileTypes.GRASS])
+        );
+
+        // Apply tile layers
+        mapData.tiles.forEach(tile => {
+            gameMap[tile.y][tile.x] = tile.layers.map(layer => {
+                switch (layer) {
+                    case 'WATER': return tileTypes.WATER;
+                    case 'WATER_BORDER': return { color: '#3bbcff', passable: false };
+                    case 'GRASS': return tileTypes.GRASS;
+                    case 'DIRT': return tileTypes.DIRT;
+                    case 'LARGE_TREE': return tileTypes.LARGE_TREE;
+                    case 'BUSH': return tileTypes.BUSH;
+                    case 'PINE_TREE': return tileTypes.PINE_TREE;
+                    case 'ROCK': return tileTypes.ROCK;
+                    case 'FLOWER': return tileTypes.FLOWER;
+                    case 'EGG': return tileTypes.EGG;
+                    case 'BADGE': return tileTypes.BADGE;
+                    default: return tileTypes.GRASS;
+                }
+            });
+        });
+
+        // Apply structure tiles
+        mapData.structures.forEach(structure => {
+            for (let y = structure.y; y < structure.y + structure.height; y++) {
+                for (let x = structure.x; x < structure.x + structure.width; x++) {
+                    if (y < mapData.height && x < mapData.width) {
+                        gameMap[y][x].push({ color: 'white', passable: false, resource: null });
+                    }
+                }
+            }
+        });
+
+        return {
+            map: gameMap,
+            structures: mapData.structures,
+            npcs: mapData.npcs || [],
+            chickens: mapData.chickens || [],
+            cockerels: mapData.cockerels || []
+        };
+    }
+
+    async saveCurrentMapState() {
+        return {
+            map: JSON.parse(JSON.stringify(window.map)),
+            width: window.MAP_WIDTH_TILES,
+            height: window.MAP_HEIGHT_TILES,
+            farmhouse: window.farmhouse ? { ...window.farmhouse } : null,
+            chickenCoop: window.chickenCoop ? { ...window.chickenCoop } : null,
+            signObj: window.signObj ? { ...window.signObj } : null,
+            npcs: window.npcs ? window.npcs.map(npc => ({
+                name: npc.name,
+                message: npc.message,
+                x: npc.x,
+                y: npc.y
+            })) : [],
+            chickens: window.chickens ? window.chickens.map(chicken => ({
+                x: chicken.x,
+                y: chicken.y
+            })) : [],
+            cockerels: window.cockerels ? window.cockerels.map(cockerel => ({
+                x: cockerel.x,
+                y: cockerel.y
+            })) : []
+        };
+    }
+
+    async restoreOriginalMap() {
+        if (this.originalMapData) {
+            // Restore map dimensions
+            window.MAP_WIDTH_TILES = this.originalMapData.width;
+            window.MAP_HEIGHT_TILES = this.originalMapData.height;
+
+            // Restore map data
+            window.map = this.originalMapData.map;
+
+            // Restore structures
+            window.farmhouse = this.originalMapData.farmhouse;
+            window.chickenCoop = this.originalMapData.chickenCoop;
+            window.signObj = this.originalMapData.signObj;
+
+            // Restore NPCs and chickens
+            window.npcs = this.originalMapData.npcs.map(npc => new NPC(this.svg, npc.name, npc.message, npc.x, npc.y));
+            window.chickens = this.originalMapData.chickens.map(chicken => new Chicken(this.svg, chicken.x, chicken.y));
+            window.cockerels = this.originalMapData.cockerels.map(cockerel => new Cockerel(this.svg, cockerel.x, cockerel.y));
+
+            // Redraw the map
+            window.drawMap();
+        }
+    }
+
     exportMap() {
         // Convert current map state to JSON format
         const mapData = this.convertMapToJSON();
@@ -592,7 +722,8 @@ export class MapEditor {
         const url = URL.createObjectURL(dataBlob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `map_${Date.now()}.json`;
+        // Use appropriate filename based on which map we're editing
+        link.download = this.isEditingPortrait ? 'map-portrait.json' : 'map.json';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
