@@ -9,6 +9,144 @@ import { MapEditor } from './mapEditor.js';
 import { HelpOverlay } from './helpOverlay.js';
 import { badgeSystem } from './badgeSystem.js';
 
+// Game objectives system
+class ObjectiveSystem {
+    constructor(svg) {
+        this.svg = svg;
+        this.currentObjective = null;
+        this.objectives = [
+            {
+                id: 'talk_to_joshua',
+                description: 'Talk to Joshua',
+                target: () => window.npcs.find(npc => npc.name.toLowerCase() === 'joshua'),
+                isComplete: () => window.npcs.find(npc => npc.name.toLowerCase() === 'joshua')?.hasSpokenTo,
+                getPosition: () => {
+                    const joshua = window.npcs.find(npc => npc.name.toLowerCase() === 'joshua');
+                    return joshua ? { x: joshua.x, y: joshua.y } : null;
+                }
+            },
+            {
+                id: 'find_first_badge',
+                description: 'Find your first badge',
+                target: () => {
+                    // Find the first badge on the map
+                    for (let y = 0; y < MAP_HEIGHT_TILES; y++) {
+                        for (let x = 0; x < MAP_WIDTH_TILES; x++) {
+                            const tiles = map[y][x];
+                            if (tiles[tiles.length - 1] === tileTypes.BADGE) {
+                                return { x, y };
+                            }
+                        }
+                    }
+                    return null;
+                },
+                isComplete: () => window.player.inventory.badges > 0,
+                getPosition: function () { return this.target(); },
+                delay: 10000 // Show arrow after 10 seconds
+            }
+        ];
+
+        // Create the guidance arrow
+        this.arrow = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        this.arrow.setAttribute('href', getSpriteUrl('arrow.gif'));
+        this.arrow.setAttribute('width', window.TILE_SIZE);
+        this.arrow.setAttribute('height', window.TILE_SIZE);
+        this.arrow.style.imageRendering = 'pixelated';
+        this.arrow.style.display = 'none';
+        this.svg.appendChild(this.arrow);
+
+        // Animation state
+        this.bounceHeight = window.TILE_SIZE * 0.3;
+        this.lastBounceSequence = 0;
+        this.bounceSequenceDelay = 2000; // 2 seconds between sequences
+        this.bounceSequenceDuration = 1200; // 1.2 seconds for the bounce sequence
+        this.isBouncingSequence = false;
+        this.bounceSequenceStartTime = 0;
+
+        // Start the first objective
+        this.startNextObjective();
+    }
+
+    startNextObjective() {
+        // Find the first incomplete objective
+        this.currentObjective = this.objectives.find(obj => !obj.isComplete());
+
+        if (this.currentObjective) {
+            console.log(`Starting objective: ${this.currentObjective.description}`);
+
+            // If there's a delay, wait before showing the arrow
+            if (this.currentObjective.delay) {
+                this.arrow.style.display = 'none';
+                setTimeout(() => {
+                    if (this.currentObjective && !this.currentObjective.isComplete()) {
+                        this.arrow.style.display = 'block';
+                    }
+                }, this.currentObjective.delay);
+            } else {
+                this.arrow.style.display = 'block';
+            }
+        } else {
+            this.arrow.style.display = 'none';
+        }
+    }
+
+    updateArrowPosition() {
+        if (!this.currentObjective) return;
+
+        const pos = this.currentObjective.getPosition();
+        if (!pos) return;
+
+        const now = Date.now();
+        const timeSinceLastSequence = now - this.lastBounceSequence;
+
+        // Check if we should start a new bounce sequence
+        if (!this.isBouncingSequence && timeSinceLastSequence >= this.bounceSequenceDelay) {
+            this.isBouncingSequence = true;
+            this.bounceSequenceStartTime = now;
+            this.lastBounceSequence = now;
+        }
+
+        let bounceOffset = 0;
+        // Update bounce state during sequence
+        if (this.isBouncingSequence) {
+            const sequenceProgress = (now - this.bounceSequenceStartTime) / this.bounceSequenceDuration;
+
+            if (sequenceProgress >= 1) {
+                // End of sequence
+                this.isBouncingSequence = false;
+            } else {
+                // Smooth easing for the bounce animation
+                const easeInOutProgress = sequenceProgress < 0.5
+                    ? 4 * sequenceProgress * sequenceProgress * sequenceProgress
+                    : 1 - Math.pow(-2 * sequenceProgress + 2, 3) / 2;
+
+                // Calculate bounce using sine wave - 5 complete cycles with smooth easing
+                bounceOffset = Math.sin(easeInOutProgress * Math.PI * 10) * this.bounceHeight;
+            }
+        }
+
+        // Position arrow above the target, centered
+        const targetCenterX = (window.MAP_OFFSET_X || 0) + (pos.x * window.TILE_SIZE) + (window.TILE_SIZE / 2);
+        const arrowX = targetCenterX - (window.TILE_SIZE / 2);
+        const arrowY = (window.MAP_OFFSET_Y || 0) + (pos.y * window.TILE_SIZE) - window.TILE_SIZE - bounceOffset;
+
+        this.arrow.setAttribute('x', arrowX);
+        this.arrow.setAttribute('y', arrowY);
+    }
+
+    tick() {
+        // Check if current objective is complete
+        if (this.currentObjective?.isComplete()) {
+            this.startNextObjective();
+        }
+
+        // Update arrow position
+        if (this.currentObjective && this.arrow.style.display !== 'none') {
+            this.updateArrowPosition();
+        }
+    }
+}
+
 window.TILE_SIZE = 40;
 window.MAP_OFFSET_X = 0;
 window.MAP_OFFSET_Y = 0;
@@ -75,6 +213,7 @@ function gameLoop(timestamp) {
             window.npcs.forEach(n => n.tick(now));
             if (window.chicks) window.chicks.forEach(chick => chick.tick(now));
             if (window.cockerels) window.cockerels.forEach(cockerel => cockerel.tick(now));
+            if (window.objectiveSystem) window.objectiveSystem.tick();
             lastTickTime = timestamp;
         }
     }
@@ -120,6 +259,9 @@ preloadSprites().then(async () => {
 
     // Initialize badge system
     badgeSystem.initialize();
+
+    // Initialize objective system
+    window.objectiveSystem = new ObjectiveSystem(svg);
 
     // Start the game loop
     requestAnimationFrame(gameLoop);

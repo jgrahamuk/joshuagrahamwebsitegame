@@ -7,6 +7,7 @@ export class NPC {
     constructor(svg, name, message, startX, startY) {
         this.name = name;
         this.message = message;
+        this.hasSpokenTo = false;
 
         // Ensure NPC starts on valid land tile
         if (startX !== undefined && startY !== undefined) {
@@ -121,6 +122,7 @@ export class NPC {
         // Face forward and stop moving
         this.direction = 'front';
         this.isShowingMessage = true;
+        this.hasSpokenTo = true;
         this.updatePosition();
 
         // Check if this is Joshua and player has a badge to deliver

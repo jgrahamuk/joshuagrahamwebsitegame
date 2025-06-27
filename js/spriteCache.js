@@ -14,6 +14,7 @@ const spriteNames = [
     'joshua-front.gif', 'joshua-back.gif', 'joshua-left.gif', 'joshua-right.gif',
     'chatbox.gif',
     'chick-front.gif', 'chick-back.gif', 'chick-left.gif', 'chick-right.gif',
+    'arrow.gif',
 ];
 
 const cache = {};
