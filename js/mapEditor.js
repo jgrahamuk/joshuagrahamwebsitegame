@@ -15,6 +15,9 @@ export class MapEditor {
         this.toolbarContainer = null;
         this.isEditingPortrait = false;
         this.originalMapData = null;
+        this.isDragging = false;
+        this.lastTileX = null;
+        this.lastTileY = null;
 
         this.tools = [
             { id: 'delete', name: 'Delete', icon: '🗑️', type: 'delete' },
@@ -146,46 +149,93 @@ export class MapEditor {
         // Reset all button styles
         const buttons = this.toolbarContainer.querySelectorAll('button');
         buttons.forEach(btn => {
-            btn.classList.remove('selected');
+            if (!btn.classList.contains('mode-toggle-button') &&
+                !btn.classList.contains('export-button')) {
+                btn.classList.remove('selected');
+            }
         });
 
-        // Highlight selected tool
+        // Find the button for this tool and highlight it
         const toolIndex = this.tools.findIndex(t => t.id === tool.id);
         if (toolIndex >= 0) {
-            buttons[toolIndex].classList.add('selected');
+            // Add 1 to account for the mode toggle button at the start
+            const buttonIndex = toolIndex + 1;
+            const button = buttons[buttonIndex];
+            if (button) {
+                button.classList.add('selected');
+            }
         }
 
         this.selectedTool = tool;
     }
 
     setupMapClickHandler() {
-        this.mapClickHandler = (e) => {
+        // Create bound event handlers that we can properly remove later
+        this.handleMouseDown = (e) => {
             if (!this.selectedTool) return;
-
-            // Stop event propagation to prevent game click handler from firing
-            e.stopPropagation();
-
-            const rect = this.svg.getBoundingClientRect();
-            const offsetX = window.MAP_OFFSET_X || 0;
-            const offsetY = window.MAP_OFFSET_Y || 0;
-
-            // Calculate clicked position relative to map offset
-            const x = Math.floor((e.clientX - rect.left - offsetX) / window.TILE_SIZE);
-            const y = Math.floor((e.clientY - rect.top - offsetY) / window.TILE_SIZE);
-
-            if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
-                this.applyTool(x, y);
-            }
+            this.isDragging = true;
+            this.handleMapInteraction(e);
         };
 
+        this.handleMouseMove = (e) => {
+            if (!this.isDragging || !this.selectedTool) return;
+            this.handleMapInteraction(e);
+        };
+
+        this.handleMouseUp = () => {
+            this.isDragging = false;
+            this.lastTileX = null;
+            this.lastTileY = null;
+        };
+
+        this.mapClickHandler = (e) => {
+            if (!this.selectedTool) return;
+            e.stopPropagation();
+            this.handleMapInteraction(e);
+        };
+
+        // Add all event listeners
+        this.svg.addEventListener('mousedown', this.handleMouseDown);
+        this.svg.addEventListener('mousemove', this.handleMouseMove);
+        document.addEventListener('mouseup', this.handleMouseUp);
         this.svg.addEventListener('click', this.mapClickHandler);
+    }
+
+    handleMapInteraction(e) {
+        const rect = this.svg.getBoundingClientRect();
+        const offsetX = window.MAP_OFFSET_X || 0;
+        const offsetY = window.MAP_OFFSET_Y || 0;
+
+        // Calculate clicked position relative to map offset
+        const x = Math.floor((e.clientX - rect.left - offsetX) / window.TILE_SIZE);
+        const y = Math.floor((e.clientY - rect.top - offsetY) / window.TILE_SIZE);
+
+        // Check if we're within map bounds
+        if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
+            // Only apply the tool if this is a new tile position
+            if (x !== this.lastTileX || y !== this.lastTileY) {
+                this.applyTool(x, y);
+                this.lastTileX = x;
+                this.lastTileY = y;
+            }
+        }
     }
 
     removeMapClickHandler() {
         if (this.mapClickHandler) {
             this.svg.removeEventListener('click', this.mapClickHandler);
+            this.svg.removeEventListener('mousedown', this.handleMouseDown);
+            this.svg.removeEventListener('mousemove', this.handleMouseMove);
+            document.removeEventListener('mouseup', this.handleMouseUp);
             this.mapClickHandler = null;
+            this.handleMouseDown = null;
+            this.handleMouseMove = null;
+            this.handleMouseUp = null;
         }
+        // Reset drag state
+        this.isDragging = false;
+        this.lastTileX = null;
+        this.lastTileY = null;
     }
 
     applyTool(x, y) {
@@ -238,16 +288,21 @@ export class MapEditor {
             const imgWidth = parseFloat(img.getAttribute('width'));
             const imgHeight = parseFloat(img.getAttribute('height'));
 
-            // Check if this image overlaps with our tile, considering scaled resources
-            const isOverlapping = (
-                imgX >= tileX - window.TILE_SIZE &&
-                imgX <= tileX + window.TILE_SIZE &&
-                imgY >= tileY - window.TILE_SIZE &&
-                imgY <= tileY + window.TILE_SIZE
-            );
-
-            if (isOverlapping) {
+            // Check if this image overlaps with our tile
+            if (imgX === tileX && imgY === tileY) {
                 imagesToRemove.push(img);
+            }
+            // Also check for scaled resources that might overlap
+            else if (imgWidth > window.TILE_SIZE || imgHeight > window.TILE_SIZE) {
+                const centerX = imgX + imgWidth / 2;
+                const centerY = imgY + imgHeight / 2;
+                const tileCenterX = tileX + window.TILE_SIZE / 2;
+                const tileCenterY = tileY + window.TILE_SIZE / 2;
+
+                if (Math.abs(centerX - tileCenterX) < window.TILE_SIZE &&
+                    Math.abs(centerY - tileCenterY) < window.TILE_SIZE) {
+                    imagesToRemove.push(img);
+                }
             }
         });
 
@@ -268,6 +323,7 @@ export class MapEditor {
         imgBase.setAttribute('y', tileY);
         imgBase.setAttribute('width', window.TILE_SIZE);
         imgBase.setAttribute('height', window.TILE_SIZE);
+        imgBase.style.imageRendering = 'pixelated';
         this.svg.appendChild(imgBase);
 
         // Add overlay if needed
@@ -282,10 +338,15 @@ export class MapEditor {
             overlay = 'bush.gif';
         } else if (top === tileTypes.PINE_TREE) {
             overlay = 'pine-tree.gif';
+            scale = 2;
         } else if (top === tileTypes.ROCK) {
             overlay = 'stone.gif';
         } else if (top === tileTypes.FLOWER) {
             overlay = 'flower.gif';
+        } else if (top === tileTypes.EGG) {
+            overlay = 'egg.gif';
+        } else if (top === tileTypes.BADGE) {
+            overlay = 'badge.gif';
         }
 
         if (overlay) {
