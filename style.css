@@ -19,18 +19,21 @@ body {
 }
 
 #ui-container {
-  opacity: 0.5;
   position: fixed;
-  padding: 0.25rem 2rem;
-  background-color: #fff;
-  top: 1rem;
-  right: 1rem;
-  display: none;
+  bottom: 1rem;
+  left: 1rem;
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
   z-index: 1000;
 }
 
-#ui-container p {
+#ui-container div {
+  color: #fff;
+}
+
+#ui-container div img {
+  height: 24px;
 }
 
 /* Map Editor Styles */

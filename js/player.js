@@ -340,8 +340,16 @@ export class Player {
             const width = parseFloat(element.getAttribute('width'));
             const height = parseFloat(element.getAttribute('height'));
 
-            // Check if this element is the resource at the target position
-            if (x === resourceX && y === resourceY && width === window.TILE_SIZE && height === window.TILE_SIZE) {
+            // Calculate center points for both the target position and the element
+            const targetCenterX = resourceX + window.TILE_SIZE / 2;
+            const targetCenterY = resourceY + window.TILE_SIZE / 2;
+            const elementCenterX = x + width / 2;
+            const elementCenterY = y + height / 2;
+
+            // Check if the centers match (within a small threshold for floating point precision)
+            const threshold = 0.1;
+            if (Math.abs(elementCenterX - targetCenterX) < threshold &&
+                Math.abs(elementCenterY - targetCenterY) < threshold) {
                 element.remove();
             }
         });

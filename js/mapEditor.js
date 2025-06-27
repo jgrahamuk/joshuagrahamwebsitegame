@@ -285,29 +285,36 @@ export class MapEditor {
         existingImages.forEach(img => {
             const imgX = parseFloat(img.getAttribute('x'));
             const imgY = parseFloat(img.getAttribute('y'));
-            const imgWidth = parseFloat(img.getAttribute('width'));
-            const imgHeight = parseFloat(img.getAttribute('height'));
 
-            // Check if this image overlaps with our tile
-            if (imgX === tileX && imgY === tileY) {
+            // Only remove images that are exactly at this tile position
+            // and don't have a data-resource attribute (base tiles only)
+            if (imgX === tileX && imgY === tileY && !img.hasAttribute('data-resource')) {
                 imagesToRemove.push(img);
-            }
-            // Also check for scaled resources that might overlap
-            else if (imgWidth > window.TILE_SIZE || imgHeight > window.TILE_SIZE) {
-                const centerX = imgX + imgWidth / 2;
-                const centerY = imgY + imgHeight / 2;
-                const tileCenterX = tileX + window.TILE_SIZE / 2;
-                const tileCenterY = tileY + window.TILE_SIZE / 2;
-
-                if (Math.abs(centerX - tileCenterX) < window.TILE_SIZE &&
-                    Math.abs(centerY - tileCenterY) < window.TILE_SIZE) {
-                    imagesToRemove.push(img);
-                }
             }
         });
 
-        // Remove the images
+        // Remove the base tile images
         imagesToRemove.forEach(img => img.remove());
+
+        // Remove any existing resource at this position
+        const existingResources = this.svg.querySelectorAll('image[data-resource]');
+        existingResources.forEach(img => {
+            const imgX = parseFloat(img.getAttribute('x'));
+            const imgY = parseFloat(img.getAttribute('y'));
+            const imgWidth = parseFloat(img.getAttribute('width'));
+            const imgHeight = parseFloat(img.getAttribute('height'));
+
+            // Check if this resource's center point is in our tile
+            const resourceCenterX = imgX + imgWidth / 2;
+            const resourceCenterY = imgY + imgHeight / 2;
+            const tileCenterX = tileX + window.TILE_SIZE / 2;
+            const tileCenterY = tileY + window.TILE_SIZE / 2;
+
+            if (Math.abs(resourceCenterX - tileCenterX) < window.TILE_SIZE / 2 &&
+                Math.abs(resourceCenterY - tileCenterY) < window.TILE_SIZE / 2) {
+                img.remove();
+            }
+        });
 
         // Redraw the specific tile
         const tiles = map[y][x];
@@ -324,6 +331,8 @@ export class MapEditor {
         imgBase.setAttribute('width', window.TILE_SIZE);
         imgBase.setAttribute('height', window.TILE_SIZE);
         imgBase.style.imageRendering = 'pixelated';
+        // Set a low z-index for base tiles
+        imgBase.style.zIndex = '1';
         this.svg.appendChild(imgBase);
 
         // Add overlay if needed
@@ -352,6 +361,7 @@ export class MapEditor {
         if (overlay) {
             const imgOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'image');
             imgOverlay.setAttribute('href', getSpriteUrl(overlay));
+            imgOverlay.setAttribute('data-resource', 'true');
 
             // For scaled resources, adjust position to keep centered
             if (scale > 1) {
@@ -368,6 +378,8 @@ export class MapEditor {
             }
 
             imgOverlay.style.imageRendering = 'pixelated';
+            // Set a higher z-index for resources
+            imgOverlay.style.zIndex = '2';
             this.svg.appendChild(imgOverlay);
         }
     }

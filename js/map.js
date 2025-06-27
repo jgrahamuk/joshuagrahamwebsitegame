@@ -212,6 +212,7 @@ export function drawMap(svg) {
             imgBase.setAttribute('width', tileSize);
             imgBase.setAttribute('height', tileSize);
             imgBase.style.imageRendering = 'pixelated';
+            imgBase.style.zIndex = '1';
             svg.appendChild(imgBase);
         }
     }
@@ -273,6 +274,7 @@ export function drawMap(svg) {
 
                 imgOverlay.setAttribute('data-resource', resourceType);
                 imgOverlay.style.imageRendering = 'pixelated';
+                imgOverlay.style.zIndex = '2';
                 svg.appendChild(imgOverlay);
             }
         }
@@ -283,6 +285,7 @@ export function drawMap(svg) {
         // Create a group for editor overlay elements
         const editorGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         editorGroup.setAttribute('pointer-events', 'none');
+        editorGroup.style.zIndex = '3';
 
         // Draw border around actual map area
         const border = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -322,14 +325,39 @@ export function drawMap(svg) {
         svg.appendChild(editorGroup);
     }
 
+    // Create a group for dynamic elements (player, NPCs, chickens)
+    const dynamicGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    dynamicGroup.setAttribute('id', 'dynamic-elements');
+    dynamicGroup.style.zIndex = '4';
+    svg.appendChild(dynamicGroup);
+
     // Redraw player and NPCs on top
     if (window.player) {
+        if (window.player.element.parentNode) {
+            window.player.element.parentNode.removeChild(window.player.element);
+        }
+        dynamicGroup.appendChild(window.player.element);
         window.player.updatePosition();
     }
     if (window.npcs) {
-        window.npcs.forEach(npc => npc.updatePosition());
+        window.npcs.forEach(npc => {
+            if (npc.element.parentNode) {
+                npc.element.parentNode.removeChild(npc.element);
+            }
+            dynamicGroup.appendChild(npc.element);
+            npc.updatePosition();
+        });
     }
     if (window.chickens) {
-        window.chickens.forEach(chicken => chicken.updatePosition());
+        window.chickens.forEach(chicken => {
+            if (chicken.element.parentNode) {
+                chicken.element.parentNode.removeChild(chicken.element);
+            }
+            dynamicGroup.appendChild(chicken.element);
+            chicken.updatePosition();
+        });
     }
+
+    // Ensure SVG uses proper stacking context
+    svg.style.isolation = 'isolate';
 } 

@@ -11,6 +11,7 @@ const tileTypes = {
     FLOWER: { color: 'pink', passable: true, resource: null },
     SMALL_TREE: { color: 'darkgreen', passable: false, resource: 'wood' },
     LARGE_TREE: { color: 'darkgreen', passable: false, resource: 'wood' },
+    PINE_TREE: { color: 'darkgreen', passable: false, resource: 'wood' },
     EGG: { color: 'white', passable: true, resource: 'egg' },
     BADGE: { color: 'gold', passable: true, resource: 'badge' },
     FARMHOUSE: { color: 'white', passable: false, resource: null },

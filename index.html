@@ -18,10 +18,22 @@
   <body>
     <div id="game-container"></div>
     <div id="ui-container">
-      <p>Wood: <span id="wood-count">0</span></p>
-      <p>Stone: <span id="stone-count">0</span></p>
-      <p>Eggs: <span id="eggs-count">0</span></p>
-      <p>Badges Delivered: <span id="badges-count">0/5</span></p>
+      <div class="ui-item">
+        <img src="resources/images/tree.gif" alt="Wood" />
+        <span id="wood-count">0</span>
+      </div>
+      <div class="ui-item">
+        <img src="resources/images/stone.gif" alt="Stone" />
+        <span id="stone-count">0</span>
+      </div>
+      <div class="ui-item">
+        <img src="resources/images/egg.gif" alt="Eggs" />
+        <span id="eggs-count">0</span>
+      </div>
+      <div class="ui-item">
+        <img src="resources/images/badge.gif" alt="Badges Delivered" />
+        <span id="badges-count">0/5</span>
+      </div>
     </div>
     <script type="module" src="js/game.js"></script>
   </body>
