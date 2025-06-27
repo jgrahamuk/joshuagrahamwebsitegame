@@ -99,7 +99,8 @@ export function convertMapDataToGameFormat(mapData, isLandscape) {
             gameMap[finalY] && gameMap[finalY][finalX] && gameMap[finalY][finalX].length > 1) {
             switch (resource.type) {
                 case 'LARGE_TREE': gameMap[finalY][finalX].push(tileTypes.LARGE_TREE); break;
-                case 'SMALL_TREE': gameMap[finalY][finalX].push(tileTypes.SMALL_TREE); break;
+                case 'BUSH': gameMap[finalY][finalX].push(tileTypes.BUSH); break;
+                case 'PINE_TREE': gameMap[finalY][finalX].push(tileTypes.PINE_TREE); break;
                 case 'ROCK': gameMap[finalY][finalX].push(tileTypes.ROCK); break;
                 case 'FLOWER': gameMap[finalY][finalX].push(tileTypes.FLOWER); break;
             }

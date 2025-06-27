@@ -139,7 +139,7 @@ export class Chicken {
                 }
 
                 // Schedule next egg lay
-                this.nextEggLay = now + 10000 + Math.random() * 10000; // 10-20 seconds for testing
+                this.nextEggLay = now + 30000 + Math.random() * 60000; // 30-90 seconds
             }
             return; // Don't do other activities while laying egg
         }
@@ -495,7 +495,7 @@ function hatchEggsTick() {
     for (const key in window.eggTimers) {
         if (window.eggTimers.hasOwnProperty(key)) {
             const [x, y] = key.split(',').map(Number);
-            if (now - window.eggTimers[key] > 60000) { // 60 seconds
+            if (now - window.eggTimers[key] > 30000) { // 30 seconds
                 // Remove egg from map and SVG
                 removeResource(x, y);
                 // Remove egg SVG element

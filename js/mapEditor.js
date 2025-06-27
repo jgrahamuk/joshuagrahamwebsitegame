@@ -18,7 +18,8 @@ export class MapEditor {
             { id: 'dirt', name: 'Dirt', icon: 'tile-dirt.gif', type: 'tile', tileType: tileTypes.DIRT },
             { id: 'water', name: 'Water', icon: 'tile-water.gif', type: 'tile', tileType: tileTypes.WATER },
             { id: 'large_tree', name: 'Large Tree', icon: 'tree.gif', type: 'resource', tileType: tileTypes.LARGE_TREE },
-            { id: 'small_tree', name: 'Small Tree', icon: 'tree.gif', type: 'resource', tileType: tileTypes.SMALL_TREE },
+            { id: 'bush', name: 'Bush', icon: 'bush.gif', type: 'resource', tileType: tileTypes.BUSH },
+            { id: 'pine_tree', name: 'Pine Tree', icon: 'pine-tree.gif', type: 'resource', tileType: tileTypes.PINE_TREE },
             { id: 'rock', name: 'Rock', icon: 'stone.gif', type: 'resource', tileType: tileTypes.ROCK },
             { id: 'flower', name: 'Flower', icon: 'flower.gif', type: 'resource', tileType: tileTypes.FLOWER },
             { id: 'egg', name: 'Egg', icon: 'egg.gif', type: 'resource', tileType: tileTypes.EGG },
@@ -217,7 +218,15 @@ export class MapEditor {
             const imgWidth = parseFloat(img.getAttribute('width'));
             const imgHeight = parseFloat(img.getAttribute('height'));
 
-            if (imgX === tileX && imgY === tileY && imgWidth === window.TILE_SIZE && imgHeight === window.TILE_SIZE) {
+            // Check if this image overlaps with our tile, considering scaled resources
+            const isOverlapping = (
+                imgX >= tileX - window.TILE_SIZE &&
+                imgX <= tileX + window.TILE_SIZE &&
+                imgY >= tileY - window.TILE_SIZE &&
+                imgY <= tileY + window.TILE_SIZE
+            );
+
+            if (isOverlapping) {
                 imagesToRemove.push(img);
             }
         });
@@ -244,8 +253,15 @@ export class MapEditor {
         // Add overlay if needed
         const top = tiles[tiles.length - 1];
         let overlay = null;
-        if (top === tileTypes.LARGE_TREE || top === tileTypes.SMALL_TREE) {
+        let scale = 1;
+
+        if (top === tileTypes.LARGE_TREE) {
             overlay = 'tree.gif';
+            scale = 2;
+        } else if (top === tileTypes.BUSH) {
+            overlay = 'bush.gif';
+        } else if (top === tileTypes.PINE_TREE) {
+            overlay = 'pine-tree.gif';
         } else if (top === tileTypes.ROCK) {
             overlay = 'stone.gif';
         } else if (top === tileTypes.FLOWER) {
@@ -255,10 +271,22 @@ export class MapEditor {
         if (overlay) {
             const imgOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'image');
             imgOverlay.setAttribute('href', getSpriteUrl(overlay));
-            imgOverlay.setAttribute('x', tileX);
-            imgOverlay.setAttribute('y', tileY);
-            imgOverlay.setAttribute('width', window.TILE_SIZE);
-            imgOverlay.setAttribute('height', window.TILE_SIZE);
+
+            // For scaled resources, adjust position to keep centered
+            if (scale > 1) {
+                const offset = (window.TILE_SIZE * (scale - 1)) / 2;
+                imgOverlay.setAttribute('x', tileX - offset);
+                imgOverlay.setAttribute('y', tileY - offset);
+                imgOverlay.setAttribute('width', window.TILE_SIZE * scale);
+                imgOverlay.setAttribute('height', window.TILE_SIZE * scale);
+            } else {
+                imgOverlay.setAttribute('x', tileX);
+                imgOverlay.setAttribute('y', tileY);
+                imgOverlay.setAttribute('width', window.TILE_SIZE);
+                imgOverlay.setAttribute('height', window.TILE_SIZE);
+            }
+
+            imgOverlay.style.imageRendering = 'pixelated';
             this.svg.appendChild(imgOverlay);
         }
     }
@@ -590,7 +618,8 @@ export class MapEditor {
                         if (layer === tileTypes.GRASS) return 'GRASS';
                         if (layer === tileTypes.DIRT) return 'DIRT';
                         if (layer === tileTypes.LARGE_TREE) return 'LARGE_TREE';
-                        if (layer === tileTypes.SMALL_TREE) return 'SMALL_TREE';
+                        if (layer === tileTypes.BUSH) return 'BUSH';
+                        if (layer === tileTypes.PINE_TREE) return 'PINE_TREE';
                         if (layer === tileTypes.ROCK) return 'ROCK';
                         if (layer === tileTypes.FLOWER) return 'FLOWER';
                         if (layer === tileTypes.EGG) return 'EGG';
@@ -603,13 +632,15 @@ export class MapEditor {
                     // Check for resources
                     const topLayer = tileLayers[tileLayers.length - 1];
                     if (topLayer === tileTypes.LARGE_TREE ||
-                        topLayer === tileTypes.SMALL_TREE ||
+                        topLayer === tileTypes.BUSH ||
+                        topLayer === tileTypes.PINE_TREE ||
                         topLayer === tileTypes.ROCK ||
                         topLayer === tileTypes.FLOWER ||
                         topLayer === tileTypes.EGG ||
                         topLayer === tileTypes.BADGE) {
                         let resourceType = 'LARGE_TREE';
-                        if (topLayer === tileTypes.SMALL_TREE) resourceType = 'SMALL_TREE';
+                        if (topLayer === tileTypes.BUSH) resourceType = 'BUSH';
+                        else if (topLayer === tileTypes.PINE_TREE) resourceType = 'PINE_TREE';
                         else if (topLayer === tileTypes.ROCK) resourceType = 'ROCK';
                         else if (topLayer === tileTypes.FLOWER) resourceType = 'FLOWER';
                         else if (topLayer === tileTypes.EGG) resourceType = 'EGG';

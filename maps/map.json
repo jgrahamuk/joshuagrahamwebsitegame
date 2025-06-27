@@ -725,7 +725,7 @@
     {
       "x": 28,
       "y": 6,
-      "layers": ["WATER", "GRASS", "WATER_BORDER", "SMALL_TREE"]
+      "layers": ["WATER", "GRASS", "WATER_BORDER", "PINE_TREE"]
     },
     {
       "x": 29,
@@ -5423,32 +5423,32 @@
       "y": 6
     },
     {
-      "type": "SMALL_TREE",
+      "type": "PINE_TREE",
       "x": 28,
       "y": 6
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 29,
       "y": 6
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 30,
       "y": 6
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 31,
       "y": 6
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 32,
       "y": 6
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 33,
       "y": 6
     },
@@ -5458,7 +5458,7 @@
       "y": 6
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 35,
       "y": 6
     },
@@ -5468,7 +5468,7 @@
       "y": 6
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 37,
       "y": 6
     },
@@ -5483,17 +5483,17 @@
       "y": 7
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 22,
       "y": 7
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 23,
       "y": 7
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 24,
       "y": 7
     },
@@ -5503,7 +5503,7 @@
       "y": 7
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 29,
       "y": 7
     },
@@ -5513,7 +5513,7 @@
       "y": 7
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 31,
       "y": 7
     },
@@ -5523,7 +5523,7 @@
       "y": 7
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 33,
       "y": 7
     },
@@ -5533,7 +5533,7 @@
       "y": 7
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 35,
       "y": 7
     },
@@ -5543,7 +5543,7 @@
       "y": 7
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 37,
       "y": 7
     },
@@ -5913,22 +5913,22 @@
       "y": 20
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 41,
       "y": 20
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 42,
       "y": 20
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 43,
       "y": 20
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 44,
       "y": 20
     },
@@ -5993,7 +5993,7 @@
       "y": 22
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 27,
       "y": 22
     },
@@ -6003,7 +6003,7 @@
       "y": 22
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 29,
       "y": 22
     },
@@ -6013,7 +6013,7 @@
       "y": 22
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 31,
       "y": 22
     },
@@ -6043,7 +6043,7 @@
       "y": 22
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 27,
       "y": 23
     },
@@ -6058,42 +6058,42 @@
       "y": 23
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 30,
       "y": 23
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 31,
       "y": 23
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 37,
       "y": 23
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 38,
       "y": 23
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 39,
       "y": 23
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 40,
       "y": 23
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 41,
       "y": 23
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 42,
       "y": 23
     },
@@ -6183,22 +6183,22 @@
       "y": 25
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 37,
       "y": 25
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 38,
       "y": 25
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 39,
       "y": 25
     },
     {
-      "type": "LARGE_TREE",
+      "type": "PINE_TREE",
       "x": 40,
       "y": 25
     },

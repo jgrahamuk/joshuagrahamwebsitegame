@@ -10,7 +10,8 @@ export const tileTypes = {
     GRASS: { color: 'green', passable: true, resource: null },
     ROCK: { color: 'grey', passable: false, resource: 'stone' },
     FLOWER: { color: 'pink', passable: true, resource: null },
-    SMALL_TREE: { color: 'darkgreen', passable: false, resource: 'wood' },
+    BUSH: { color: 'darkgreen', passable: false, resource: 'wood' },
+    PINE_TREE: { color: 'darkgreen', passable: false, resource: 'wood' },
     LARGE_TREE: { color: 'darkgreen', passable: false, resource: 'wood' },
     EGG: { color: 'white', passable: true, resource: 'egg' },
     BADGE: { color: 'gold', passable: true, resource: 'badge' },
@@ -201,9 +202,19 @@ export function drawMap(svg) {
             const top = tiles[tiles.length - 1];
             let overlay = null;
             let resourceType = null;
-            if (top === tileTypes.LARGE_TREE || top === tileTypes.SMALL_TREE) {
+            let scale = 1;
+
+            if (top === tileTypes.LARGE_TREE) {
                 overlay = 'tree.gif';
                 resourceType = 'tree';
+                scale = 2;
+            } else if (top === tileTypes.BUSH) {
+                overlay = 'bush.gif';
+                resourceType = 'tree';
+            } else if (top === tileTypes.PINE_TREE) {
+                overlay = 'pine-tree.gif';
+                resourceType = 'tree';
+                scale = 2;
             } else if (top === tileTypes.ROCK) {
                 overlay = 'stone.gif';
                 resourceType = 'stone';
@@ -217,13 +228,25 @@ export function drawMap(svg) {
                 overlay = 'badge.gif';
                 resourceType = 'badge';
             }
+
             if (overlay) {
                 const imgOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'image');
                 imgOverlay.setAttribute('href', getSpriteUrl(overlay));
-                imgOverlay.setAttribute('x', offsetX + x * tileSize);
-                imgOverlay.setAttribute('y', offsetY + y * tileSize);
-                imgOverlay.setAttribute('width', tileSize);
-                imgOverlay.setAttribute('height', tileSize);
+
+                // For scaled resources, adjust position to keep centered
+                if (scale > 1) {
+                    const offset = (window.TILE_SIZE * (scale - 1)) / 2;
+                    imgOverlay.setAttribute('x', offsetX + x * window.TILE_SIZE - offset);
+                    imgOverlay.setAttribute('y', offsetY + y * window.TILE_SIZE - offset);
+                    imgOverlay.setAttribute('width', window.TILE_SIZE * scale);
+                    imgOverlay.setAttribute('height', window.TILE_SIZE * scale);
+                } else {
+                    imgOverlay.setAttribute('x', offsetX + x * window.TILE_SIZE);
+                    imgOverlay.setAttribute('y', offsetY + y * window.TILE_SIZE);
+                    imgOverlay.setAttribute('width', window.TILE_SIZE);
+                    imgOverlay.setAttribute('height', window.TILE_SIZE);
+                }
+
                 imgOverlay.setAttribute('data-resource', resourceType);
                 imgOverlay.style.imageRendering = 'pixelated';
                 svg.appendChild(imgOverlay);
