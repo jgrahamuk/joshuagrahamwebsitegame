@@ -1,5 +1,5 @@
 import { tileTypes, placeResourceAtPosition, removeResource } from './map.js';
-import { randomGrassOrDirt } from './map.js';
+import { randomGrassOrDirt, getTile } from './map.js';
 import { getSpriteUrl } from './spriteCache.js';
 
 // Badge definitions with messages
@@ -34,11 +34,54 @@ class BadgeSystem {
         this.completedBadges = new Set();
     }
 
+    // Find a valid position for a badge (not blocked by resources or structures)
+    findValidBadgePosition() {
+        let attempts = 0;
+        const maxAttempts = 100; // Prevent infinite loops
+
+        while (attempts < maxAttempts) {
+            const position = randomGrassOrDirt();
+            const tile = getTile(position.x, position.y);
+
+            // Check if the tile is passable (grass or dirt) and has no resource on it
+            if ((tile === tileTypes.GRASS || tile === tileTypes.DIRT) &&
+                !this.isPositionBlocked(position)) {
+                return position;
+            }
+
+            attempts++;
+        }
+
+        console.error('Could not find valid badge position after', maxAttempts, 'attempts');
+        return null;
+    }
+
+    // Check if a position is blocked by any resource or structure
+    isPositionBlocked(position) {
+        if (!window.svg) return true;
+
+        const offsetX = window.MAP_OFFSET_X || 0;
+        const offsetY = window.MAP_OFFSET_Y || 0;
+        const targetX = offsetX + position.x * window.TILE_SIZE;
+        const targetY = offsetY + position.y * window.TILE_SIZE;
+
+        // Check for any resources or structures at this position
+        const elements = window.svg.querySelectorAll('image[data-resource]');
+        for (const element of elements) {
+            const x = parseFloat(element.getAttribute('x'));
+            const y = parseFloat(element.getAttribute('y'));
+            if (x === targetX && y === targetY) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     // Place the next badge on the map
     placeNextBadge() {
         if (this.currentBadgeIndex >= badges.length) {
             console.log('All badges have been collected!');
-            // Clear the current badge position since no more badges
             this.currentBadgePosition = null;
             return;
         }
@@ -46,16 +89,18 @@ class BadgeSystem {
         // Remove current badge if it exists
         if (this.currentBadgePosition) {
             removeResource(this.currentBadgePosition.x, this.currentBadgePosition.y);
-            // Remove the visual element from SVG
             this.removeBadgeElement(this.currentBadgePosition);
         }
 
-        // Find a new position for the badge
-        const position = randomGrassOrDirt();
+        // Find a valid position for the badge
+        const position = this.findValidBadgePosition();
+        if (!position) {
+            console.error('Failed to place badge - no valid position found');
+            return;
+        }
+
         placeResourceAtPosition(position.x, position.y, tileTypes.BADGE);
         this.currentBadgePosition = position;
-
-        // Add the badge element directly to SVG
         this.addBadgeElement(position);
 
         console.log(`Badge ${this.currentBadgeIndex + 1} placed at (${position.x}, ${position.y})`);
