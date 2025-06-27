@@ -55,7 +55,7 @@
     {
       "x": 5,
       "y": 3,
-      "layers": ["WATER", "GRASS", "PINE_TREE"]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 6,
@@ -70,7 +70,7 @@
     {
       "x": 8,
       "y": 3,
-      "layers": ["WATER", "GRASS", "LARGE_TREE"]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 9,
@@ -100,7 +100,7 @@
     {
       "x": 5,
       "y": 4,
-      "layers": ["WATER", "GRASS"]
+      "layers": ["WATER", "GRASS", "PINE_TREE"]
     },
     {
       "x": 6,
@@ -255,7 +255,7 @@
     {
       "x": 3,
       "y": 7,
-      "layers": ["WATER", "GRASS", "PINE_TREE"]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 4,
@@ -795,7 +795,7 @@
     {
       "x": 6,
       "y": 15,
-      "layers": ["WATER", "GRASS", "FLOWER", "FLOWER"]
+      "layers": ["WATER", "GRASS", "FLOWER"]
     },
     {
       "x": 7,
@@ -1300,12 +1300,12 @@
     {
       "x": 3,
       "y": 25,
-      "layers": ["WATER", "GRASS", "PINE_TREE"]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 4,
       "y": 25,
-      "layers": ["WATER", "GRASS", "PINE_TREE"]
+      "layers": ["WATER", "GRASS"]
     },
     {
       "x": 5,
@@ -1620,7 +1620,7 @@
     {
       "x": 9,
       "y": 31,
-      "layers": ["WATER", "GRASS"]
+      "layers": ["WATER", "GRASS", "LARGE_TREE"]
     },
     {
       "x": 10,
@@ -1635,7 +1635,7 @@
     {
       "x": 9,
       "y": 32,
-      "layers": ["WATER", "GRASS", "LARGE_TREE"]
+      "layers": ["WATER", "GRASS"]
     }
   ],
   "structures": [
@@ -1703,19 +1703,14 @@
       "y": 3
     },
     {
-      "type": "PINE_TREE",
-      "x": 5,
-      "y": 3
-    },
-    {
-      "type": "LARGE_TREE",
-      "x": 8,
-      "y": 3
-    },
-    {
       "type": "LARGE_TREE",
       "x": 9,
       "y": 3
+    },
+    {
+      "type": "PINE_TREE",
+      "x": 5,
+      "y": 4
     },
     {
       "type": "ROCK",
@@ -1770,11 +1765,6 @@
     {
       "type": "PINE_TREE",
       "x": 2,
-      "y": 7
-    },
-    {
-      "type": "PINE_TREE",
-      "x": 3,
       "y": 7
     },
     {
@@ -1914,31 +1904,6 @@
     },
     {
       "type": "FLOWER",
-      "x": 5,
-      "y": 15
-    },
-    {
-      "type": "FLOWER",
-      "x": 6,
-      "y": 15
-    },
-    {
-      "type": "FLOWER",
-      "x": 7,
-      "y": 15
-    },
-    {
-      "type": "FLOWER",
-      "x": 8,
-      "y": 15
-    },
-    {
-      "type": "FLOWER",
-      "x": 9,
-      "y": 15
-    },
-    {
-      "type": "FLOWER",
       "x": 2,
       "y": 16
     },
@@ -1954,16 +1919,6 @@
     },
     {
       "type": "FLOWER",
-      "x": 5,
-      "y": 16
-    },
-    {
-      "type": "FLOWER",
-      "x": 9,
-      "y": 16
-    },
-    {
-      "type": "FLOWER",
       "x": 12,
       "y": 16
     },
@@ -1975,16 +1930,6 @@
     {
       "type": "FLOWER",
       "x": 3,
-      "y": 17
-    },
-    {
-      "type": "FLOWER",
-      "x": 5,
-      "y": 17
-    },
-    {
-      "type": "FLOWER",
-      "x": 9,
       "y": 17
     },
     {
@@ -2083,16 +2028,6 @@
       "y": 25
     },
     {
-      "type": "PINE_TREE",
-      "x": 3,
-      "y": 25
-    },
-    {
-      "type": "PINE_TREE",
-      "x": 4,
-      "y": 25
-    },
-    {
       "type": "LARGE_TREE",
       "x": 12,
       "y": 25
@@ -2101,16 +2036,6 @@
       "type": "LARGE_TREE",
       "x": 13,
       "y": 25
-    },
-    {
-      "type": "PINE_TREE",
-      "x": 3,
-      "y": 27
-    },
-    {
-      "type": "FLOWER",
-      "x": 7,
-      "y": 27
     },
     {
       "type": "FLOWER",
@@ -2126,11 +2051,6 @@
       "type": "PINE_TREE",
       "x": 13,
       "y": 27
-    },
-    {
-      "type": "ROCK",
-      "x": 7,
-      "y": 28
     },
     {
       "type": "FLOWER",
@@ -2198,7 +2118,7 @@
       "name": "Joshua",
       "x": 6,
       "y": 17,
-      "message": "Hey! I'm Joshua! I'm a technical leader and polyglot full-stack developer with 25+ years of experience. I've delivered over 200 technical projects for large and small businesses alike.<br /><br />But uhh... I can't remember where I left my badge for work.\n\nI don't suppose you could give me a hand. \n\nIf you could find it, that'd be awesome!"
+      "message": "Hey! I'm Joshua! I'm a software dveloper who's delivered over 200 technical projects.<br /><br />But uhh... I can't remember where I left my badge for work.\n\nI don't suppose you could give me a hand. \n\nIf you could find it, that'd be awesome!"
     }
   ],
   "chickens": [

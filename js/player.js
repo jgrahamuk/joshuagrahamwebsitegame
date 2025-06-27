@@ -5,6 +5,32 @@ import { badgeSystem } from './badgeSystem.js';
 
 export class Player {
     constructor(svg, startX, startY) {
+        // Validate starting position
+        const startTile = getTile(startX, startY);
+        if (!startTile || (startTile !== tileTypes.GRASS && startTile !== tileTypes.DIRT)) {
+            console.error('Invalid player starting position, must be on grass or dirt');
+            // Find nearest valid tile
+            let found = false;
+            let radius = 1;
+            while (!found && radius < Math.max(MAP_WIDTH_TILES, MAP_HEIGHT_TILES)) {
+                for (let dy = -radius; dy <= radius && !found; dy++) {
+                    for (let dx = -radius; dx <= radius && !found; dx++) {
+                        const newX = startX + dx;
+                        const newY = startY + dy;
+                        if (newX >= 0 && newX < MAP_WIDTH_TILES && newY >= 0 && newY < MAP_HEIGHT_TILES) {
+                            const tile = getTile(newX, newY);
+                            if (tile === tileTypes.GRASS || tile === tileTypes.DIRT) {
+                                startX = newX;
+                                startY = newY;
+                                found = true;
+                            }
+                        }
+                    }
+                }
+                radius++;
+            }
+        }
+
         this.x = startX;
         this.y = startY;
         this.direction = 'front';
@@ -99,7 +125,7 @@ export class Player {
         // Create text element
         const textElement = document.createElement('div');
         textElement.className = 'chatbox-text';
-        textElement.innerHTML = "Hey! Check out this website. Isn't it snazzy?! Just click anywhere on the map and I'll go there. There are lots of items to pick up and things to do.<br /><br />Maybe you should go talk to Joshua, as this is his website. you'll find him somewhere on the island. He's wearing a flannel shirt.";
+        textElement.innerHTML = "Hey! Check out this website. Isn't it snazzy?! Just click anywhere on the map and I'll go there.<br /><br />Maybe you should go talk to Joshua, as this is his website. you'll find him somewhere on the island. He's wearing a flannel shirt.";
 
         // Assemble the chatbox
         chatbox.appendChild(textElement);
@@ -107,7 +133,10 @@ export class Player {
         document.body.appendChild(this.introMessageContainer);
 
         // Add click handler to end intro
-        const clickHandler = () => this.endIntroSequence();
+        const clickHandler = (e) => {
+            e.stopPropagation(); // Prevent click from reaching map click handler
+            this.endIntroSequence();
+        };
         this.svg.addEventListener('click', clickHandler, { once: true });
 
         // Auto-end intro after 10 seconds

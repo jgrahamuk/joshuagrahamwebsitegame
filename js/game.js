@@ -164,9 +164,13 @@ class ObjectiveSystem {
             }
         }
 
+        // Determine target width (NPCs are 2 tiles wide, badges/items are 1 tile)
+        const isNPC = this.currentObjective.id === 'talk_to_joshua';
+        const targetWidth = isNPC ? window.TILE_SIZE * 2 : window.TILE_SIZE;
+
         // Position arrow above the target, centered
-        const targetCenterX = (window.MAP_OFFSET_X || 0) + (pos.x * window.TILE_SIZE) + (window.TILE_SIZE / 2);
-        const arrowX = targetCenterX - (window.TILE_SIZE / 2);
+        const targetX = (window.MAP_OFFSET_X || 0) + (pos.x * window.TILE_SIZE);
+        const arrowX = targetX + (targetWidth / 2) - (window.TILE_SIZE / 2);
         const arrowY = (window.MAP_OFFSET_Y || 0) + (pos.y * window.TILE_SIZE) - window.TILE_SIZE - bounceOffset;
 
         this.arrow.setAttribute('x', arrowX);
@@ -272,8 +276,19 @@ preloadSprites().then(async () => {
     gameEntitiesGroup.setAttribute('id', 'game-entities');
     svg.appendChild(gameEntitiesGroup);
 
-    // Find a valid player start
-    let start = randomGrassOrDirt();
+    // Find a valid player start position
+    let start;
+    if (window.player) {
+        // If player exists, check if current position is valid
+        const currentTile = getTile(window.player.x, window.player.y);
+        if (currentTile === tileTypes.GRASS || currentTile === tileTypes.DIRT) {
+            start = { x: window.player.x, y: window.player.y };
+        } else {
+            start = randomGrassOrDirt();
+        }
+    } else {
+        start = randomGrassOrDirt();
+    }
     window.player = new Player(svg, start.x, start.y);
 
     // Create chickens from loaded data
