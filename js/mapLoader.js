@@ -3,7 +3,7 @@ import { tileTypes } from './map.js';
 let currentMapData = null;
 
 export async function loadMapData(isLandscape) {
-    const mapFile = 'maps/map.json';
+    const mapFile = isLandscape ? 'maps/map.json' : 'maps/map-portrait.json';
 
     try {
         const response = await fetch(mapFile);
@@ -40,38 +40,22 @@ export function getCurrentMapData() {
     return currentMapData;
 }
 
-export function convertMapDataToGameFormat(mapData, isLandscape) {
+export function convertMapDataToGameFormat(mapData) {
     const { width, height, tiles, structures, resources, npcs, chickens, cockerels } = mapData;
-
-    // For portrait mode, swap width and height
-    const finalWidth = isLandscape ? width : height;
-    const finalHeight = isLandscape ? height : width;
 
     // Convert tile data to game format
     const gameMap = [];
-    for (let y = 0; y < finalHeight; y++) {
+    for (let y = 0; y < height; y++) {
         gameMap[y] = [];
-        for (let x = 0; x < finalWidth; x++) {
+        for (let x = 0; x < width; x++) {
             gameMap[y][x] = [tileTypes.WATER]; // Default water
         }
     }
 
-    // Apply tile layers with transposition for portrait mode
+    // Apply tile layers
     tiles.forEach(tile => {
-        let finalX, finalY;
-        if (isLandscape) {
-            finalX = tile.x;
-            finalY = tile.y;
-        } else {
-            // For portrait mode, rotate 90 degrees clockwise:
-            // new_x = old_y
-            // new_y = width - 1 - old_x
-            finalX = tile.y;
-            finalY = width - 1 - tile.x;
-        }
-
-        if (finalX >= 0 && finalX < finalWidth && finalY >= 0 && finalY < finalHeight) {
-            gameMap[finalY][finalX] = tile.layers.map(layerType => {
+        if (tile.x >= 0 && tile.x < width && tile.y >= 0 && tile.y < height) {
+            gameMap[tile.y][tile.x] = tile.layers.map(layerType => {
                 switch (layerType) {
                     case 'WATER': return tileTypes.WATER;
                     case 'WATER_BORDER': return { ...tileTypes.WATER, color: '#3bbcff' };
@@ -83,116 +67,28 @@ export function convertMapDataToGameFormat(mapData, isLandscape) {
         }
     });
 
-    // Apply resources with transposition
+    // Apply resources
     resources.forEach(resource => {
-        let finalX, finalY;
-        if (isLandscape) {
-            finalX = resource.x;
-            finalY = resource.y;
-        } else {
-            // For portrait mode, rotate 90 degrees clockwise:
-            finalX = resource.y;
-            finalY = width - 1 - resource.x;
-        }
-
-        if (finalX >= 0 && finalX < finalWidth && finalY >= 0 && finalY < finalHeight &&
-            gameMap[finalY] && gameMap[finalY][finalX] && gameMap[finalY][finalX].length > 1) {
+        if (resource.x >= 0 && resource.x < width && resource.y >= 0 && resource.y < height &&
+            gameMap[resource.y] && gameMap[resource.y][resource.x] && gameMap[resource.y][resource.x].length > 1) {
             switch (resource.type) {
-                case 'LARGE_TREE': gameMap[finalY][finalX].push(tileTypes.LARGE_TREE); break;
-                case 'BUSH': gameMap[finalY][finalX].push(tileTypes.BUSH); break;
-                case 'PINE_TREE': gameMap[finalY][finalX].push(tileTypes.PINE_TREE); break;
-                case 'ROCK': gameMap[finalY][finalX].push(tileTypes.ROCK); break;
-                case 'FLOWER': gameMap[finalY][finalX].push(tileTypes.FLOWER); break;
+                case 'LARGE_TREE': gameMap[resource.y][resource.x].push(tileTypes.LARGE_TREE); break;
+                case 'BUSH': gameMap[resource.y][resource.x].push(tileTypes.BUSH); break;
+                case 'PINE_TREE': gameMap[resource.y][resource.x].push(tileTypes.PINE_TREE); break;
+                case 'ROCK': gameMap[resource.y][resource.x].push(tileTypes.ROCK); break;
+                case 'FLOWER': gameMap[resource.y][resource.x].push(tileTypes.FLOWER); break;
             }
         }
     });
 
-    // Transform structures with transposition and size swapping
-    const transformedStructures = structures.map(structure => {
-        let finalX, finalY, finalWidth, finalHeight;
-
-        if (isLandscape) {
-            finalX = structure.x;
-            finalY = structure.y;
-            finalWidth = structure.width;
-            finalHeight = structure.height;
-        } else {
-            finalX = structure.y - 1;
-            finalY = width - structure.x - structure.width;
-            finalWidth = structure.width;
-            finalHeight = structure.height;
-
-        }
-
-        return {
-            ...structure,
-            x: finalX,
-            y: finalY,
-            width: finalWidth,
-            height: finalHeight
-        };
-    });
-
-    // Transform NPCs with transposition
-    const transformedNpcs = npcs.map(npc => {
-        let finalX, finalY;
-        if (isLandscape) {
-            finalX = npc.x;
-            finalY = npc.y;
-        } else {
-            finalX = npc.y;
-            finalY = width - 1 - npc.x;
-        }
-
-        return {
-            ...npc,
-            x: finalX,
-            y: finalY
-        };
-    });
-
-    // Transform chickens with transposition
-    const transformedChickens = chickens.map(chicken => {
-        let finalX, finalY;
-        if (isLandscape) {
-            finalX = chicken.x;
-            finalY = chicken.y;
-        } else {
-            finalX = chicken.y;
-            finalY = width - 1 - chicken.x;
-        }
-
-        return {
-            x: finalX,
-            y: finalY
-        };
-    });
-
-    // Transform cockerels with transposition
-    const transformedCockerels = cockerels ? cockerels.map(cockerel => {
-        let finalX, finalY;
-        if (isLandscape) {
-            finalX = cockerel.x;
-            finalY = cockerel.y;
-        } else {
-            finalX = cockerel.y;
-            finalY = width - 1 - cockerel.x;
-        }
-
-        return {
-            x: finalX,
-            y: finalY
-        };
-    }) : [];
-
     return {
         map: gameMap,
-        structures: transformedStructures,
-        npcs: transformedNpcs,
-        chickens: transformedChickens,
-        cockerels: transformedCockerels,
-        width: finalWidth,
-        height: finalHeight
+        structures,
+        npcs,
+        chickens,
+        cockerels,
+        width,
+        height
     };
 }
 

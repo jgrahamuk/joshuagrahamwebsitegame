@@ -1,21 +1,6 @@
 import { getSpriteUrl } from './spriteCache.js';
 
 export function placeStructures(map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES) {
-    const isLandscape = window.innerWidth > window.innerHeight;
-
-    // Helper function to transform coordinates for portrait mode
-    function transformCoordinates(x, y, width) {
-        if (isLandscape) {
-            return { x, y };
-        } else {
-            // Same transformation as tiles: rotate 90 degrees clockwise
-            return {
-                x: y,
-                y: width - 1 - x
-            };
-        }
-    }
-
     // Place farmhouse
     if (window.farmhouse) {
         for (let y = window.farmhouse.y; y < window.farmhouse.y + window.farmhouse.h; y++) {
@@ -51,21 +36,7 @@ export function placeStructures(map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES) {
 }
 
 export function drawStructures(svg, offsetX = 0, offsetY = 0) {
-    const isLandscape = window.innerWidth > window.innerHeight;
     const tileSize = window.TILE_SIZE;
-
-    // Helper function to transform coordinates for portrait mode
-    function transformCoordinates(x, y, width) {
-        if (isLandscape) {
-            return { x, y };
-        } else {
-            // Same transformation as tiles: rotate 90 degrees clockwise
-            return {
-                x: y,
-                y: width - 1 - x
-            };
-        }
-    }
 
     // Draw farmhouse
     if (window.farmhouse) {

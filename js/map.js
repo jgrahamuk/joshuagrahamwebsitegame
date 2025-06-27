@@ -38,8 +38,8 @@ export async function initializeMap() {
     const isLandscape = aspectRatio > 1;
 
     // Load map data from JSON
-    const mapData = await loadMapData();
-    const gameData = convertMapDataToGameFormat(mapData, isLandscape);
+    const mapData = await loadMapData(isLandscape);
+    const gameData = convertMapDataToGameFormat(mapData);
 
     // Update map dimensions
     MAP_WIDTH_TILES = gameData.width;
@@ -92,6 +92,16 @@ export function randomGrassOrDirt() {
 }
 
 export function removeResource(x, y) {
+    // Validate coordinates are within map bounds
+    if (x < 0 || x >= MAP_WIDTH_TILES || y < 0 || y >= MAP_HEIGHT_TILES) {
+        return null;
+    }
+
+    // Validate map and tiles exist
+    if (!map || !map[y] || !map[y][x]) {
+        return null;
+    }
+
     const tiles = map[y][x];
     const topTile = tiles[tiles.length - 1];
 

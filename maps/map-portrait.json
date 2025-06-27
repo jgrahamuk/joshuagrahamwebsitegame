@@ -1,0 +1,89 @@
+{
+  "width": 30,
+  "height": 34,
+  "tiles": [
+    { "x": 0, "y": 0, "layers": ["WATER"] },
+    { "x": 1, "y": 0, "layers": ["WATER"] },
+    { "x": 2, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 3, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 4, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 5, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 6, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 7, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 8, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 9, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 10, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 11, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 12, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 13, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 14, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 15, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 16, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 17, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 18, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 19, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 20, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 21, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 22, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 23, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 24, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 25, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 26, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 27, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 28, "y": 0, "layers": ["WATER", "GRASS"] },
+    { "x": 29, "y": 0, "layers": ["WATER", "GRASS"] }
+  ],
+  "structures": [
+    {
+      "type": "FARMHOUSE",
+      "x": 15,
+      "y": 10,
+      "width": 4,
+      "height": 3
+    },
+    {
+      "type": "CHICKEN_COOP",
+      "x": 22,
+      "y": 12,
+      "width": 3,
+      "height": 2
+    },
+    {
+      "type": "SIGN",
+      "x": 27,
+      "y": 7,
+      "width": 6,
+      "height": 4
+    }
+  ],
+  "resources": [
+    { "type": "LARGE_TREE", "x": 5, "y": 5 },
+    { "type": "LARGE_TREE", "x": 8, "y": 7 },
+    { "type": "LARGE_TREE", "x": 12, "y": 15 },
+    { "type": "PINE_TREE", "x": 18, "y": 8 },
+    { "type": "PINE_TREE", "x": 22, "y": 6 },
+    { "type": "PINE_TREE", "x": 25, "y": 9 },
+    { "type": "BUSH", "x": 7, "y": 12 },
+    { "type": "BUSH", "x": 10, "y": 9 },
+    { "type": "BUSH", "x": 15, "y": 7 },
+    { "type": "ROCK", "x": 20, "y": 10 },
+    { "type": "ROCK", "x": 23, "y": 8 },
+    { "type": "FLOWER", "x": 9, "y": 11 },
+    { "type": "FLOWER", "x": 14, "y": 13 },
+    { "type": "FLOWER", "x": 17, "y": 12 }
+  ],
+  "npcs": [
+    {
+      "name": "Joshua",
+      "x": 20,
+      "y": 11,
+      "message": "Welcome to my farm! It looks like the chickens are having a great time."
+    }
+  ],
+  "chickens": [
+    { "x": 23, "y": 13 },
+    { "x": 24, "y": 13 },
+    { "x": 23, "y": 14 }
+  ],
+  "cockerels": [{ "x": 24, "y": 14 }]
+}
