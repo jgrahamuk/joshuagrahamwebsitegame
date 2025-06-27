@@ -23,7 +23,8 @@ class ObjectiveSystem {
                 getPosition: () => {
                     const joshua = window.npcs.find(npc => npc.name.toLowerCase() === 'joshua');
                     return joshua ? { x: joshua.x, y: joshua.y } : null;
-                }
+                },
+                initialDelay: 5000 // 5 second delay after intro
             },
             {
                 id: 'find_first_badge',
@@ -62,8 +63,9 @@ class ObjectiveSystem {
         this.bounceSequenceDuration = 1200; // 1.2 seconds for the bounce sequence
         this.isBouncingSequence = false;
         this.bounceSequenceStartTime = 0;
+        this.waitingForIntro = true;
 
-        // Start the first objective
+        // Start the first objective (but don't show arrow yet)
         this.startNextObjective();
     }
 
@@ -74,9 +76,28 @@ class ObjectiveSystem {
         if (this.currentObjective) {
             console.log(`Starting objective: ${this.currentObjective.description}`);
 
-            // If there's a delay, wait before showing the arrow
-            if (this.currentObjective.delay) {
-                this.arrow.style.display = 'none';
+            // Hide arrow initially
+            this.arrow.style.display = 'none';
+
+            // If this is the first objective and we're waiting for intro
+            if (this.currentObjective.id === 'talk_to_joshua' && this.waitingForIntro) {
+                // Wait for intro to finish plus initial delay
+                const checkIntro = () => {
+                    if (!window.player.isInIntro) {
+                        setTimeout(() => {
+                            if (this.currentObjective && !this.currentObjective.isComplete()) {
+                                this.waitingForIntro = false;
+                                this.arrow.style.display = 'block';
+                            }
+                        }, this.currentObjective.initialDelay);
+                    } else {
+                        setTimeout(checkIntro, 100);
+                    }
+                };
+                checkIntro();
+            }
+            // For subsequent objectives, use their delay property
+            else if (this.currentObjective.delay) {
                 setTimeout(() => {
                     if (this.currentObjective && !this.currentObjective.isComplete()) {
                         this.arrow.style.display = 'block';
@@ -228,6 +249,11 @@ preloadSprites().then(async () => {
     // Update global map reference to point to the current map data
     window.map = map;
 
+    // Create a group for all game entities
+    const gameEntitiesGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gameEntitiesGroup.setAttribute('id', 'game-entities');
+    svg.appendChild(gameEntitiesGroup);
+
     // Find a valid player start
     let start = randomGrassOrDirt();
     window.player = new Player(svg, start.x, start.y);
@@ -237,6 +263,11 @@ preloadSprites().then(async () => {
     mapData.chickens.forEach(chickenData => {
         const chicken = new Chicken(svg, chickenData.x, chickenData.y);
         window.chickens.push(chicken);
+        // Move chicken element to game entities group
+        if (chicken.element.parentNode) {
+            chicken.element.parentNode.removeChild(chicken.element);
+        }
+        gameEntitiesGroup.appendChild(chicken.element);
     });
 
     // Create cockerels from loaded data (if any)
@@ -245,11 +276,24 @@ preloadSprites().then(async () => {
         mapData.cockerels.forEach(cockerelData => {
             const cockerel = new Cockerel(svg, cockerelData.x, cockerelData.y);
             window.cockerels.push(cockerel);
+            // Move cockerel element to game entities group
+            if (cockerel.element.parentNode) {
+                cockerel.element.parentNode.removeChild(cockerel.element);
+            }
+            gameEntitiesGroup.appendChild(cockerel.element);
         });
     }
 
     // Create NPCs from loaded data
-    window.npcs = mapData.npcs.map(npcData => new NPC(svg, npcData.name, npcData.message, npcData.x, npcData.y));
+    window.npcs = mapData.npcs.map(npcData => {
+        const npc = new NPC(svg, npcData.name, npcData.message, npcData.x, npcData.y);
+        // Move NPC element to game entities group
+        if (npc.element.parentNode) {
+            npc.element.parentNode.removeChild(npc.element);
+        }
+        gameEntitiesGroup.appendChild(npc.element);
+        return npc;
+    });
 
     // Initialize map editor (hidden by default)
     window.mapEditor = new MapEditor(svg, gameContainer);
@@ -262,6 +306,23 @@ preloadSprites().then(async () => {
 
     // Initialize objective system
     window.objectiveSystem = new ObjectiveSystem(svg);
+
+    // Add intro sequence observer
+    const introObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                const isInIntro = window.player.isInIntro;
+                gameEntitiesGroup.style.opacity = isInIntro ? '0' : '1';
+                gameEntitiesGroup.style.pointerEvents = isInIntro ? 'none' : 'auto';
+            }
+        });
+    });
+
+    // Start observing the player element for style changes
+    introObserver.observe(window.player.element, {
+        attributes: true,
+        attributeFilter: ['style']
+    });
 
     // Start the game loop
     requestAnimationFrame(gameLoop);

@@ -95,9 +95,13 @@ export class Player {
         this.introMessageElement = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         this.introMessageElement.setAttribute('href', getSpriteUrl('chatbox.gif'));
 
+        // Adjust chatbox size based on orientation
+        const isPortrait = window.innerHeight > window.innerWidth;
+        const scaleFactor = isPortrait ? 0.8 : 1; // 20% smaller in portrait mode
+
         // Position chatbox above character with proper spacing
-        const chatboxWidth = window.TILE_SIZE * 24;
-        const chatboxHeight = window.TILE_SIZE * 12;
+        const chatboxWidth = window.TILE_SIZE * 24 * scaleFactor;
+        const chatboxHeight = window.TILE_SIZE * 12 * scaleFactor;
         const chatboxX = screenCenterX - chatboxWidth / 2;
         const chatboxY = characterY - chatboxHeight - window.TILE_SIZE;
 
@@ -114,7 +118,7 @@ export class Player {
 
         // Create and position text with proper wrapping
         const message = "Hey! Check out this website. Isn't it snazzy?! Just click anywhere on the map and I'll go there. There are lots of items to pick up and things to do. Maybe you should go talk to Joshua, as this is his website. you'll find him somewhere on the island. He's wearing a flannel shirt.";
-        const padding = window.TILE_SIZE * 1;
+        const padding = window.TILE_SIZE * 1 * scaleFactor;
         const maxWidth = chatboxWidth - padding * 4;
         const words = message.split(' ');
         const lines = [];
@@ -122,7 +126,7 @@ export class Player {
 
         words.forEach(word => {
             const testLine = currentLine + (currentLine ? ' ' : '') + word;
-            const estimatedWidth = testLine.length * 8;
+            const estimatedWidth = testLine.length * 8 + 40; // Rough estimate of width based on character count
             if (estimatedWidth > maxWidth && currentLine) {
                 lines.push(currentLine);
                 currentLine = word;
@@ -135,16 +139,23 @@ export class Player {
         }
 
         // Create text elements for each line
-        const lineHeight = window.TILE_SIZE * 0.7;
+        const lineHeight = window.TILE_SIZE * 0.8;
         const textStartY = chatboxY + padding * 2;
+        const textStartX = chatboxX + padding * 12;
+
+        // Create a text container group
+        const textGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        textGroup.classList.add('npc-chatbox-text');
+        this.introGroup.appendChild(textGroup);
 
         lines.forEach((line, index) => {
             const textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            textElement.setAttribute('x', chatboxX * 1.5 + padding);
+            textElement.setAttribute('x', textStartX);
             textElement.setAttribute('y', textStartY + index * lineHeight);
-            textElement.classList.add('npc-chatbox-text');
+            textElement.setAttribute('width', 50);
             textElement.textContent = line;
-            this.introGroup.appendChild(textElement);
+            textElement.style.fontSize = `${Math.floor(window.TILE_SIZE * 0.8)}px`;
+            textGroup.appendChild(textElement);
             this.introTextElements.push(textElement);
         });
 
