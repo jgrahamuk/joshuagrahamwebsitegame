@@ -2,8 +2,11 @@ import { tileTypes, placeResourceAtPosition, removeResource, map, MAP_WIDTH_TILE
 import { getSpriteUrl } from './spriteCache.js';
 import { NPC } from './npcs.js';
 import { Chicken, Cockerel } from './chickens.js';
-import { loadMapData, convertMapDataToGameFormat } from './mapLoader.js';
+import { loadMapData, convertMapDataToGameFormat, getCurrentMapId, setCurrentMapId } from './mapLoader.js';
 import { initializeMap } from './map.js';
+import { saveMapToSupabase } from './mapBrowser.js';
+import { getCurrentUser } from './auth.js';
+import { isConfigured } from './supabase.js';
 
 export class MapEditor {
     constructor(svg, gameContainer) {
@@ -141,6 +144,18 @@ export class MapEditor {
             this.exportMap();
         });
         this.toolbarContainer.appendChild(exportButton);
+
+        // Add cloud save button (only if Supabase is configured)
+        if (isConfigured()) {
+            const cloudSaveButton = document.createElement('button');
+            cloudSaveButton.innerHTML = '☁';
+            cloudSaveButton.title = 'Save to Cloud';
+            cloudSaveButton.className = 'export-button cloud-save-button';
+            cloudSaveButton.addEventListener('click', () => {
+                this.showCloudSaveDialog();
+            });
+            this.toolbarContainer.appendChild(cloudSaveButton);
+        }
 
         this.gameContainer.appendChild(this.toolbarContainer);
     }
@@ -916,6 +931,70 @@ export class MapEditor {
             npcs,
             chickens
         };
+    }
+
+    showCloudSaveDialog() {
+        const user = getCurrentUser();
+        if (!user) {
+            alert('Sign in to save maps to the cloud.');
+            return;
+        }
+
+        // Remove existing dialog if present
+        const existing = document.getElementById('cloud-save-dialog');
+        if (existing) existing.remove();
+
+        const currentId = getCurrentMapId();
+
+        const dialog = document.createElement('div');
+        dialog.id = 'cloud-save-dialog';
+        dialog.innerHTML = `
+            <div class="cloud-save-panel">
+                <h3>${currentId ? 'Update Map' : 'Save New Map'}</h3>
+                <input type="text" id="cloud-save-name" placeholder="Map name" value="${currentId ? '' : 'My Map'}" />
+                <input type="text" id="cloud-save-desc" placeholder="Description (optional)" />
+                <label class="cloud-save-public">
+                    <input type="checkbox" id="cloud-save-is-public" /> Make public
+                </label>
+                <div class="cloud-save-actions">
+                    <button id="cloud-save-confirm" class="auth-btn auth-btn-primary">Save</button>
+                    <button id="cloud-save-cancel" class="auth-btn auth-btn-secondary">Cancel</button>
+                </div>
+                <div id="cloud-save-status" style="display:none;"></div>
+            </div>
+        `;
+        document.body.appendChild(dialog);
+
+        document.getElementById('cloud-save-cancel').addEventListener('click', () => {
+            dialog.remove();
+        });
+
+        document.getElementById('cloud-save-confirm').addEventListener('click', async () => {
+            const name = document.getElementById('cloud-save-name').value.trim() || 'Untitled Map';
+            const description = document.getElementById('cloud-save-desc').value.trim();
+            const isPublic = document.getElementById('cloud-save-is-public').checked;
+            const statusEl = document.getElementById('cloud-save-status');
+
+            try {
+                statusEl.textContent = 'Saving...';
+                statusEl.style.display = 'block';
+                statusEl.style.color = '#aaa';
+
+                const mapJSON = this.convertMapToJSON();
+                const saved = await saveMapToSupabase(mapJSON, name, description, isPublic, currentId);
+
+                if (saved) {
+                    setCurrentMapId(saved.id);
+                    statusEl.textContent = 'Saved!';
+                    statusEl.style.color = '#4caf50';
+                    setTimeout(() => dialog.remove(), 1000);
+                }
+            } catch (err) {
+                statusEl.textContent = 'Error: ' + err.message;
+                statusEl.style.display = 'block';
+                statusEl.style.color = '#f44336';
+            }
+        });
     }
 
     showEditorIndicator() {

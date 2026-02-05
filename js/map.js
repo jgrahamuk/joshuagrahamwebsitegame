@@ -86,6 +86,47 @@ export async function initializeMap(forcePortrait = false) {
     return gameData;
 }
 
+export function initializeMapFromData(gameData) {
+    MAP_WIDTH_TILES = gameData.width;
+    MAP_HEIGHT_TILES = gameData.height;
+    map = gameData.map;
+
+    farmhouse = null;
+    chickenCoop = null;
+    signObj = null;
+    window.farmhouse = null;
+    window.chickenCoop = null;
+    window.signObj = null;
+
+    if (gameData.structures) {
+        gameData.structures.forEach(structure => {
+            const structureObj = {
+                x: structure.x,
+                y: structure.y,
+                w: structure.width,
+                h: structure.height
+            };
+
+            switch (structure.type) {
+                case 'FARMHOUSE':
+                    farmhouse = structureObj;
+                    window.farmhouse = farmhouse;
+                    break;
+                case 'CHICKEN_COOP':
+                    chickenCoop = structureObj;
+                    window.chickenCoop = chickenCoop;
+                    break;
+                case 'SIGN':
+                    signObj = structureObj;
+                    window.signObj = signObj;
+                    break;
+            }
+        });
+    }
+
+    return gameData;
+}
+
 export function getTile(x, y) {
     if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
         const tiles = map[y][x];

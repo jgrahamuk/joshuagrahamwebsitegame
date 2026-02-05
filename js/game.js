@@ -1,4 +1,4 @@
-import { initializeMap, getTile, randomGrassOrDirt, tileTypes, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, setMapSize, drawMap } from './map.js';
+import { initializeMap, initializeMapFromData, getTile, randomGrassOrDirt, tileTypes, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, setMapSize, drawMap } from './map.js';
 import { findPath, moveToTarget } from './movement.js';
 import { Player } from './player.js';
 import { Chicken, Cockerel } from './chickens.js';
@@ -8,6 +8,10 @@ import { drawStructures } from './structures.js';
 import { MapEditor } from './mapEditor.js';
 import { HelpOverlay } from './helpOverlay.js';
 import { badgeSystem } from './badgeSystem.js';
+import { isConfigured } from './supabase.js';
+import { initAuth, onAuthChange, showAuthScreen, getCurrentUser } from './auth.js';
+import { showMapBrowser, onMapSelected } from './mapBrowser.js';
+import { loadMapFromSupabase, convertMapDataToGameFormat } from './mapLoader.js';
 
 // Add at the start of the file, before any other code
 function updateOrientation() {
@@ -262,9 +266,24 @@ function gameLoop(timestamp) {
     }
 }
 
-preloadSprites().then(async () => {
-    // Initialize map and get loaded data
-    const mapData = await initializeMap();
+// Start the game with optional Supabase map ID
+async function startGame(supabaseMapId) {
+    let mapData;
+
+    if (supabaseMapId) {
+        // Load map from Supabase
+        const supaMapData = await loadMapFromSupabase(supabaseMapId);
+        if (supaMapData) {
+            mapData = convertMapDataToGameFormat(supaMapData);
+            initializeMapFromData(mapData);
+        } else {
+            // Fall back to default map if Supabase load fails
+            mapData = await initializeMap();
+        }
+    } else {
+        mapData = await initializeMap();
+    }
+
     updateTileSize();
     drawMap(svg);
 
@@ -406,31 +425,58 @@ preloadSprites().then(async () => {
     });
 
     window.addEventListener('resize', async () => {
-        const mapData = await initializeMap();
+        const resizeMapData = await initializeMap();
         updateTileSize();
         drawMap(svg);
 
         // Re-create player at last known position (default to 0,0 if not available)
-        let start = { x: window.player?.x || 0, y: window.player?.y || 0 };
-        window.player = new Player(svg, start.x, start.y);
+        let resizeStart = { x: window.player?.x || 0, y: window.player?.y || 0 };
+        window.player = new Player(svg, resizeStart.x, resizeStart.y);
 
         // Re-create chickens
         window.chickens = [];
-        mapData.chickens.forEach(chickenData => {
+        resizeMapData.chickens.forEach(chickenData => {
             const chicken = new Chicken(svg, chickenData.x, chickenData.y);
             window.chickens.push(chicken);
         });
 
         // Re-create cockerels
         window.cockerels = [];
-        if (mapData.cockerels) {
-            mapData.cockerels.forEach(cockerelData => {
+        if (resizeMapData.cockerels) {
+            resizeMapData.cockerels.forEach(cockerelData => {
                 const cockerel = new Cockerel(svg, cockerelData.x, cockerelData.y);
                 window.cockerels.push(cockerel);
             });
         }
 
         // Re-create NPCs
-        window.npcs = mapData.npcs.map(npcData => new NPC(svg, npcData.name, npcData.message, npcData.x, npcData.y));
+        window.npcs = resizeMapData.npcs.map(npcData => new NPC(svg, npcData.name, npcData.message, npcData.x, npcData.y));
     });
+}
+
+preloadSprites().then(async () => {
+    if (isConfigured()) {
+        // Supabase is configured - show auth screen, then map browser
+        const user = await initAuth();
+
+        onMapSelected((mapId) => {
+            startGame(mapId);
+        });
+
+        onAuthChange((user) => {
+            // After auth resolves (sign in or guest), show map browser
+            showMapBrowser();
+        });
+
+        if (user) {
+            // Already signed in - show map browser
+            showMapBrowser();
+        } else {
+            // Show auth screen
+            showAuthScreen();
+        }
+    } else {
+        // No Supabase - start game immediately with default map
+        startGame(null);
+    }
 }); 

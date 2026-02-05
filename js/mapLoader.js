@@ -1,6 +1,16 @@
 import { tileTypes } from './map.js';
+import { loadMapById } from './mapBrowser.js';
 
 let currentMapData = null;
+let currentMapId = null; // Supabase map ID if loaded from DB
+
+export function getCurrentMapId() {
+    return currentMapId;
+}
+
+export function setCurrentMapId(id) {
+    currentMapId = id;
+}
 
 export async function loadMapData(isLandscape) {
     const mapFile = isLandscape ? 'maps/map.json' : 'maps/map-portrait.json';
@@ -11,11 +21,28 @@ export async function loadMapData(isLandscape) {
             throw new Error(`Failed to load map: ${response.statusText}`);
         }
         currentMapData = await response.json();
+        currentMapId = null; // Default map, no DB ID
         return currentMapData;
     } catch (error) {
         console.error('Error loading map data:', error);
         // Fallback to generated map if JSON loading fails
         return generateFallbackMap();
+    }
+}
+
+export async function loadMapFromSupabase(mapId) {
+    try {
+        const mapRecord = await loadMapById(mapId);
+        if (!mapRecord || !mapRecord.map_data) {
+            console.error('Map not found or empty:', mapId);
+            return null;
+        }
+        currentMapData = mapRecord.map_data;
+        currentMapId = mapRecord.id;
+        return currentMapData;
+    } catch (error) {
+        console.error('Error loading map from Supabase:', error);
+        return null;
     }
 }
 
@@ -102,11 +129,11 @@ export function convertMapDataToGameFormat(mapData) {
     return {
         map: gameMap,
         structures,
-        npcs,
-        chickens,
-        cockerels,
-        width,
-        height
+        npcs: npcs || [],
+        chickens: chickens || [],
+        cockerels: cockerels || [],
+        width: width || 60,
+        height: height || 34
     };
 }
 
@@ -134,4 +161,4 @@ export function saveMap() {
     a.download = 'map.json';
     a.click();
     URL.revokeObjectURL(url);
-} 
+}
