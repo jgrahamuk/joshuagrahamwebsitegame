@@ -1,19 +1,30 @@
--- Supabase Migration: Multi-user maps
+-- Supabase Migration: Multi-user maps with subscriptions
 -- Run this in the Supabase SQL Editor to set up the database schema.
 
 -- Profiles table (extends Supabase auth.users)
 create table if not exists public.profiles (
   id uuid references auth.users on delete cascade primary key,
   display_name text not null default '',
+  username text unique,
+  stripe_customer_id text,
+  subscription_status text not null default 'none',
+  subscription_plan text,
   created_at timestamptz not null default now()
 );
+
+-- Index for fast username lookups (used for maap.to/username routing)
+create unique index if not exists profiles_username_idx on public.profiles(username);
 
 -- Automatically create a profile when a new user signs up
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, display_name)
-  values (new.id, coalesce(new.raw_user_meta_data->>'display_name', split_part(new.email, '@', 1)));
+  insert into public.profiles (id, display_name, username)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data->>'display_name', split_part(new.email, '@', 1)),
+    new.raw_user_meta_data->>'username'
+  );
   return new;
 end;
 $$ language plpgsql security definer;
@@ -84,3 +95,35 @@ create policy "Owners can update their maps"
 create policy "Owners can delete their maps"
   on public.maps for delete
   using (auth.uid() = owner_id);
+
+-- ─────────────────────────────────────────────
+-- Stripe Webhook Helper
+-- Call this from your Stripe webhook handler (Edge Function)
+-- to activate a subscription after successful payment.
+-- ─────────────────────────────────────────────
+create or replace function public.activate_subscription(
+  p_user_id uuid,
+  p_stripe_customer_id text,
+  p_plan text
+)
+returns void as $$
+begin
+  update public.profiles
+  set
+    stripe_customer_id = p_stripe_customer_id,
+    subscription_status = 'active',
+    subscription_plan = p_plan
+  where id = p_user_id;
+end;
+$$ language plpgsql security definer;
+
+create or replace function public.cancel_subscription(
+  p_stripe_customer_id text
+)
+returns void as $$
+begin
+  update public.profiles
+  set subscription_status = 'canceled'
+  where stripe_customer_id = p_stripe_customer_id;
+end;
+$$ language plpgsql security definer;

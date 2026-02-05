@@ -34,16 +34,17 @@ export async function initAuth() {
     return currentUser;
 }
 
-export async function signUp(email, password, displayName) {
+export async function signUp(email, password, displayName, username) {
     const sb = getSupabase();
     if (!sb) throw new Error('Supabase not configured');
+
+    const metadata = { display_name: displayName };
+    if (username) metadata.username = username;
 
     const { data, error } = await sb.auth.signUp({
         email,
         password,
-        options: {
-            data: { display_name: displayName }
-        }
+        options: { data: metadata }
     });
 
     if (error) throw error;

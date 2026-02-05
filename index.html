@@ -3,11 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      Joshua Graham - Developer, manager, mentor, photographer, feeder of
-      chickens
-    </title>
-    <link rel="stylesheet" href="style.css" />
+    <title>maap.to - Create your own world</title>
+    <link rel="stylesheet" href="landing.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -15,28 +12,226 @@
       rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://js.stripe.com/v3/"></script>
   </head>
   <body>
-    <div id="game-container"></div>
-    <div id="auth-user-indicator"></div>
-    <div id="ui-container">
-      <div class="ui-item">
-        <img src="resources/images/tree.gif" alt="Wood" />
-        <span id="wood-count">0</span>
+    <!-- Animated tile background -->
+    <div class="bg-tiles" aria-hidden="true"></div>
+
+    <header>
+      <nav>
+        <a href="/" class="logo">maap.to</a>
+        <div class="nav-links">
+          <a href="#pricing">Pricing</a>
+          <a href="#how-it-works">How it works</a>
+          <button id="nav-signin-btn" class="btn btn-outline btn-sm">Sign In</button>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Hero -->
+      <section class="hero">
+        <div class="hero-content">
+          <h1>Build your own world.<br>Share it with everyone.</h1>
+          <p class="hero-sub">
+            Create pixel-art islands with the in-browser editor, get your own
+            link at <strong>maap.to/yourname</strong>, and let anyone explore your creation.
+          </p>
+          <div class="hero-cta">
+            <button id="hero-signup-btn" class="btn btn-primary btn-lg">Get Your World</button>
+            <a href="game.html" class="btn btn-ghost btn-lg">Try the Demo</a>
+          </div>
+          <p class="hero-hint">No credit card required to start</p>
+        </div>
+        <div class="hero-preview">
+          <div class="preview-window">
+            <div class="preview-bar">
+              <span class="preview-dot"></span>
+              <span class="preview-dot"></span>
+              <span class="preview-dot"></span>
+              <span class="preview-url">maap.to/<span class="preview-name">yourname</span></span>
+            </div>
+            <div class="preview-tiles">
+              <img src="resources/images/tile-water.gif" class="ptile" alt="" />
+              <img src="resources/images/tile-grass.gif" class="ptile" alt="" />
+              <img src="resources/images/tile-grass.gif" class="ptile" alt="" />
+              <img src="resources/images/tile-grass.gif" class="ptile" alt="" />
+              <img src="resources/images/tile-water.gif" class="ptile" alt="" />
+              <img src="resources/images/tile-water.gif" class="ptile" alt="" />
+              <img src="resources/images/tile-grass.gif" class="ptile" alt="" />
+              <img src="resources/images/tree.gif" class="ptile ptile-tree" alt="" />
+              <img src="resources/images/tile-grass.gif" class="ptile" alt="" />
+              <img src="resources/images/tile-water.gif" class="ptile" alt="" />
+              <img src="resources/images/tile-water.gif" class="ptile" alt="" />
+              <img src="resources/images/tile-grass.gif" class="ptile" alt="" />
+              <img src="resources/images/tile-grass.gif" class="ptile" alt="" />
+              <img src="resources/images/farmhouse.gif" class="ptile ptile-farm" alt="" />
+              <img src="resources/images/tile-water.gif" class="ptile" alt="" />
+              <img src="resources/images/tile-water.gif" class="ptile" alt="" />
+              <img src="resources/images/tile-grass.gif" class="ptile" alt="" />
+              <img src="resources/images/chicken-front.gif" class="ptile ptile-chicken" alt="" />
+              <img src="resources/images/tile-grass.gif" class="ptile" alt="" />
+              <img src="resources/images/tile-water.gif" class="ptile" alt="" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- How it works -->
+      <section id="how-it-works" class="how-section">
+        <h2>How it works</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step-icon">
+              <img src="resources/images/character-front.gif" alt="Sign up" />
+            </div>
+            <h3>1. Claim your name</h3>
+            <p>Pick a username and your world instantly lives at <strong>maap.to/yourname</strong></p>
+          </div>
+          <div class="step">
+            <div class="step-icon">
+              <img src="resources/images/tree.gif" alt="Build" />
+            </div>
+            <h3>2. Build your island</h3>
+            <p>Use the built-in editor to place terrain, trees, buildings, NPCs, and chickens</p>
+          </div>
+          <div class="step">
+            <div class="step-icon">
+              <img src="resources/images/chicken-front.gif" alt="Share" />
+            </div>
+            <h3>3. Share your link</h3>
+            <p>Anyone with your link can explore your world right in their browser</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pricing -->
+      <section id="pricing" class="pricing-section">
+        <h2>Simple pricing</h2>
+        <p class="pricing-sub">One plan. Everything included. Cancel anytime.</p>
+        <div class="pricing-cards">
+          <div class="pricing-card early-bird">
+            <div class="card-badge">Early Bird</div>
+            <div class="card-price">
+              <span class="price-currency">$</span>
+              <span class="price-amount">2</span>
+              <span class="price-period">/month</span>
+            </div>
+            <div class="price-original">$5/month after early bird ends</div>
+            <ul class="card-features">
+              <li>Your own world at maap.to/name</li>
+              <li>Full map editor access</li>
+              <li>Unlimited map saves</li>
+              <li>Public or private worlds</li>
+              <li>Custom NPCs & messages</li>
+              <li>Lock in this price forever</li>
+            </ul>
+            <button class="btn btn-primary btn-lg card-cta" data-plan="early_bird">Get Started - $2/mo</button>
+          </div>
+
+          <div class="pricing-card standard">
+            <div class="card-price">
+              <span class="price-currency">$</span>
+              <span class="price-amount">5</span>
+              <span class="price-period">/month</span>
+            </div>
+            <div class="price-note">Standard price</div>
+            <ul class="card-features">
+              <li>Your own world at maap.to/name</li>
+              <li>Full map editor access</li>
+              <li>Unlimited map saves</li>
+              <li>Public or private worlds</li>
+              <li>Custom NPCs & messages</li>
+            </ul>
+            <button class="btn btn-outline btn-lg card-cta" data-plan="standard">Get Started - $5/mo</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section class="faq-section">
+        <h2>Questions</h2>
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>Can I try it before paying?</summary>
+            <p>Yes! Hit "Try the Demo" to explore a world right now. No account needed.</p>
+          </details>
+          <details class="faq-item">
+            <summary>What does "lock in forever" mean?</summary>
+            <p>Early bird subscribers keep the $2/month price for as long as their subscription stays active. Even when the price goes up for new users.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Can anyone see my world?</summary>
+            <p>You control visibility. Make it public and share the link, or keep it private for yourself.</p>
+          </details>
+          <details class="faq-item">
+            <summary>What can I build?</summary>
+            <p>Islands with grass, water, dirt, trees, rocks, flowers, buildings, NPCs with custom messages, chickens, and more. The editor runs right in your browser.</p>
+          </details>
+        </div>
+      </section>
+
+      <!-- Final CTA -->
+      <section class="final-cta">
+        <h2>Ready to build?</h2>
+        <p>Claim your world before all the good names are taken.</p>
+        <button id="final-signup-btn" class="btn btn-primary btn-lg">Get maap.to/yourname</button>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        <span class="footer-logo">maap.to</span>
+        <span class="footer-copy">Pixel worlds for everyone</span>
       </div>
-      <div class="ui-item">
-        <img src="resources/images/stone.gif" alt="Stone" />
-        <span id="stone-count">0</span>
-      </div>
-      <div class="ui-item">
-        <img src="resources/images/egg.gif" alt="Eggs" />
-        <span id="eggs-count">0</span>
-      </div>
-      <div class="ui-item">
-        <img src="resources/images/badge.gif" alt="Badges Delivered" />
-        <span id="badges-count">0/5</span>
+    </footer>
+
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="modal" style="display:none;">
+      <div class="modal-panel">
+        <button class="modal-close" id="modal-close">&times;</button>
+        <h2>Claim your world</h2>
+        <div id="signup-step-1">
+          <label class="input-label" for="signup-username">Choose your URL</label>
+          <div class="url-input-row">
+            <span class="url-prefix">maap.to/</span>
+            <input type="text" id="signup-username" placeholder="yourname" autocomplete="username" maxlength="30" />
+          </div>
+          <div id="username-status" class="input-status"></div>
+
+          <label class="input-label" for="signup-email">Email</label>
+          <input type="email" id="signup-email" placeholder="you@example.com" autocomplete="email" />
+
+          <label class="input-label" for="signup-password">Password</label>
+          <input type="password" id="signup-password" placeholder="At least 6 characters" autocomplete="new-password" />
+
+          <div id="signup-error" class="input-error" style="display:none;"></div>
+
+          <button id="signup-submit-btn" class="btn btn-primary btn-lg btn-full">Create Account & Subscribe</button>
+          <p class="signup-hint">Already have an account? <button id="signup-switch-signin" class="link-btn">Sign in</button></p>
+        </div>
+
+        <div id="signup-step-signin" style="display:none;">
+          <label class="input-label" for="signin-email">Email</label>
+          <input type="email" id="signin-email" placeholder="you@example.com" autocomplete="email" />
+
+          <label class="input-label" for="signin-password">Password</label>
+          <input type="password" id="signin-password" placeholder="Password" autocomplete="current-password" />
+
+          <div id="signin-error" class="input-error" style="display:none;"></div>
+
+          <button id="signin-submit-btn" class="btn btn-primary btn-lg btn-full">Sign In</button>
+          <p class="signup-hint">Need an account? <button id="signin-switch-signup" class="link-btn">Sign up</button></p>
+        </div>
+
+        <div id="signup-step-processing" style="display:none;">
+          <div class="processing-spinner"></div>
+          <p>Redirecting to checkout...</p>
+        </div>
       </div>
     </div>
-    <script type="module" src="js/game.js"></script>
+
+    <script type="module" src="js/landing.js"></script>
   </body>
 </html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Joshua Graham - Developer, manager, mentor, photographer, feeder of
+      chickens
+    </title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body>
+    <div id="game-container"></div>
+    <div id="auth-user-indicator"></div>
+    <div id="ui-container">
+      <div class="ui-item">
+        <img src="resources/images/tree.gif" alt="Wood" />
+        <span id="wood-count">0</span>
+      </div>
+      <div class="ui-item">
+        <img src="resources/images/stone.gif" alt="Stone" />
+        <span id="stone-count">0</span>
+      </div>
+      <div class="ui-item">
+        <img src="resources/images/egg.gif" alt="Eggs" />
+        <span id="eggs-count">0</span>
+      </div>
+      <div class="ui-item">
+        <img src="resources/images/badge.gif" alt="Badges Delivered" />
+        <span id="badges-count">0/5</span>
+      </div>
+    </div>
+    <script type="module" src="js/game.js"></script>
+  </body>
+</html>
