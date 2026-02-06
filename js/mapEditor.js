@@ -39,7 +39,6 @@ export class MapEditor {
             // Structures
             { id: 'farmhouse', name: 'Farmhouse', icon: 'farmhouse.gif', type: 'structure', structureType: 'FARMHOUSE', width: 10, height: 6 },
             { id: 'chicken_coop', name: 'Chicken Coop', icon: 'chicken-coop.gif', type: 'structure', structureType: 'CHICKEN_COOP', width: 5, height: 3 },
-            { id: 'sign', name: 'Sign', icon: 'sign-joshuagraham.gif', type: 'structure', structureType: 'SIGN', width: 5, height: 3 },
             // NPCs
             { id: 'npc_joshua', name: 'Joshua NPC', icon: 'joshua-front.gif', type: 'npc', npcType: 'Joshua', message: 'Welcome to my farm! It looks like the chickens are having a great time.' },
             // Chickens and Cockerels
@@ -203,7 +202,12 @@ export class MapEditor {
             const y = Math.floor((e.clientY - rect.top - offsetY) / window.TILE_SIZE);
 
             if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
+                // Skip if clicking on same resource type
                 if (this.selectedTool.type === 'resource' && this.isSameResourceType(x, y, this.selectedTool.tileType)) {
+                    return; // Skip - let double-click handle it
+                }
+                // Skip if clicking on NPC (unless delete tool) to allow double-click config
+                if (this.selectedTool.type !== 'delete' && this.getNPCAt(x, y)) {
                     return; // Skip - let double-click handle it
                 }
             }
@@ -241,12 +245,17 @@ export class MapEditor {
                 if (this.selectedTool.type === 'resource' && this.isSameResourceType(x, y, this.selectedTool.tileType)) {
                     return;
                 }
+                // Skip if clicking on NPC (unless delete tool) to allow double-click config
+                if (this.selectedTool.type !== 'delete' && this.getNPCAt(x, y)) {
+                    return;
+                }
                 this.handleMapInteraction(e);
             }
         };
 
         this.mapDblClickHandler = (e) => {
             e.stopPropagation();
+            console.log('Double-click detected in map editor');
 
             const rect = this.svg.getBoundingClientRect();
             const offsetX = window.MAP_OFFSET_X || 0;
@@ -255,7 +264,13 @@ export class MapEditor {
             const x = Math.floor((e.clientX - rect.left - offsetX) / window.TILE_SIZE);
             const y = Math.floor((e.clientY - rect.top - offsetY) / window.TILE_SIZE);
 
+            console.log(`Double-click at tile (${x}, ${y})`);
+
             if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
+                const npcAt = this.getNPCAt(x, y);
+                console.log('NPC at position:', npcAt);
+                console.log('isConfigurableItem:', this.isConfigurableItem(x, y));
+
                 if (this.isConfigurableItem(x, y)) {
                     this.configureItem(x, y);
                 }
@@ -482,13 +497,13 @@ export class MapEditor {
             tiles.pop();
         }
 
-        // Check if there's an NPC at this position
-        if (window.npcs) {
-            const npcIndex = window.npcs.findIndex(npc => npc.x === x && npc.y === y);
+        // Check if there's an NPC at this position (use broad detection)
+        const npcToDelete = this.getNPCAt(x, y);
+        if (npcToDelete) {
+            const npcIndex = window.npcs.indexOf(npcToDelete);
             if (npcIndex >= 0) {
-                const npc = window.npcs[npcIndex];
-                if (npc.element && npc.element.parentNode) {
-                    npc.element.parentNode.removeChild(npc.element);
+                if (npcToDelete.element && npcToDelete.element.parentNode) {
+                    npcToDelete.element.parentNode.removeChild(npcToDelete.element);
                 }
                 window.npcs.splice(npcIndex, 1);
                 needsRedraw = true;
@@ -539,11 +554,20 @@ export class MapEditor {
     }
 
     showCollectableTipOnce() {
-        // Only show once per user
-        if (localStorage.getItem('collectableTipShown')) {
+        this.showEditTipOnce('collectable', 'Double-click on a collectable item to add a message that displays when someone collects it!');
+    }
+
+    showNPCTipOnce() {
+        this.showEditTipOnce('npc', 'Double-click on an NPC to change their name and what they say!');
+    }
+
+    showEditTipOnce(type, message) {
+        // Only show once per type
+        const storageKey = `${type}TipShown`;
+        if (localStorage.getItem(storageKey)) {
             return;
         }
-        localStorage.setItem('collectableTipShown', 'true');
+        localStorage.setItem(storageKey, 'true');
 
         // Create tip element
         const tip = document.createElement('div');
@@ -552,7 +576,7 @@ export class MapEditor {
             <div class="collectable-tip-content">
                 <span class="collectable-tip-icon">💡</span>
                 <span class="collectable-tip-text">
-                    <strong>Tip:</strong> Double-click on a collectable item to add a message that displays when someone collects it!
+                    <strong>Tip:</strong> ${message}
                 </span>
             </div>
             <button class="collectable-tip-close">&times;</button>
@@ -656,7 +680,22 @@ export class MapEditor {
         return topTile === resourceType;
     }
 
+    getNPCAt(x, y) {
+        // Check if there's an NPC at this position (use same logic as NPC.isClicked)
+        if (!window.npcs) return null;
+        return window.npcs.find(npc => {
+            const dx = Math.abs(npc.x - x);
+            const dy = Math.abs(npc.y - y);
+            return dx <= 1 && dy <= 1;
+        });
+    }
+
     isConfigurableItem(x, y) {
+        // Check if there's an NPC at this position
+        if (this.getNPCAt(x, y)) {
+            return true;
+        }
+
         // Check if there's a collectable resource at this position
         const tiles = map[y][x];
         if (!tiles || tiles.length === 0) return false;
@@ -674,6 +713,13 @@ export class MapEditor {
 
     configureItem(x, y) {
         if (!this.isConfigurableItem(x, y)) {
+            return;
+        }
+
+        // Check if it's an NPC
+        const npc = this.getNPCAt(x, y);
+        if (npc) {
+            this.showNPCConfigureDialog(npc);
             return;
         }
 
@@ -738,6 +784,85 @@ export class MapEditor {
             } else {
                 this.showSaveIndicator('Message removed');
             }
+            setTimeout(() => this.hideSaveIndicator(), 1500);
+        });
+
+        // Close on click outside
+        dialog.addEventListener('click', (e) => {
+            if (e.target === dialog) {
+                dialog.remove();
+            }
+        });
+    }
+
+    showNPCConfigureDialog(npc) {
+        // Remove existing dialog if present
+        const existing = document.getElementById('configure-npc-dialog');
+        if (existing) existing.remove();
+
+        const dialog = document.createElement('div');
+        dialog.id = 'configure-npc-dialog';
+        dialog.innerHTML = `
+            <div class="cloud-save-panel configure-item-panel">
+                <h3>Configure NPC</h3>
+                <p style="color: #888; font-size: 0.9rem; margin-bottom: 12px;">
+                    Set the name and message for this character.
+                </p>
+                <label style="color: #aaa; font-size: 0.85rem; display: block; margin-bottom: 4px;">Name</label>
+                <input type="text" id="configure-npc-name" value="${npc.name || ''}" placeholder="Character name" />
+                <label style="color: #aaa; font-size: 0.85rem; display: block; margin-bottom: 4px; margin-top: 12px;">Message</label>
+                <textarea id="configure-npc-message" rows="4" placeholder="What does this character say?">${npc.message || ''}</textarea>
+                <div class="cloud-save-actions">
+                    <button id="configure-npc-confirm" class="auth-btn auth-btn-primary">Save</button>
+                    <button id="configure-npc-cancel" class="auth-btn auth-btn-secondary">Cancel</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(dialog);
+
+        // Style the inputs
+        const nameInput = document.getElementById('configure-npc-name');
+        nameInput.style.cssText = `
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #444;
+            border-radius: 6px;
+            background: #111;
+            color: #eee;
+            font-family: inherit;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        `;
+
+        const textarea = document.getElementById('configure-npc-message');
+        textarea.style.cssText = `
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #444;
+            border-radius: 6px;
+            background: #111;
+            color: #eee;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            margin-bottom: 12px;
+        `;
+
+        document.getElementById('configure-npc-cancel').addEventListener('click', () => {
+            dialog.remove();
+        });
+
+        document.getElementById('configure-npc-confirm').addEventListener('click', () => {
+            const newName = document.getElementById('configure-npc-name').value.trim();
+            const newMessage = document.getElementById('configure-npc-message').value.trim();
+
+            npc.name = newName || 'NPC';
+            npc.message = newMessage || '';
+
+            dialog.remove();
+            this.scheduleAutoSave();
+
+            this.showSaveIndicator('NPC updated');
             setTimeout(() => this.hideSaveIndicator(), 1500);
         });
 
@@ -900,6 +1025,9 @@ export class MapEditor {
 
         // Ensure the NPC is visible by redrawing it
         npc.updatePosition();
+
+        // Show tip about double-click to edit
+        this.showNPCTipOnce();
 
         console.log(`NPC ${tool.npcType} placed at (${x}, ${y}). Total NPCs: ${window.npcs.length}`);
     }

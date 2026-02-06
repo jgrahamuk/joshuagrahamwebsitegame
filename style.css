@@ -597,7 +597,8 @@ body.portrait .chatbox-text {
 }
 
 /* Configure Item Dialog */
-#configure-item-dialog {
+#configure-item-dialog,
+#configure-npc-dialog {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.7);

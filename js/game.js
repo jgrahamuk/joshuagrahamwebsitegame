@@ -12,6 +12,7 @@ import { initAuth, onAuthChange, showAuthScreen, getCurrentUser } from './auth.j
 import { showMapBrowser, onMapSelected } from './mapBrowser.js';
 import { loadMapFromSupabase, convertMapDataToGameFormat } from './mapLoader.js';
 import { handleRoute, parseRoute } from './router.js';
+import { config } from './config.js';
 import { generateStarterIsland } from './mapGenerator.js';
 import { fetchMyMaps, saveMapToSupabase } from './mapBrowser.js';
 
@@ -207,7 +208,7 @@ function showUnpaidOwnerBanner() {
     banner.innerHTML = `
         <div class="unpaid-banner-content">
             <span>Your world is not visible to others until you subscribe.</span>
-            <a href="/?signup=1" class="unpaid-banner-btn">Subscribe Now</a>
+            <button class="unpaid-banner-btn" id="subscribe-now-btn">Subscribe Now</button>
         </div>
         <button class="unpaid-banner-close">&times;</button>
     `;
@@ -241,11 +242,17 @@ function showUnpaidOwnerBanner() {
             color: white;
             padding: 0.4rem 1rem;
             border-radius: 6px;
-            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
             font-size: 0.95rem;
         }
         .unpaid-banner-btn:hover {
             background: #388e3c;
+        }
+        .unpaid-banner-btn:disabled {
+            background: #666;
+            cursor: wait;
         }
         .unpaid-banner-close {
             background: none;
@@ -264,6 +271,52 @@ function showUnpaidOwnerBanner() {
 
     banner.querySelector('.unpaid-banner-close').addEventListener('click', () => {
         banner.remove();
+    });
+
+    // Subscribe button - go directly to Stripe
+    document.getElementById('subscribe-now-btn').addEventListener('click', async (e) => {
+        const btn = e.target;
+        btn.disabled = true;
+        btn.textContent = 'Redirecting...';
+
+        try {
+            const user = getCurrentUser();
+            const username = user?.user_metadata?.username || window.currentMapProfile?.username;
+
+            if (!user || !username) {
+                throw new Error('Unable to get user info');
+            }
+
+            const response = await fetch('/api/create-checkout-session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    priceId: config.STRIPE_PRICE_EARLY_BIRD,
+                    userId: user.id,
+                    username: username,
+                    successUrl: `${window.location.origin}/${username}?welcome=1`,
+                    cancelUrl: `${window.location.origin}/${username}?canceled=1`
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+            if (!data.sessionId) throw new Error('No sessionId returned');
+
+            const stripe = Stripe(config.STRIPE_PUBLISHABLE_KEY);
+            const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
+            if (error) throw error;
+
+        } catch (err) {
+            console.error('Checkout error:', err);
+            btn.disabled = false;
+            btn.textContent = 'Subscribe Now';
+            alert('Failed to start checkout: ' + err.message);
+        }
     });
 }
 
@@ -308,8 +361,8 @@ function updateTileSize() {
     svg.style.top = '';
 }
 
-// Make drawMap globally accessible
-window.drawMap = drawMap;
+// Make drawMap globally accessible (wrapper to use window.svg by default)
+window.drawMap = (svgArg) => drawMap(svgArg || window.svg);
 
 function gameLoop(timestamp) {
     // Request next frame first
@@ -534,6 +587,12 @@ function startGameWithMapData(mapData, options = {}) {
         if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
             // Check if clicking on an NPC or surrounding tiles
             const clickedNPC = window.npcs.find(npc => npc.isClicked(x, y));
+
+            // In edit mode, don't process NPC clicks (let double-click configure them)
+            if (window.mapEditor && window.mapEditor.isActive && clickedNPC) {
+                return;
+            }
+
             if (clickedNPC && clickedNPC.isNearPlayer(window.player.x, window.player.y)) {
                 // Already adjacent - show message immediately
                 window.npcs.filter(npc => npc !== clickedNPC).forEach(npc => npc.hideMessage());
