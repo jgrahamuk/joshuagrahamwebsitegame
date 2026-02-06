@@ -47,17 +47,6 @@ export class MapEditor {
             { id: 'cockerel', name: 'Cockerel', icon: 'cockerel-front.gif', type: 'cockerel' }
         ];
 
-        this.setupKeyboardShortcuts();
-    }
-
-    setupKeyboardShortcuts() {
-        document.addEventListener('keydown', (e) => {
-            // Ctrl+Shift+E to toggle editor
-            if (e.ctrlKey && e.shiftKey && e.key === 'E') {
-                e.preventDefault();
-                this.toggleEditor();
-            }
-        });
     }
 
     toggleEditor() {
@@ -72,7 +61,6 @@ export class MapEditor {
         this.isActive = true;
         this.createToolbar();
         this.setupMapClickHandler();
-        this.showEditorIndicator();
 
         // Hide inventory UI when editing
         const uiContainer = document.getElementById('ui-container');
@@ -89,7 +77,6 @@ export class MapEditor {
             this.toolbarContainer = null;
         }
         this.removeMapClickHandler();
-        this.hideEditorIndicator();
 
         // If we were editing the portrait map, switch back to landscape if appropriate
         if (this.isEditingPortrait) {
@@ -223,9 +210,27 @@ export class MapEditor {
         };
 
         this.mapClickHandler = (e) => {
+            // If no tool selected, let the click pass through for player movement
             if (!this.selectedTool) return;
             e.stopPropagation();
+            e.preventDefault();
             this.handleMapInteraction(e);
+        };
+
+        this.mapDblClickHandler = (e) => {
+            e.stopPropagation();
+            const rect = this.svg.getBoundingClientRect();
+            const offsetX = window.MAP_OFFSET_X || 0;
+            const offsetY = window.MAP_OFFSET_Y || 0;
+
+            const x = Math.floor((e.clientX - rect.left - offsetX) / window.TILE_SIZE);
+            const y = Math.floor((e.clientY - rect.top - offsetY) / window.TILE_SIZE);
+
+            if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
+                if (this.isConfigurableItem(x, y)) {
+                    this.configureItem(x, y);
+                }
+            }
         };
 
         // Add all event listeners
@@ -233,6 +238,7 @@ export class MapEditor {
         this.svg.addEventListener('mousemove', this.handleMouseMove);
         document.addEventListener('mouseup', this.handleMouseUp);
         this.svg.addEventListener('click', this.mapClickHandler);
+        this.svg.addEventListener('dblclick', this.mapDblClickHandler);
     }
 
     handleMapInteraction(e) {
@@ -266,6 +272,10 @@ export class MapEditor {
             this.handleMouseMove = null;
             this.handleMouseUp = null;
         }
+        if (this.mapDblClickHandler) {
+            this.svg.removeEventListener('dblclick', this.mapDblClickHandler);
+            this.mapDblClickHandler = null;
+        }
         // Reset drag state
         this.isDragging = false;
         this.lastTileX = null;
@@ -273,11 +283,8 @@ export class MapEditor {
     }
 
     applyTool(x, y) {
-        // If no tool selected, check if clicking on a configurable item
+        // If no tool selected, do nothing (double-click handles configuration)
         if (!this.selectedTool) {
-            if (this.isConfigurableItem(x, y)) {
-                this.configureItem(x, y);
-            }
             return;
         }
 
@@ -1235,19 +1242,5 @@ export class MapEditor {
                 dialog.remove();
             }
         });
-    }
-
-    showEditorIndicator() {
-        this.indicator = document.createElement('div');
-        this.indicator.className = 'map-editor-indicator';
-        this.indicator.textContent = 'Map Editor Active';
-        document.body.appendChild(this.indicator);
-    }
-
-    hideEditorIndicator() {
-        if (this.indicator) {
-            document.body.removeChild(this.indicator);
-            this.indicator = null;
-        }
     }
 } 

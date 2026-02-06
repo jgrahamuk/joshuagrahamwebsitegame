@@ -309,7 +309,30 @@ export class Player {
         // Check for collectable text before removing
         const collectable = collectablesSystem.getCollectable(resourcePos.x, resourcePos.y);
 
-        // Use map.js to remove the resource and handle respawning
+        // Check if this is a user world (not demo)
+        const isUserWorld = !!window.currentMapId;
+
+        // Owner should not collect items (they're in edit mode)
+        if (isUserWorld && window.isMapOwner) {
+            return;
+        }
+
+        // Guest viewing someone else's world - visual collection only
+        if (isUserWorld && !window.isMapOwner) {
+            if (collectable) {
+                // Mark as collected and show message
+                collectablesSystem.markCollected(resourcePos.x, resourcePos.y);
+                this.removeResourceElement(resourcePos);
+                this.updateInventoryDisplay();
+
+                if (collectable.text) {
+                    collectablesSystem.showCollectionMessage(collectable.text);
+                }
+            }
+            return;
+        }
+
+        // Demo world - normal resource gathering with map modification
         const removedResource = removeResource(resourcePos.x, resourcePos.y);
 
         if (removedResource) {
@@ -337,9 +360,8 @@ export class Player {
 
             // Show collection message if this was a collectable
             if (collectable && collectable.text) {
+                collectablesSystem.markCollected(resourcePos.x, resourcePos.y);
                 collectablesSystem.showCollectionMessage(collectable.text);
-                // Remove from collectables since the item is gone
-                collectablesSystem.removeCollectable(resourcePos.x, resourcePos.y);
             }
         }
     }
@@ -404,7 +426,12 @@ export class Player {
             eggsCountElement.textContent = this.inventory.eggs;
         }
         if (badgesCountElement) {
-            badgesCountElement.textContent = badgeSystem.getBadgeDisplayText();
+            // Use collectables system for user worlds, badge system for demo
+            if (collectablesSystem.getTotalCount() > 0) {
+                badgesCountElement.textContent = collectablesSystem.getDisplayText();
+            } else {
+                badgesCountElement.textContent = badgeSystem.getBadgeDisplayText();
+            }
         }
     }
 } 

@@ -6,7 +6,6 @@ import { NPC, npcDefinitions } from './npcs.js';
 import { preloadSprites, getSpriteUrl } from './spriteCache.js';
 import { drawStructures } from './structures.js';
 import { MapEditor } from './mapEditor.js';
-import { HelpOverlay } from './helpOverlay.js';
 import { badgeSystem } from './badgeSystem.js';
 import { isConfigured } from './supabase.js';
 import { initAuth, onAuthChange, showAuthScreen, getCurrentUser } from './auth.js';
@@ -291,11 +290,12 @@ async function startGame(supabaseMapId) {
 }
 
 // Start the game with pre-converted map data
-// options: { skipIntro: false, introText: null, pageTitle: null, isOwner: false }
+// options: { skipIntro: false, introText: null, pageTitle: null, isOwner: false, isUserWorld: false }
 function startGameWithMapData(mapData, options = {}) {
     // Store intro text and page title for map editor
     window.currentMapIntroText = options.introText || mapData.introText || null;
     window.currentMapPageTitle = options.pageTitle || mapData.pageTitle || null;
+    window.isMapOwner = options.isOwner || false;
 
     // Set the page title
     if (window.currentMapPageTitle) {
@@ -374,11 +374,11 @@ function startGameWithMapData(mapData, options = {}) {
     // Initialize map editor (hidden by default)
     window.mapEditor = new MapEditor(svg, gameContainer);
 
-    // Initialize help overlay
-    window.helpOverlay = new HelpOverlay();
 
-    // Initialize badge system
-    badgeSystem.initialize();
+    // Initialize badge system (only for demo world, not user worlds)
+    if (!options.isUserWorld) {
+        badgeSystem.initialize();
+    }
 
     // Initialize objective system
     window.objectiveSystem = new ObjectiveSystem(svg);
@@ -408,8 +408,8 @@ function startGameWithMapData(mapData, options = {}) {
         // If player is in intro sequence, ignore map clicks
         if (window.player.isInIntro) return;
 
-        // If map editor is active, let the editor handle clicks
-        if (window.mapEditor && window.mapEditor.isActive) return;
+        // If map editor is active with a tool selected, let the editor handle clicks
+        if (window.mapEditor && window.mapEditor.isActive && window.mapEditor.selectedTool) return;
 
         const rect = svg.getBoundingClientRect();
         const x = Math.floor((e.clientX - rect.left - (window.MAP_OFFSET_X || 0)) / window.TILE_SIZE);
@@ -506,6 +506,7 @@ preloadSprites().then(async () => {
 
             startGameWithMapData(mapData, {
                 isOwner,
+                isUserWorld: true,
                 introText: routeResult.mapData.introText,
                 pageTitle: routeResult.mapData.pageTitle
             });
@@ -556,7 +557,7 @@ preloadSprites().then(async () => {
                 // Load and enable editor
                 const mapData = convertMapDataToGameFormat(starterMap);
                 initializeMapFromData(mapData);
-                startGameWithMapData(mapData, { isOwner: true });
+                startGameWithMapData(mapData, { isOwner: true, isUserWorld: true });
 
                 // Enable editor after a short delay
                 setTimeout(() => {
@@ -574,6 +575,7 @@ preloadSprites().then(async () => {
                     initializeMapFromData(mapData);
                     startGameWithMapData(mapData, {
                         isOwner: true,
+                        isUserWorld: true,
                         introText: mapRecord.introText,
                         pageTitle: mapRecord.pageTitle
                     });
