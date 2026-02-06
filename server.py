@@ -79,24 +79,24 @@ class DevHandler(http.server.SimpleHTTPRequestHandler):
 
     def is_static_path(self, path):
         """Check if path is a static file or directory."""
-        path = path.strip('/')
+        clean_path = path.strip('/')
 
         # Root path
-        if not path:
+        if not clean_path:
             return True
 
         # Check file extension
-        _, ext = os.path.splitext(path)
+        _, ext = os.path.splitext(clean_path)
         if ext.lower() in STATIC_EXTENSIONS:
             return True
 
         # Check known static paths
-        first_segment = path.split('/')[0]
+        first_segment = clean_path.split('/')[0]
         if first_segment in STATIC_PATHS:
             return True
 
-        # Check if file exists
-        if os.path.exists(path):
+        # Check if file exists in current directory
+        if os.path.exists(clean_path) and os.path.isfile(clean_path):
             return True
 
         return False
@@ -137,6 +137,8 @@ class DevHandler(http.server.SimpleHTTPRequestHandler):
         if query:
             target_url += '?' + query
 
+        print(f"  ↳ Proxying to: {target_url}")
+
         try:
             # Read request body for POST
             body = None
@@ -155,8 +157,9 @@ class DevHandler(http.server.SimpleHTTPRequestHandler):
             # Make request
             with urllib.request.urlopen(req, timeout=30) as response:
                 response_body = response.read()
+                status_code = response.getcode()
 
-                self.send_response(response.status)
+                self.send_response(status_code)
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.send_header('Content-Type', response.headers.get('Content-Type', 'application/json'))
                 self.send_header('Content-Length', len(response_body))
@@ -165,6 +168,7 @@ class DevHandler(http.server.SimpleHTTPRequestHandler):
 
         except urllib.error.HTTPError as e:
             error_body = e.read()
+            print(f"  ↳ HTTP Error {e.code}: {error_body[:200]}")
             self.send_response(e.code)
             self.send_header('Access-Control-Allow-Origin', '*')
             self.send_header('Content-Type', 'application/json')
@@ -173,8 +177,20 @@ class DevHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(error_body)
 
         except urllib.error.URLError as e:
+            print(f"  ↳ Connection Error: {e}")
             error_msg = f'{{"error": "Supabase connection failed: {str(e)}"}}'.encode()
             self.send_response(502)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(error_msg))
+            self.end_headers()
+            self.wfile.write(error_msg)
+
+        except Exception as e:
+            print(f"  ↳ Unexpected Error: {e}")
+            error_msg = f'{{"error": "Proxy error: {str(e)}"}}'.encode()
+            self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
             self.send_header('Content-Type', 'application/json')
             self.send_header('Content-Length', len(error_msg))
             self.end_headers()
@@ -182,14 +198,22 @@ class DevHandler(http.server.SimpleHTTPRequestHandler):
 
     def log_message(self, format, *args):
         """Custom log format."""
-        path = args[0].split()[1] if args else ''
-        if path.startswith('/api/'):
-            prefix = '→ API'
-        elif self.looks_like_username(path.strip('/').split('/')[0] if path != '/' else ''):
-            prefix = '→ SPA'
-        else:
-            prefix = '     '
-        print(f"{prefix} {args[0]}")
+        try:
+            message = format % args
+            # Try to extract path from request line like "GET /path HTTP/1.1"
+            parts = message.split()
+            path = parts[1] if len(parts) >= 2 else ''
+
+            if path.startswith('/api/'):
+                prefix = '→ API'
+            elif path != '/' and self.looks_like_username(path.strip('/').split('/')[0]):
+                prefix = '→ SPA'
+            else:
+                prefix = '     '
+            print(f"{prefix} {message}")
+        except Exception:
+            # Fallback for error messages
+            print(f"     {format % args if args else format}")
 
 
 def run():
