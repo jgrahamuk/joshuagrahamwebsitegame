@@ -226,17 +226,21 @@ export function drawMap(svg) {
     const offsetX = window.MAP_OFFSET_X || 0;
     const offsetY = window.MAP_OFFSET_Y || 0;
 
+    // Small overlap to prevent gaps from floating-point rounding
+    const tileOverlap = 0.5;
+    const renderSize = tileSize + tileOverlap;
+
     // Fill the entire SVG area with water tiles (no gaps)
-    const numXTiles = Math.ceil(svgWidth / tileSize);
-    const numYTiles = Math.ceil(svgHeight / tileSize);
+    const numXTiles = Math.ceil(svgWidth / tileSize) + 1;
+    const numYTiles = Math.ceil(svgHeight / tileSize) + 1;
     for (let y = 0; y < numYTiles; y++) {
         for (let x = 0; x < numXTiles; x++) {
             const imgWater = document.createElementNS('http://www.w3.org/2000/svg', 'image');
             imgWater.setAttribute('href', getSpriteUrl('tile-water.gif'));
             imgWater.setAttribute('x', x * tileSize);
             imgWater.setAttribute('y', y * tileSize);
-            imgWater.setAttribute('width', tileSize);
-            imgWater.setAttribute('height', tileSize);
+            imgWater.setAttribute('width', renderSize);
+            imgWater.setAttribute('height', renderSize);
             imgWater.style.imageRendering = 'pixelated';
             svg.appendChild(imgWater);
         }
@@ -255,8 +259,8 @@ export function drawMap(svg) {
             imgBase.setAttribute('href', basePath);
             imgBase.setAttribute('x', offsetX + x * tileSize);
             imgBase.setAttribute('y', offsetY + y * tileSize);
-            imgBase.setAttribute('width', tileSize);
-            imgBase.setAttribute('height', tileSize);
+            imgBase.setAttribute('width', renderSize);
+            imgBase.setAttribute('height', renderSize);
             imgBase.style.imageRendering = 'pixelated';
             imgBase.style.zIndex = '1';
             svg.appendChild(imgBase);

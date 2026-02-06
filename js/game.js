@@ -661,11 +661,6 @@ function startGameWithMapData(mapData, options = {}) {
         const x = Math.floor((clientX - rect.left - (window.MAP_OFFSET_X || 0)) / window.TILE_SIZE);
         const y = Math.floor((clientY - rect.top - (window.MAP_OFFSET_Y || 0)) / window.TILE_SIZE);
 
-        handleMapClick(x, y);
-    }
-
-    function handleMapClick(x, y) {
-
         if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
             // Check if clicking on an NPC or surrounding tiles
             const clickedNPC = window.npcs.find(npc => npc.isClicked(x, y));
@@ -682,11 +677,30 @@ function startGameWithMapData(mapData, options = {}) {
                 return;
             }
 
-            // Check if clicking on a resource
+            // Check if clicking on a resource - on mobile, also check adjacent tiles for tolerance
             const tile = getTile(x, y);
             if (tile && tile.resource) {
                 moveToTarget(x, y, window.player, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, 'resource');
                 return;
+            }
+
+            // On mobile, check nearby tiles for resources (tap tolerance)
+            if (window.mobileViewport) {
+                const nearby = [
+                    { dx: -1, dy: 0 }, { dx: 1, dy: 0 },
+                    { dx: 0, dy: -1 }, { dx: 0, dy: 1 }
+                ];
+                for (const { dx, dy } of nearby) {
+                    const nx = x + dx;
+                    const ny = y + dy;
+                    if (nx >= 0 && nx < MAP_WIDTH_TILES && ny >= 0 && ny < MAP_HEIGHT_TILES) {
+                        const nearTile = getTile(nx, ny);
+                        if (nearTile && nearTile.resource) {
+                            moveToTarget(nx, ny, window.player, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, 'resource');
+                            return;
+                        }
+                    }
+                }
             }
 
             // Check if clicking on an NPC (not adjacent)
@@ -705,6 +719,33 @@ function startGameWithMapData(mapData, options = {}) {
         const clickedNPC = window.npcs.find(npc => npc.isClicked(x, y));
         if (!clickedNPC) {
             window.npcs.forEach(npc => npc.hideMessage());
+        }
+    }
+
+    // Click handler for desktop
+    svg.addEventListener('click', (e) => {
+        handleMapInteraction(e.clientX, e.clientY);
+    });
+
+    // Touch handler for mobile - needed for reliable touch detection on real devices
+    let touchHandled = false;
+    svg.addEventListener('touchstart', (e) => {
+        touchHandled = false;
+    });
+
+    svg.addEventListener('touchend', (e) => {
+        // Don't handle if player is in intro (let the intro click handler work)
+        if (window.player && window.player.isInIntro) return;
+
+        // Don't handle if map editor is active with a tool
+        if (window.mapEditor && window.mapEditor.isActive && window.mapEditor.selectedTool) return;
+
+        if (e.changedTouches.length > 0) {
+            const touch = e.changedTouches[0];
+            console.log('Touch at:', touch.clientX, touch.clientY);
+            handleMapInteraction(touch.clientX, touch.clientY);
+            touchHandled = true;
+            e.preventDefault(); // Prevent click from also firing
         }
     });
 

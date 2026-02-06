@@ -3,6 +3,7 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  background: #1a5f7a; /* Water-like blue to hide any gaps */
 }
 
 #game-container {
@@ -10,6 +11,7 @@ body {
   height: 100vh;
   position: relative;
   overflow: hidden;
+  background: #1a5f7a;
 }
 
 #game-container svg {
