@@ -321,10 +321,12 @@ function showTrialBanner(daysRemaining) {
     const banner = document.createElement('div');
     banner.id = 'trial-banner';
 
-    const daysText = daysRemaining === 1 ? '1 day' : `${daysRemaining} days`;
+    // Handle missing or invalid daysRemaining
+    const days = daysRemaining || 7; // Default to 7 if not set
+    const daysText = days === 1 ? '1 day' : `${days} days`;
     banner.innerHTML = `
         <div class="trial-banner-content">
-            <span>🎉 Free trial: <strong>${daysText}</strong> remaining</span>
+            <span>Free trial: <strong>${daysText}</strong> remaining</span>
             <button class="trial-banner-btn" id="add-payment-btn">Add Payment Method</button>
         </div>
         <button class="trial-banner-close">&times;</button>
