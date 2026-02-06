@@ -2,6 +2,7 @@ import { placeStructures } from './structures.js';
 import { loadMapData, convertMapDataToGameFormat } from './mapLoader.js';
 import { getSpriteUrl } from './spriteCache.js';
 import { drawStructures } from './structures.js';
+import { imageTilesSystem } from './imageTiles.js';
 
 // Map generation and tile helpers
 export const tileTypes = {
@@ -16,6 +17,7 @@ export const tileTypes = {
     EGG: { color: 'white', passable: true, resource: 'egg' },
     BADGE: { color: 'gold', passable: true, resource: 'badge' },
     FARMHOUSE: { color: 'white', passable: false, resource: null },
+    IMAGE: { color: '#8844aa', passable: false, resource: null },
 };
 export let MAP_WIDTH_TILES = 60;
 export let MAP_HEIGHT_TILES = 34;
@@ -329,6 +331,54 @@ export function drawMap(svg) {
             }
         }
     }
+
+    // Draw image tile blocks
+    const imageGroups = imageTilesSystem.getAllGroups();
+    imageGroups.forEach(group => {
+        const blockX = offsetX + group.x * tileSize;
+        const blockY = offsetY + group.y * tileSize;
+        const blockW = group.width * tileSize;
+        const blockH = group.height * tileSize;
+
+        if (group.imageData) {
+            // Draw the uploaded image stretched across the block
+            const imgEl = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+            imgEl.setAttribute('href', group.imageData);
+            imgEl.setAttribute('x', blockX);
+            imgEl.setAttribute('y', blockY);
+            imgEl.setAttribute('width', blockW);
+            imgEl.setAttribute('height', blockH);
+            imgEl.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+            imgEl.setAttribute('data-image-block', group.groupId);
+            imgEl.style.zIndex = '2';
+            svg.appendChild(imgEl);
+        } else {
+            // Draw placeholder for image tiles without an uploaded image
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', blockX);
+            rect.setAttribute('y', blockY);
+            rect.setAttribute('width', blockW);
+            rect.setAttribute('height', blockH);
+            rect.setAttribute('fill', 'rgba(136, 68, 170, 0.3)');
+            rect.setAttribute('stroke', '#8844aa');
+            rect.setAttribute('stroke-width', '2');
+            rect.setAttribute('stroke-dasharray', '6,3');
+            rect.setAttribute('data-image-block', group.groupId);
+            rect.style.zIndex = '2';
+            svg.appendChild(rect);
+
+            // Add icon text in center
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', blockX + blockW / 2);
+            text.setAttribute('y', blockY + blockH / 2 + 6);
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('fill', '#bb88dd');
+            text.setAttribute('font-size', Math.min(blockW, blockH, tileSize * 1.5));
+            text.setAttribute('pointer-events', 'none');
+            text.textContent = '\u{1F5BC}';
+            svg.appendChild(text);
+        }
+    });
 
     // If map editor is active, draw grid and border
     if (window.mapEditor && window.mapEditor.isActive) {

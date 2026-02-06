@@ -7,6 +7,7 @@ import { saveMapToSupabase } from './mapBrowser.js';
 import { getCurrentUser } from './auth.js';
 import { isConfigured } from './supabase.js';
 import { collectablesSystem } from './collectables.js';
+import { imageTilesSystem } from './imageTiles.js';
 
 export class MapEditor {
     constructor(svg, gameContainer) {
@@ -43,7 +44,9 @@ export class MapEditor {
             { id: 'npc_joshua', name: 'Joshua NPC', icon: 'joshua-front.gif', type: 'npc', npcType: 'Joshua', message: 'Welcome to my farm! It looks like the chickens are having a great time.' },
             // Chickens and Cockerels
             { id: 'chicken', name: 'Chicken', icon: 'chicken-front.gif', type: 'chicken' },
-            { id: 'cockerel', name: 'Cockerel', icon: 'cockerel-front.gif', type: 'cockerel' }
+            { id: 'cockerel', name: 'Cockerel', icon: 'cockerel-front.gif', type: 'cockerel' },
+            // Image tile
+            { id: 'image', name: 'Image', icon: '🖼️', type: 'image', tileType: tileTypes.IMAGE }
         ];
 
     }
@@ -212,6 +215,10 @@ export class MapEditor {
                 if (this.selectedTool.type !== 'delete' && this.getNPCAt(x, y)) {
                     return; // Skip - let double-click handle it
                 }
+                // Skip if clicking on existing image tile (unless delete tool) to allow double-click config
+                if (this.selectedTool.type !== 'delete' && imageTilesSystem.hasTile(x, y)) {
+                    return; // Skip - let double-click handle it
+                }
             }
 
             this.isDragging = true;
@@ -249,6 +256,10 @@ export class MapEditor {
                 }
                 // Skip if clicking on NPC (unless delete tool) to allow double-click config
                 if (this.selectedTool.type !== 'delete' && this.getNPCAt(x, y)) {
+                    return;
+                }
+                // Skip if clicking on existing image tile (unless delete tool) to allow double-click config
+                if (this.selectedTool.type !== 'delete' && imageTilesSystem.hasTile(x, y)) {
                     return;
                 }
                 this.handleMapInteraction(e);
@@ -357,6 +368,11 @@ export class MapEditor {
         } else if (this.selectedTool.type === 'cockerel') {
             this.placeCockerel(x, y);
             // Redraw the entire map to ensure cockerels are properly displayed
+            window.drawMap();
+            this.scheduleAutoSave();
+            return;
+        } else if (this.selectedTool.type === 'image') {
+            this.placeImageTile(x, y);
             window.drawMap();
             this.scheduleAutoSave();
             return;
@@ -487,6 +503,12 @@ export class MapEditor {
 
         // Remove any collectable data at this position
         collectablesSystem.removeCollectable(x, y);
+
+        // Remove image tile data if present
+        if (imageTilesSystem.hasTile(x, y)) {
+            imageTilesSystem.removeTile(x, y);
+            needsRedraw = true;
+        }
 
         // Check if this is a structure tile
         const isStructureTile = tiles.some(tile => tile.color === 'white' && !tile.passable);
@@ -698,6 +720,11 @@ export class MapEditor {
             return true;
         }
 
+        // Check if there's an image tile at this position
+        if (imageTilesSystem.hasTile(x, y)) {
+            return true;
+        }
+
         // Check if there's a collectable resource at this position
         const tiles = map[y][x];
         if (!tiles || tiles.length === 0) return false;
@@ -722,6 +749,12 @@ export class MapEditor {
         const npc = this.getNPCAt(x, y);
         if (npc) {
             this.showNPCConfigureDialog(npc);
+            return;
+        }
+
+        // Check if it's an image tile
+        if (imageTilesSystem.hasTile(x, y)) {
+            this.showImageUploadDialog(x, y);
             return;
         }
 
@@ -874,6 +907,137 @@ export class MapEditor {
                 dialog.remove();
             }
         });
+    }
+
+    showImageUploadDialog(x, y) {
+        // Remove existing dialog if present
+        const existing = document.getElementById('image-upload-dialog');
+        if (existing) existing.remove();
+
+        const group = imageTilesSystem.getGroup(x, y);
+        const hasImage = group && group.imageData;
+
+        const dialog = document.createElement('div');
+        dialog.id = 'image-upload-dialog';
+        dialog.innerHTML = `
+            <div class="cloud-save-panel image-upload-panel">
+                <h3>Image Block</h3>
+                <p style="color: #888; font-size: 0.9rem; margin-bottom: 12px;">
+                    Upload an image to display across this image block.
+                    The image will be stretched to fit the tile area.
+                </p>
+                <div id="image-upload-preview" class="image-upload-preview">
+                    ${hasImage ? `<img src="${group.imageData}" alt="Current image" />` : '<span>No image set</span>'}
+                </div>
+                <input type="file" id="image-upload-input" accept="image/*" style="display: none;" />
+                <div class="cloud-save-actions" style="flex-direction: column; gap: 8px;">
+                    <button id="image-upload-choose" class="auth-btn auth-btn-primary">Choose Image</button>
+                    ${hasImage ? '<button id="image-upload-remove" class="auth-btn auth-btn-secondary" style="color: #f44336;">Remove Image</button>' : ''}
+                    <button id="image-upload-cancel" class="auth-btn auth-btn-secondary">Close</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(dialog);
+
+        const fileInput = document.getElementById('image-upload-input');
+        const preview = document.getElementById('image-upload-preview');
+
+        document.getElementById('image-upload-choose').addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Limit file size to 500KB to keep map_data reasonable
+            if (file.size > 512000) {
+                // Resize the image
+                this._resizeImage(file, 500, 500, (dataUrl) => {
+                    imageTilesSystem.setGroupImage(x, y, dataUrl);
+                    preview.innerHTML = `<img src="${dataUrl}" alt="Uploaded image" />`;
+                    this._addRemoveButton(dialog, x, y, preview);
+                    window.drawMap();
+                    this.scheduleAutoSave();
+                });
+            } else {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const dataUrl = ev.target.result;
+                    imageTilesSystem.setGroupImage(x, y, dataUrl);
+                    preview.innerHTML = `<img src="${dataUrl}" alt="Uploaded image" />`;
+                    this._addRemoveButton(dialog, x, y, preview);
+                    window.drawMap();
+                    this.scheduleAutoSave();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        const removeBtn = document.getElementById('image-upload-remove');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', () => {
+                imageTilesSystem.setGroupImage(x, y, null);
+                preview.innerHTML = '<span>No image set</span>';
+                removeBtn.remove();
+                window.drawMap();
+                this.scheduleAutoSave();
+            });
+        }
+
+        document.getElementById('image-upload-cancel').addEventListener('click', () => {
+            dialog.remove();
+        });
+
+        // Close on click outside
+        dialog.addEventListener('click', (e) => {
+            if (e.target === dialog) {
+                dialog.remove();
+            }
+        });
+    }
+
+    _addRemoveButton(dialog, x, y, preview) {
+        // Add remove button if not already present
+        if (!document.getElementById('image-upload-remove')) {
+            const actions = dialog.querySelector('.cloud-save-actions');
+            const cancelBtn = document.getElementById('image-upload-cancel');
+            const removeBtn = document.createElement('button');
+            removeBtn.id = 'image-upload-remove';
+            removeBtn.className = 'auth-btn auth-btn-secondary';
+            removeBtn.style.color = '#f44336';
+            removeBtn.textContent = 'Remove Image';
+            actions.insertBefore(removeBtn, cancelBtn);
+            removeBtn.addEventListener('click', () => {
+                imageTilesSystem.setGroupImage(x, y, null);
+                preview.innerHTML = '<span>No image set</span>';
+                removeBtn.remove();
+                window.drawMap();
+                this.scheduleAutoSave();
+            });
+        }
+    }
+
+    _resizeImage(file, maxWidth, maxHeight, callback) {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+            let { width, height } = img;
+            if (width > maxWidth || height > maxHeight) {
+                const ratio = Math.min(maxWidth / width, maxHeight / height);
+                width = Math.round(width * ratio);
+                height = Math.round(height * ratio);
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            URL.revokeObjectURL(url);
+            callback(dataUrl);
+        };
+        img.src = url;
     }
 
     // Debounced auto-save to Supabase
@@ -1084,6 +1248,31 @@ export class MapEditor {
         console.log(`Cockerel placed at (${x}, ${y}). Total cockerels: ${window.cockerels.length}`);
     }
 
+    placeImageTile(x, y) {
+        const tiles = map[y][x];
+        const topTile = tiles[tiles.length - 1];
+
+        // Don't place on structures
+        if (topTile.color === 'white' && !topTile.passable) return;
+
+        // Don't place if already an image tile here
+        if (imageTilesSystem.hasTile(x, y)) return;
+
+        // Set the tile layer to IMAGE type (on top of base)
+        if (tiles.length > 1) {
+            // Remove existing resource overlay if any
+            const top = tiles[tiles.length - 1];
+            if (top.resource) tiles.pop();
+        }
+        tiles.push(tileTypes.IMAGE);
+
+        // Register in image tile system
+        imageTilesSystem.addTile(x, y);
+
+        // Show tip once
+        this.showEditTipOnce('image', 'Double-click on an image block to upload an image! Place tiles next to each other to make a larger image area.');
+    }
+
     removeStructureAt(x, y) {
         // Find which structure this tile belongs to
         let structureFound = false;
@@ -1215,6 +1404,7 @@ export class MapEditor {
                     case 'FLOWER': return tileTypes.FLOWER;
                     case 'EGG': return tileTypes.EGG;
                     case 'BADGE': return tileTypes.BADGE;
+                    case 'IMAGE': return tileTypes.IMAGE;
                     default: return tileTypes.GRASS;
                 }
             });
@@ -1312,6 +1502,7 @@ export class MapEditor {
                         if (layer === tileTypes.FLOWER) return 'FLOWER';
                         if (layer === tileTypes.EGG) return 'EGG';
                         if (layer === tileTypes.BADGE) return 'BADGE';
+                        if (layer === tileTypes.IMAGE) return 'IMAGE';
                         return 'WATER';
                     });
 
@@ -1413,7 +1604,8 @@ export class MapEditor {
             cockerels,
             introText: window.currentMapIntroText || null,
             pageTitle: window.currentMapPageTitle || null,
-            collectables: collectablesSystem.toMapData()
+            collectables: collectablesSystem.toMapData(),
+            imageTiles: imageTilesSystem.toMapData()
         };
     }
 
