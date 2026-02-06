@@ -13,6 +13,8 @@ import { initAuth, onAuthChange, showAuthScreen, getCurrentUser } from './auth.j
 import { showMapBrowser, onMapSelected } from './mapBrowser.js';
 import { loadMapFromSupabase, convertMapDataToGameFormat } from './mapLoader.js';
 import { handleRoute, parseRoute } from './router.js';
+import { generateStarterIsland } from './mapGenerator.js';
+import { fetchMyMaps, saveMapToSupabase } from './mapBrowser.js';
 
 // Add at the start of the file, before any other code
 function updateOrientation() {
@@ -289,7 +291,17 @@ async function startGame(supabaseMapId) {
 }
 
 // Start the game with pre-converted map data
-function startGameWithMapData(mapData) {
+// options: { skipIntro: false, introText: null, pageTitle: null, isOwner: false }
+function startGameWithMapData(mapData, options = {}) {
+    // Store intro text and page title for map editor
+    window.currentMapIntroText = options.introText || mapData.introText || null;
+    window.currentMapPageTitle = options.pageTitle || mapData.pageTitle || null;
+
+    // Set the page title
+    if (window.currentMapPageTitle) {
+        document.title = `${window.currentMapPageTitle} - maap.to`;
+    }
+
     updateTileSize();
     drawMap(svg);
 
@@ -314,7 +326,13 @@ function startGameWithMapData(mapData) {
     } else {
         start = randomGrassOrDirt();
     }
-    window.player = new Player(svg, start.x, start.y);
+
+    // Create player with intro options
+    const playerOptions = {
+        skipIntro: options.skipIntro || options.isOwner || false,
+        introText: options.introText || mapData.introText || null
+    };
+    window.player = new Player(svg, start.x, start.y, playerOptions);
 
     // Create chickens from loaded data
     window.chickens = [];
@@ -389,6 +407,9 @@ function startGameWithMapData(mapData) {
     svg.addEventListener('click', (e) => {
         // If player is in intro sequence, ignore map clicks
         if (window.player.isInIntro) return;
+
+        // If map editor is active, let the editor handle clicks
+        if (window.mapEditor && window.mapEditor.isActive) return;
 
         const rect = svg.getBoundingClientRect();
         const x = Math.floor((e.clientX - rect.left - (window.MAP_OFFSET_X || 0)) / window.TILE_SIZE);
@@ -470,7 +491,7 @@ preloadSprites().then(async () => {
 
         if (routeResult && routeResult.mapData) {
             // Initialize auth in background (for edit button if owner)
-            initAuth();
+            const currentUser = await initAuth();
 
             // Convert and start game with the routed map
             const mapData = convertMapDataToGameFormat(routeResult.mapData);
@@ -480,28 +501,100 @@ preloadSprites().then(async () => {
             window.currentMapId = routeResult.mapId;
             window.currentMapProfile = routeResult.profile;
 
-            startGameWithMapData(mapData);
+            // Check if current user is the owner
+            const isOwner = currentUser && routeResult.profile && currentUser.id === routeResult.profile.id;
+
+            startGameWithMapData(mapData, {
+                isOwner,
+                introText: routeResult.mapData.introText,
+                pageTitle: routeResult.mapData.pageTitle
+            });
+
+            // If owner, enable the editor
+            if (isOwner) {
+                setTimeout(() => {
+                    if (window.mapEditor) {
+                        window.mapEditor.toggleEditor();
+                    }
+                }, 500);
+            }
         }
         // If routeResult is null, handleRoute already showed not-found screen
         return;
     }
 
     if (isConfigured()) {
-        // Supabase is configured - show auth screen, then map browser
+        // Supabase is configured - show auth screen
         const user = await initAuth();
 
-        onMapSelected((mapId) => {
-            startGame(mapId);
-        });
+        async function handleUserReady(user) {
+            if (!user) {
+                // Guest - play default map
+                startGame(null);
+                return;
+            }
 
-        onAuthChange((user) => {
-            // After auth resolves (sign in or guest), show map browser
-            showMapBrowser();
-        });
+            // Check if user has a map
+            const myMaps = await fetchMyMaps();
+
+            if (myMaps.length === 0) {
+                // New user - generate starter island
+                const starterMap = generateStarterIsland(50, 30);
+
+                // Save it to Supabase
+                const savedMap = await saveMapToSupabase(
+                    starterMap,
+                    'My World',
+                    '',
+                    true // public by default
+                );
+
+                if (savedMap) {
+                    window.currentMapId = savedMap.id;
+                }
+
+                // Load and enable editor
+                const mapData = convertMapDataToGameFormat(starterMap);
+                initializeMapFromData(mapData);
+                startGameWithMapData(mapData, { isOwner: true });
+
+                // Enable editor after a short delay
+                setTimeout(() => {
+                    if (window.mapEditor) {
+                        window.mapEditor.toggleEditor();
+                    }
+                }, 500);
+            } else {
+                // Existing user - load their first map
+                const userMap = myMaps[0];
+                const mapRecord = await loadMapFromSupabase(userMap.id);
+                if (mapRecord) {
+                    window.currentMapId = userMap.id;
+                    const mapData = convertMapDataToGameFormat(mapRecord);
+                    initializeMapFromData(mapData);
+                    startGameWithMapData(mapData, {
+                        isOwner: true,
+                        introText: mapRecord.introText,
+                        pageTitle: mapRecord.pageTitle
+                    });
+
+                    // Enable editor for owner
+                    setTimeout(() => {
+                        if (window.mapEditor) {
+                            window.mapEditor.toggleEditor();
+                        }
+                    }, 500);
+                } else {
+                    startGame(null);
+                }
+            }
+        }
+
+        onAuthChange(handleUserReady);
 
         if (user) {
-            // Already signed in - show map browser
-            showMapBrowser();
+            // Already signed in
+            handleUserReady(user);
         } else {
             // Show auth screen
             showAuthScreen();

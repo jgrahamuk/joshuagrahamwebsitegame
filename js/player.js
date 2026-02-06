@@ -2,9 +2,14 @@ import { tileTypes, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, map, removeResou
 import { findPath } from './movement.js';
 import { getSpriteUrl } from './spriteCache.js';
 import { badgeSystem } from './badgeSystem.js';
+import { collectablesSystem } from './collectables.js';
 
 export class Player {
-    constructor(svg, startX, startY) {
+    constructor(svg, startX, startY, options = {}) {
+        // Options: { skipIntro: false, introText: null }
+        const skipIntro = options.skipIntro || false;
+        const introText = options.introText || "Hey! Check out this website. Isn't it snazzy?! Just click anywhere on the map and I'll go there.<br /><br />Maybe you should go talk to Joshua, as this is his website. you'll find him somewhere on the island. He's wearing a flannel shirt.";
+        this.introText = introText;
         // Validate starting position
         const startTile = getTile(startX, startY);
         if (!startTile || (startTile !== tileTypes.GRASS && startTile !== tileTypes.DIRT)) {
@@ -52,7 +57,7 @@ export class Player {
         };
 
         // Intro sequence state
-        this.isInIntro = true;
+        this.isInIntro = !skipIntro;
         this.introScale = 2;
         this.introMessageContainer = null;
         this.introTimeout = null;
@@ -125,7 +130,7 @@ export class Player {
         // Create text element
         const textElement = document.createElement('div');
         textElement.className = 'chatbox-text';
-        textElement.innerHTML = "Hey! Check out this website. Isn't it snazzy?! Just click anywhere on the map and I'll go there.<br /><br />Maybe you should go talk to Joshua, as this is his website. you'll find him somewhere on the island. He's wearing a flannel shirt.";
+        textElement.innerHTML = this.introText;
 
         // Assemble the chatbox
         chatbox.appendChild(textElement);
@@ -301,6 +306,9 @@ export class Player {
     }
 
     gatherResource(resourcePos) {
+        // Check for collectable text before removing
+        const collectable = collectablesSystem.getCollectable(resourcePos.x, resourcePos.y);
+
         // Use map.js to remove the resource and handle respawning
         const removedResource = removeResource(resourcePos.x, resourcePos.y);
 
@@ -325,6 +333,13 @@ export class Player {
             // Remove the visual element from SVG (for non-badge resources)
             if (removedResource.resource !== 'badge') {
                 this.removeResourceElement(resourcePos);
+            }
+
+            // Show collection message if this was a collectable
+            if (collectable && collectable.text) {
+                collectablesSystem.showCollectionMessage(collectable.text);
+                // Remove from collectables since the item is gone
+                collectablesSystem.removeCollectable(resourcePos.x, resourcePos.y);
             }
         }
     }

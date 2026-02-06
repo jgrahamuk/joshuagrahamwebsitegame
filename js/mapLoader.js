@@ -1,5 +1,6 @@
 import { tileTypes } from './map.js';
 import { loadMapById } from './mapBrowser.js';
+import { collectablesSystem } from './collectables.js';
 
 let currentMapData = null;
 let currentMapId = null; // Supabase map ID if loaded from DB
@@ -126,6 +127,13 @@ export function convertMapDataToGameFormat(mapData) {
         }
     });
 
+    // Load collectables into the system
+    if (mapData.collectables) {
+        collectablesSystem.loadFromMapData(mapData.collectables);
+    } else {
+        collectablesSystem.loadFromMapData([]);
+    }
+
     return {
         map: gameMap,
         structures,
@@ -133,7 +141,10 @@ export function convertMapDataToGameFormat(mapData) {
         chickens: chickens || [],
         cockerels: cockerels || [],
         width: width || 60,
-        height: height || 34
+        height: height || 34,
+        introText: mapData.introText || null,
+        pageTitle: mapData.pageTitle || null,
+        collectables: mapData.collectables || []
     };
 }
 

@@ -75,9 +75,9 @@ export class HelpOverlay {
             <h3 style="color: #666; margin-top: 20px;">Map Editor</h3>
             <ul style="line-height: 1.6;">
                 <li><strong>Ctrl+Shift+E</strong> - Toggle map editor toolbar</li>
-                <li><strong>Ctrl+Shift+S</strong> - Export current map as JSON (when editor is active)</li>
                 <li><strong>Click toolbar item</strong> - Select tool (delete, grass, trees, etc.)</li>
                 <li><strong>Click on map</strong> - Apply selected tool to tile</li>
+                <li><strong>Click item (no tool)</strong> - Add a collection message to item</li>
             </ul>
             
             <h3 style="color: #666; margin-top: 20px;">Help</h3>

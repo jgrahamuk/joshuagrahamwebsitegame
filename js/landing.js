@@ -1,13 +1,13 @@
 // ── Stripe Configuration ──
 // Replace these with your Stripe keys and price IDs
-const STRIPE_PUBLISHABLE_KEY = 'YOUR_STRIPE_PUBLISHABLE_KEY';
-const STRIPE_PRICE_EARLY_BIRD = 'YOUR_STRIPE_PRICE_ID_EARLY_BIRD'; // $2/mo
-const STRIPE_PRICE_STANDARD = 'YOUR_STRIPE_PRICE_ID_STANDARD';     // $5/mo
+const STRIPE_PUBLISHABLE_KEY = 'pk_live_51Sxlhv9VtrGMJaBFtUvUYKHKuCQ4Z0f114TSrqqU7QVAYK6yS1a294H7P67gPwNznG21k8AI9nwTELhb6vQUtGMh00zWvgCv4s';
+const STRIPE_PRICE_EARLY_BIRD = 'price_1Sxnd79VtrGMJaBFi1YAtmi8'; // $2/mo
+const STRIPE_PRICE_STANDARD = 'price_1SxoBq9VtrGMJaBFWMSOX0Qi';     // $5/mo
 
-// Supabase Edge Function for creating Stripe Checkout Sessions.
+// Supabase Edge Function URLs
 // With nginx, /api/ is proxied to your Supabase functions.
-// Alternatively, use the direct URL: https://YOUR_PROJECT_ID.supabase.co/functions/v1/create-checkout-session
 const CHECKOUT_API_URL = '/api/create-checkout-session';
+const PRICES_API_URL = '/api/get-prices';
 
 // ── Supabase (reuse the same config) ──
 const SUPABASE_URL = 'http://127.0.0.1:54321';
@@ -33,6 +33,7 @@ function isStripeConfigured() {
 // ── State ──
 let selectedPlan = 'early_bird';
 let usernameCheckTimeout = null;
+let fetchedPrices = {}; // { early_bird: { id, amount, currency }, standard: { ... } }
 
 // ── DOM ──
 const modal = document.getElementById('signup-modal');
@@ -278,9 +279,10 @@ async function handleSignin() {
 async function redirectToCheckout(userId, username) {
     showStep('processing');
 
+    // Use fetched price ID if available, otherwise fall back to config
     const priceId = selectedPlan === 'early_bird'
-        ? STRIPE_PRICE_EARLY_BIRD
-        : STRIPE_PRICE_STANDARD;
+        ? (fetchedPrices.early_bird?.id || STRIPE_PRICE_EARLY_BIRD)
+        : (fetchedPrices.standard?.id || STRIPE_PRICE_STANDARD);
 
     if (!isStripeConfigured()) {
         // Stripe not configured yet - just redirect to the game
@@ -626,3 +628,148 @@ if (previewSvg) {
         window.addEventListener('resize', drawPreviewMap);
     });
 }
+
+// ── Stripe Dynamic Pricing ──
+async function fetchPrices() {
+    try {
+        // Get price IDs from the config (or pass them to the API)
+        const priceIds = [STRIPE_PRICE_EARLY_BIRD, STRIPE_PRICE_STANDARD].filter(
+            id => id && !id.startsWith('YOUR_')
+        );
+
+        if (priceIds.length === 0) {
+            console.log('No Stripe price IDs configured');
+            return;
+        }
+
+        const response = await fetch(PRICES_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ priceIds })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.error) {
+            throw new Error(data.error);
+        }
+
+        // Map prices to our plan structure
+        for (const price of data.prices) {
+            if (price.id === STRIPE_PRICE_EARLY_BIRD) {
+                fetchedPrices.early_bird = {
+                    id: price.id,
+                    amount: price.unitAmount / 100, // Convert cents to dollars
+                    currency: price.currency,
+                    interval: price.interval || 'month',
+                    name: price.productName
+                };
+            } else if (price.id === STRIPE_PRICE_STANDARD) {
+                fetchedPrices.standard = {
+                    id: price.id,
+                    amount: price.unitAmount / 100,
+                    currency: price.currency,
+                    interval: price.interval || 'month',
+                    name: price.productName
+                };
+            }
+        }
+
+        updatePricingDisplay();
+    } catch (err) {
+        console.error('Failed to fetch prices:', err);
+        // Prices remain at their default HTML values
+    }
+}
+
+function formatPrice(amount, currency = 'usd') {
+    const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currency.toUpperCase(),
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    });
+    return formatter.format(amount);
+}
+
+function updatePricingDisplay() {
+    // Update Early Bird card
+    if (fetchedPrices.early_bird) {
+        const earlyBirdCard = document.querySelector('.pricing-card.early-bird');
+        if (earlyBirdCard) {
+            const priceAmount = earlyBirdCard.querySelector('.price-amount');
+            const ctaButton = earlyBirdCard.querySelector('.card-cta');
+            const price = fetchedPrices.early_bird;
+
+            if (priceAmount) {
+                priceAmount.textContent = price.amount;
+            }
+            if (ctaButton) {
+                ctaButton.textContent = `Get Started - $${price.amount}/${price.interval === 'year' ? 'yr' : 'mo'}`;
+            }
+        }
+    }
+
+    // Update Standard card
+    if (fetchedPrices.standard) {
+        const standardCard = document.querySelector('.pricing-card.standard');
+        if (standardCard) {
+            const priceAmount = standardCard.querySelector('.price-amount');
+            const ctaButton = standardCard.querySelector('.card-cta');
+            const price = fetchedPrices.standard;
+
+            if (priceAmount) {
+                priceAmount.textContent = price.amount;
+            }
+            if (ctaButton) {
+                ctaButton.textContent = `Get Started - $${price.amount}/${price.interval === 'year' ? 'yr' : 'mo'}`;
+            }
+
+            // Also update the "after early bird" text on the early bird card
+            const earlyBirdCard = document.querySelector('.pricing-card.early-bird');
+            if (earlyBirdCard) {
+                const originalPrice = earlyBirdCard.querySelector('.price-original');
+                if (originalPrice) {
+                    originalPrice.textContent = `$${price.amount}/${price.interval === 'year' ? 'year' : 'month'} after early bird ends`;
+                }
+            }
+        }
+    }
+}
+
+// Fetch prices on page load
+fetchPrices();
+
+// ── Local Currency Notice ──
+// Show a note for international visitors that local currency is available at checkout
+async function detectAndShowCurrencyNotice() {
+    try {
+        // Use a simple timezone-based detection (no external API needed)
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const usTimezones = ['New_York', 'Chicago', 'Denver', 'Los_Angeles', 'Phoenix', 'Anchorage', 'Honolulu'];
+        const isLikelyUS = timezone.startsWith('America/') && usTimezones.some(tz => timezone.includes(tz));
+
+        if (!isLikelyUS) {
+            // Add notice to pricing section
+            const pricingSection = document.querySelector('.pricing-section');
+            if (pricingSection) {
+                const notice = document.createElement('p');
+                notice.className = 'currency-notice';
+                notice.textContent = 'Prices shown in USD. Pay in your local currency at checkout.';
+                notice.style.cssText = 'text-align: center; color: #666; font-size: 0.9rem; margin-top: -0.5rem; margin-bottom: 1.5rem;';
+
+                const pricingSub = pricingSection.querySelector('.pricing-sub');
+                if (pricingSub) {
+                    pricingSub.after(notice);
+                }
+            }
+        }
+    } catch (e) {
+        // Silently fail - notice is optional
+    }
+}
+
+detectAndShowCurrencyNotice();

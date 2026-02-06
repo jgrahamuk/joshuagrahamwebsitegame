@@ -96,6 +96,85 @@ function generateResources(width, height, isLandscape) {
     return resources;
 }
 
+/**
+ * Generate a simple starter island for new users
+ * @param {number} width - Map width in tiles
+ * @param {number} height - Map height in tiles
+ * @returns {object} Map data in the standard format
+ */
+export function generateStarterIsland(width = 40, height = 25) {
+    const tiles = generateMapData(width, height, width > height);
+
+    // Get grass tile positions for placing resources
+    const grassTiles = tiles
+        .filter(t => t.layers.includes('GRASS'))
+        .map(t => ({ x: t.x, y: t.y }));
+
+    // Shuffle for random placement
+    for (let i = grassTiles.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [grassTiles[i], grassTiles[j]] = [grassTiles[j], grassTiles[i]];
+    }
+
+    const resources = [];
+    const numTrees = Math.floor(grassTiles.length * 0.04);
+    const numRocks = Math.floor(grassTiles.length * 0.02);
+    const numFlowers = Math.floor(grassTiles.length * 0.03);
+
+    let idx = 0;
+
+    // Place trees
+    for (let i = 0; i < numTrees && idx < grassTiles.length; i++) {
+        const pos = grassTiles[idx++];
+        const type = Math.random() > 0.5 ? 'LARGE_TREE' : 'PINE_TREE';
+        resources.push({ type, x: pos.x, y: pos.y });
+    }
+
+    // Place rocks
+    for (let i = 0; i < numRocks && idx < grassTiles.length; i++) {
+        const pos = grassTiles[idx++];
+        resources.push({ type: 'ROCK', x: pos.x, y: pos.y });
+    }
+
+    // Place flowers
+    for (let i = 0; i < numFlowers && idx < grassTiles.length; i++) {
+        const pos = grassTiles[idx++];
+        resources.push({ type: 'FLOWER', x: pos.x, y: pos.y });
+    }
+
+    // Place farmhouse near center
+    const cx = Math.floor(width / 2);
+    const cy = Math.floor(height / 2);
+
+    const structures = [
+        { type: 'FARMHOUSE', x: cx - 1, y: cy - 1, width: 3, height: 2 }
+    ];
+
+    // A couple chickens and a rooster
+    const chickens = [
+        { x: cx + 3, y: cy + 1 },
+        { x: cx + 2, y: cy + 2 }
+    ];
+
+    const cockerels = [
+        { x: cx + 4, y: cy + 2 }
+    ];
+
+    return {
+        width,
+        height,
+        tiles,
+        structures,
+        resources,
+        npcs: [],
+        chickens,
+        cockerels,
+        introText: null,
+        pageTitle: null,
+        collectables: []
+    };
+}
+
 export function generateMapFiles() {
     // Generate landscape map
     const landscapeMap = {
