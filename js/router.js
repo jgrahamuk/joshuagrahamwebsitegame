@@ -1,6 +1,8 @@
 // Client-side router for maap.to/username URLs
 // nginx routes all non-static paths to game.html, this parses the username
 import { getSupabase, isConfigured } from './supabase.js';
+import { getCurrentUser } from './auth.js';
+import { generateStarterIsland } from './mapGenerator.js';
 
 /**
  * Parse the current URL path to get the username
@@ -18,6 +20,11 @@ export function parseRoute() {
     // game.html = demo mode
     if (segments[0] === 'game.html') {
         return { username: null };
+    }
+
+    // "demo" is a reserved name for the demo world
+    if (segments[0].toLowerCase() === 'demo') {
+        return { username: null, isDemo: true };
     }
 
     // First segment is the username
@@ -169,11 +176,26 @@ export async function handleRoute() {
     }
 
     // Get their public map
-    const map = await getUserPublicMap(profile.id);
+    let map = await getUserPublicMap(profile.id);
 
     if (!map) {
-        showNotFound("This user hasn't published a world yet.");
-        return null;
+        // No map exists - check if the current user is the owner
+        const currentUser = getCurrentUser();
+
+        if (currentUser && currentUser.id === profile.id) {
+            // Owner is viewing their own page - create a starter map
+            console.log('Creating starter map for user:', profile.username);
+            map = await createStarterMapForUser(profile.id);
+
+            if (!map) {
+                showNotFound("Failed to create your world. Please try again.");
+                return null;
+            }
+        } else {
+            // Visitor viewing someone else's empty page
+            showNotFound("This user hasn't published a world yet.");
+            return null;
+        }
     }
 
     updatePageMeta(profile);
@@ -183,4 +205,33 @@ export async function handleRoute() {
         mapId: map.id,
         profile,
     };
+}
+
+/**
+ * Create a starter map for a user
+ */
+async function createStarterMapForUser(userId) {
+    const sb = getSupabase();
+    if (!sb) return null;
+
+    const starterMap = generateStarterIsland(50, 30);
+
+    const { data, error } = await sb
+        .from('maps')
+        .insert({
+            owner_id: userId,
+            name: 'My World',
+            description: '',
+            map_data: starterMap,
+            is_public: true
+        })
+        .select()
+        .single();
+
+    if (error) {
+        console.error('Error creating starter map:', error);
+        return null;
+    }
+
+    return data;
 }

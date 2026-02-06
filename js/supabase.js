@@ -1,7 +1,9 @@
 // Supabase client configuration
-// Replace these with your Supabase project credentials
-const SUPABASE_URL = 'http://127.0.0.1:54321';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';
+import { config } from './config.js';
+
+// Uses /api prefix - proxied by server.py (local) or nginx (production)
+const SUPABASE_URL = window.location.origin + '/api';
+const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
 
 let supabaseClient = null;
 

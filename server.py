@@ -4,7 +4,7 @@ Local development server with routing support.
 
 Features:
 - Serves static files from the current directory
-- Proxies /api/* requests to Supabase Edge Functions
+- Proxies Supabase requests (/auth, /rest, /functions, /storage, /api)
 - Routes /<username> paths to game.html for SPA-style routing
 
 Usage:
@@ -22,7 +22,10 @@ from urllib.parse import urlparse, urljoin
 
 # Configuration
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
-SUPABASE_URL = 'http://127.0.0.1:54321/functions/v1'
+SUPABASE_BASE_URL = 'http://127.0.0.1:54321'
+
+# All Supabase requests go through /api prefix
+SUPABASE_PREFIX = '/api'
 
 # Static file extensions
 STATIC_EXTENSIONS = {
@@ -43,12 +46,16 @@ class DevHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, apikey, x-client-info')
         self.end_headers()
 
+    def is_supabase_path(self, path):
+        """Check if path should be proxied to Supabase."""
+        return path.startswith(SUPABASE_PREFIX + '/')
+
     def do_GET(self):
         """Handle GET requests with routing."""
         path = urlparse(self.path).path
 
-        # API proxy
-        if path.startswith('/api/'):
+        # Supabase proxy
+        if self.is_supabase_path(path):
             self.proxy_to_supabase('GET')
             return
 
@@ -68,10 +75,10 @@ class DevHandler(http.server.SimpleHTTPRequestHandler):
         super().do_GET()
 
     def do_POST(self):
-        """Handle POST requests (API proxy only)."""
+        """Handle POST requests."""
         path = urlparse(self.path).path
 
-        if path.startswith('/api/'):
+        if self.is_supabase_path(path):
             self.proxy_to_supabase('POST')
             return
 
@@ -128,11 +135,19 @@ class DevHandler(http.server.SimpleHTTPRequestHandler):
             self.send_error(404, 'File Not Found')
 
     def proxy_to_supabase(self, method):
-        """Proxy request to Supabase Edge Functions."""
+        """Proxy request to Supabase."""
         path = urlparse(self.path).path
-        function_path = path[4:]  # Remove '/api' prefix
 
-        target_url = SUPABASE_URL + function_path
+        # Strip /api prefix
+        target_path = path[len(SUPABASE_PREFIX):]
+
+        # Edge functions called directly under /api/ (not /api/auth, /api/rest, etc.)
+        # need to be routed to /functions/v1/
+        known_supabase_paths = ('/auth/', '/rest/', '/storage/', '/realtime/', '/functions/')
+        if not any(target_path.startswith(p) for p in known_supabase_paths):
+            target_path = '/functions/v1' + target_path
+
+        target_url = SUPABASE_BASE_URL + target_path
         query = urlparse(self.path).query
         if query:
             target_url += '?' + query
@@ -219,7 +234,7 @@ class DevHandler(http.server.SimpleHTTPRequestHandler):
 def run():
     with socketserver.TCPServer(("", PORT), DevHandler) as httpd:
         print(f"🗺️  maap.to dev server running at http://localhost:{PORT}")
-        print(f"   API proxy: /api/* → {SUPABASE_URL}/*")
+        print(f"   Supabase proxy: /api/* → {SUPABASE_BASE_URL}")
         print(f"   SPA routes: /<username> → game.html")
         print(f"   Press Ctrl+C to stop\n")
         try:

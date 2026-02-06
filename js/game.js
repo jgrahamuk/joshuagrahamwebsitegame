@@ -374,9 +374,58 @@ function startGameWithMapData(mapData, options = {}) {
     // Initialize map editor (hidden by default)
     window.mapEditor = new MapEditor(svg, gameContainer);
 
-
-    // Initialize badge system (only for demo world, not user worlds)
+    // Add buttons for demo mode
     if (!options.isUserWorld) {
+        // "Get Your Own World" button - top right
+        const getWorldButton = document.createElement('button');
+        getWorldButton.id = 'demo-get-world-button';
+        getWorldButton.textContent = 'Get Your Own World';
+        getWorldButton.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: "Jersey 10", system-ui, sans-serif;
+            font-size: 1.1rem;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        `;
+        getWorldButton.addEventListener('click', () => {
+            window.location.href = '/?signup=1';
+        });
+        document.body.appendChild(getWorldButton);
+
+        // "Edit Map" button - bottom right
+        const editButton = document.createElement('button');
+        editButton.id = 'demo-edit-button';
+        editButton.textContent = 'Edit Map';
+        editButton.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: "Jersey 10", system-ui, sans-serif;
+            font-size: 1.1rem;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        `;
+        editButton.addEventListener('click', () => {
+            window.mapEditor.toggleEditor();
+            editButton.textContent = window.mapEditor.isActive ? 'Play Mode' : 'Edit Map';
+        });
+        document.body.appendChild(editButton);
+
+        // Initialize badge system (only for demo world)
         badgeSystem.initialize();
     }
 
@@ -482,16 +531,24 @@ function startGameWithMapData(mapData, options = {}) {
 }
 
 preloadSprites().then(async () => {
-    // Check URL route first (e.g., /username)
-    const { username } = parseRoute();
+    // Check URL route first (e.g., /username or /demo)
+    const route = parseRoute();
+    const { username } = route;
+
+    // Demo mode - skip auth, go straight to demo
+    if (route.isDemo) {
+        startGame(null);
+        return;
+    }
 
     if (isConfigured() && username) {
-        // Direct link to a user's world - load it directly
+        // Initialize auth first so we know if the current user is the owner
+        const currentUser = await initAuth();
+
+        // Direct link to a user's world - load it (may create map if owner has none)
         const routeResult = await handleRoute();
 
         if (routeResult && routeResult.mapData) {
-            // Initialize auth in background (for edit button if owner)
-            const currentUser = await initAuth();
 
             // Convert and start game with the routed map
             const mapData = convertMapDataToGameFormat(routeResult.mapData);

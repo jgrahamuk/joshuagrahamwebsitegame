@@ -1,17 +1,19 @@
-// ── Stripe Configuration ──
-// Replace these with your Stripe keys and price IDs
-const STRIPE_PUBLISHABLE_KEY = 'pk_live_51Sxlhv9VtrGMJaBFtUvUYKHKuCQ4Z0f114TSrqqU7QVAYK6yS1a294H7P67gPwNznG21k8AI9nwTELhb6vQUtGMh00zWvgCv4s';
-const STRIPE_PRICE_EARLY_BIRD = 'price_1Sxnd79VtrGMJaBFi1YAtmi8'; // $2/mo
-const STRIPE_PRICE_STANDARD = 'price_1SxoBq9VtrGMJaBFWMSOX0Qi';     // $5/mo
+// ── Configuration ──
+import { config } from './config.js';
+
+const STRIPE_PUBLISHABLE_KEY = config.STRIPE_PUBLISHABLE_KEY;
+const STRIPE_PRICE_EARLY_BIRD = config.STRIPE_PRICE_EARLY_BIRD;
+const STRIPE_PRICE_STANDARD = config.STRIPE_PRICE_STANDARD;
 
 // Supabase Edge Function URLs
 // With nginx, /api/ is proxied to your Supabase functions.
 const CHECKOUT_API_URL = '/api/create-checkout-session';
 const PRICES_API_URL = '/api/get-prices';
 
-// ── Supabase (reuse the same config) ──
-const SUPABASE_URL = 'http://127.0.0.1:54321';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';
+// ── Supabase ──
+// Uses /api prefix - proxied by server.py (local) or nginx (production)
+const SUPABASE_URL = window.location.origin + '/api';
+const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
 
 let sb = null;
 
@@ -312,12 +314,21 @@ async function redirectToCheckout(userId, username) {
             })
         });
 
-        const { sessionId, error } = await response.json();
-        if (error) throw new Error(error);
+        if (!response.ok) {
+            const text = await response.text();
+            console.error('Checkout API error:', response.status, text);
+            throw new Error(`API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Checkout API response:', data);
+
+        if (data.error) throw new Error(data.error);
+        if (!data.sessionId) throw new Error('No sessionId returned from API');
 
         // Redirect to Stripe Checkout
         const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
-        const { error: stripeError } = await stripe.redirectToCheckout({ sessionId });
+        const { error: stripeError } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
         if (stripeError) throw stripeError;
 
     } catch (err) {
@@ -773,3 +784,43 @@ async function detectAndShowCurrencyNotice() {
 }
 
 detectAndShowCurrencyNotice();
+
+// ── Auto-open signup modal from query param ──
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('signup') === '1') {
+    openModal('early_bird');
+}
+
+// ── Check auth state and update nav ──
+async function checkAuthAndUpdateNav() {
+    const client = getSupabase();
+    if (!client) return;
+
+    try {
+        const { data: { session } } = await client.auth.getSession();
+
+        if (session?.user) {
+            // User is logged in - get their username
+            const { data: profile } = await client
+                .from('profiles')
+                .select('username')
+                .eq('id', session.user.id)
+                .single();
+
+            const navSigninBtn = document.getElementById('nav-signin-btn');
+            if (navSigninBtn && profile?.username) {
+                // Replace button with a link to their world
+                const myMaapLink = document.createElement('a');
+                myMaapLink.href = `/${profile.username}`;
+                myMaapLink.className = 'btn btn-outline btn-sm';
+                myMaapLink.textContent = 'My Maap';
+                navSigninBtn.replaceWith(myMaapLink);
+            }
+        }
+    } catch (err) {
+        console.error('Error checking auth state:', err);
+    }
+}
+
+// Check auth on page load
+checkAuthAndUpdateNav();

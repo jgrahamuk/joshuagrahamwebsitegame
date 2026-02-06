@@ -426,8 +426,9 @@ export class Player {
             eggsCountElement.textContent = this.inventory.eggs;
         }
         if (badgesCountElement) {
-            // Use collectables system for user worlds, badge system for demo
-            if (collectablesSystem.getTotalCount() > 0) {
+            // For user worlds, use collectables system only
+            // For demo world (no currentMapId), use badge system
+            if (window.currentMapId) {
                 badgesCountElement.textContent = collectablesSystem.getDisplayText();
             } else {
                 badgesCountElement.textContent = badgeSystem.getBadgeDisplayText();

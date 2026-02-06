@@ -47,6 +47,8 @@ class CollectablesSystem {
         } else {
             this.collectables.delete(key);
         }
+        // Update total count when editing
+        this.totalCount = this.collectables.size;
     }
 
     // Get collectable data for a position
@@ -64,7 +66,10 @@ class CollectablesSystem {
     // Remove collectable at position
     removeCollectable(x, y) {
         const key = `${x},${y}`;
-        this.collectables.delete(key);
+        if (this.collectables.delete(key)) {
+            // Update total count when editing
+            this.totalCount = this.collectables.size;
+        }
     }
 
     // Mark a collectable as collected
