@@ -4,20 +4,19 @@ const STRIPE_PUBLISHABLE_KEY = 'YOUR_STRIPE_PUBLISHABLE_KEY';
 const STRIPE_PRICE_EARLY_BIRD = 'YOUR_STRIPE_PRICE_ID_EARLY_BIRD'; // $2/mo
 const STRIPE_PRICE_STANDARD = 'YOUR_STRIPE_PRICE_ID_STANDARD';     // $5/mo
 
-// Your backend endpoint that creates a Stripe Checkout Session.
-// This should be a Supabase Edge Function or similar serverless function.
-// It receives { priceId, userId, username } and returns { sessionId }.
+// Supabase Edge Function for creating Stripe Checkout Sessions.
+// With nginx, /api/ is proxied to your Supabase functions.
+// Alternatively, use the direct URL: https://YOUR_PROJECT_ID.supabase.co/functions/v1/create-checkout-session
 const CHECKOUT_API_URL = '/api/create-checkout-session';
 
 // ── Supabase (reuse the same config) ──
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_URL = 'http://127.0.0.1:54321';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';
 
 let sb = null;
 
 function getSupabase() {
-    if (!sb && typeof window.supabase !== 'undefined' &&
-        SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+    if (!sb && typeof window.supabase !== 'undefined') {
         sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
     return sb;
@@ -373,8 +372,18 @@ const islandMap = [
 // Objects to place on the map: { type, col, row, scale }
 const mapObjects = [
     { type: 'tree.gif', col: 2, row: 2, scale: 1.8 },
-    { type: 'tree.gif', col: 7, row: 3, scale: 1.8 },
-    { type: 'farmhouse.gif', col: 4, row: 2, scale: 2 },
+    { type: 'pine-tree.gif', col: 7, row: 2, scale: 1.8 },
+    { type: 'pine-tree.gif', col: 7, row: 3, scale: 1.8 },
+    { type: 'pine-tree.gif', col: 6, row: 2, scale: 1.8 },
+    { type: 'pine-tree.gif', col: 3, row: 1, scale: 1.8 },
+    { type: 'tree.gif', col: 4, row: 1, scale: 1.8 },
+    { type: 'pine-tree.gif', col: 5, row: 1, scale: 1.8 },
+    { type: 'farmhouse.gif', col: 4, row: 3, scale: 2.5 },
+    { type: 'flower.gif', col: 6, row: 4, scale: 0.8 },
+    { type: 'flower.gif', col: 3, row: 5, scale: 0.8 },
+    { type: 'flower.gif', col: 5, row: 6, scale: 0.8 },
+    { type: 'stone.gif', col: 1, row: 4, scale: 0.75 },
+    { type: 'stone.gif', col: 6, row: 5, scale: 0.75 },
 ];
 
 // Blocked tiles (where objects are)
@@ -383,6 +392,8 @@ const blockedTiles = [
     { col: 7, row: 3 },
     { col: 4, row: 2 },
     { col: 5, row: 2 },
+    { col: 1, row: 4 },
+    { col: 6, row: 5 },
 ];
 
 // Build grass tiles list
@@ -405,12 +416,13 @@ function isValidTile(col, row) {
 
 // Preview state
 let tileSize = 0;
-let chickenElement = null;
+let chickenElements = {}; // One SVG element per sprite
+let currentChickenSprite = 'front';
 let chickenPos = { col: 5, row: 4 };
 let chickenDir = 'front';
 let pecksRemaining = 0;
 
-const chickenSprites = {
+const chickenSpriteNames = {
     front: 'chicken-front.gif',
     back: 'chicken-back.gif',
     left: 'chicken-left.gif',
@@ -418,6 +430,22 @@ const chickenSprites = {
     peckLeft: 'chicken-peck-left.gif',
     peckRight: 'chicken-peck-right.gif',
 };
+
+// Chicken sprite filenames (preloaded on init)
+const chickenSprites = { ...chickenSpriteNames };
+
+// Preload chicken sprites into browser cache
+function preloadChickenSprites() {
+    const promises = Object.values(chickenSpriteNames).map((filename) => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = resolve;
+            img.onerror = resolve;
+            img.src = `resources/images/${filename}`;
+        });
+    });
+    return Promise.all(promises);
+}
 
 function createSvgImage(src, x, y, width, height) {
     const img = document.createElementNS('http://www.w3.org/2000/svg', 'image');
@@ -475,19 +503,23 @@ function drawPreviewMap() {
         previewSvg.appendChild(img);
     }
 
-    // Create chicken element
-    chickenElement = createSvgImage(
-        chickenSprites[chickenDir],
-        offsetX + chickenPos.col * tileSize,
-        offsetY + chickenPos.row * tileSize,
-        tileSize,
-        tileSize
-    );
-    previewSvg.appendChild(chickenElement);
+    // Create all chicken sprite elements (75% of tile size, centered in tile)
+    const chickenSize = tileSize * 0.75;
+    const chickenOffset = (tileSize - chickenSize) / 2;
+    const chickenX = offsetX + chickenPos.col * tileSize + chickenOffset;
+    const chickenY = offsetY + chickenPos.row * tileSize + chickenOffset;
+
+    chickenElements = {};
+    for (const [key, url] of Object.entries(chickenSprites)) {
+        const el = createSvgImage(url, chickenX, chickenY, chickenSize, chickenSize);
+        el.style.display = key === currentChickenSprite ? 'block' : 'none';
+        chickenElements[key] = el;
+        previewSvg.appendChild(el);
+    }
 }
 
 function updateChickenPosition() {
-    if (!chickenElement || !previewSvg) return;
+    if (!previewSvg || Object.keys(chickenElements).length === 0) return;
     const rect = previewSvg.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
@@ -495,17 +527,39 @@ function updateChickenPosition() {
     const offsetX = (width - COLS * tileSize) / 2;
     const offsetY = (height - ROWS * tileSize) / 2;
 
-    chickenElement.setAttribute('x', offsetX + chickenPos.col * tileSize);
-    chickenElement.setAttribute('y', offsetY + chickenPos.row * tileSize);
+    const chickenSize = tileSize * 0.75;
+    const chickenOffset = (tileSize - chickenSize) / 2;
+    const x = offsetX + chickenPos.col * tileSize + chickenOffset;
+    const y = offsetY + chickenPos.row * tileSize + chickenOffset;
+
+    // Update position of all chicken elements
+    for (const el of Object.values(chickenElements)) {
+        el.setAttribute('x', x);
+        el.setAttribute('y', y);
+        el.setAttribute('width', chickenSize);
+        el.setAttribute('height', chickenSize);
+    }
 }
 
 function updateChickenSprite(isPecking = false) {
-    if (!chickenElement) return;
-    let sprite = chickenSprites[chickenDir];
+    if (Object.keys(chickenElements).length === 0) return;
+
+    // Determine which sprite to show
+    let spriteKey = chickenDir;
     if (isPecking && (chickenDir === 'left' || chickenDir === 'right')) {
-        sprite = chickenDir === 'left' ? chickenSprites.peckLeft : chickenSprites.peckRight;
+        spriteKey = chickenDir === 'left' ? 'peckLeft' : 'peckRight';
     }
-    chickenElement.setAttribute('href', `resources/images/${sprite}`);
+
+    // Hide current, show new
+    if (spriteKey !== currentChickenSprite) {
+        if (chickenElements[currentChickenSprite]) {
+            chickenElements[currentChickenSprite].style.display = 'none';
+        }
+        if (chickenElements[spriteKey]) {
+            chickenElements[spriteKey].style.display = 'block';
+        }
+        currentChickenSprite = spriteKey;
+    }
 }
 
 function getAdjacentTiles() {
@@ -564,9 +618,11 @@ function scheduleNextAction() {
     setTimeout(moveChicken, 1500 + Math.random() * 2000);
 }
 
-// Initialize
+// Initialize after sprites are preloaded
 if (previewSvg) {
-    drawPreviewMap();
-    scheduleNextAction();
-    window.addEventListener('resize', drawPreviewMap);
+    preloadChickenSprites().then(() => {
+        drawPreviewMap();
+        scheduleNextAction();
+        window.addEventListener('resize', drawPreviewMap);
+    });
 }

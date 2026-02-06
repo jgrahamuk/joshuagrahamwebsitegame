@@ -12,6 +12,7 @@ import { isConfigured } from './supabase.js';
 import { initAuth, onAuthChange, showAuthScreen, getCurrentUser } from './auth.js';
 import { showMapBrowser, onMapSelected } from './mapBrowser.js';
 import { loadMapFromSupabase, convertMapDataToGameFormat } from './mapLoader.js';
+import { handleRoute, parseRoute } from './router.js';
 
 // Add at the start of the file, before any other code
 function updateOrientation() {
@@ -284,6 +285,11 @@ async function startGame(supabaseMapId) {
         mapData = await initializeMap();
     }
 
+    startGameWithMapData(mapData);
+}
+
+// Start the game with pre-converted map data
+function startGameWithMapData(mapData) {
     updateTileSize();
     drawMap(svg);
 
@@ -455,6 +461,31 @@ async function startGame(supabaseMapId) {
 }
 
 preloadSprites().then(async () => {
+    // Check URL route first (e.g., /username)
+    const { username } = parseRoute();
+
+    if (isConfigured() && username) {
+        // Direct link to a user's world - load it directly
+        const routeResult = await handleRoute();
+
+        if (routeResult && routeResult.mapData) {
+            // Initialize auth in background (for edit button if owner)
+            initAuth();
+
+            // Convert and start game with the routed map
+            const mapData = convertMapDataToGameFormat(routeResult.mapData);
+            initializeMapFromData(mapData);
+
+            // Store map metadata for potential editing
+            window.currentMapId = routeResult.mapId;
+            window.currentMapProfile = routeResult.profile;
+
+            startGameWithMapData(mapData);
+        }
+        // If routeResult is null, handleRoute already showed not-found screen
+        return;
+    }
+
     if (isConfigured()) {
         // Supabase is configured - show auth screen, then map browser
         const user = await initAuth();
