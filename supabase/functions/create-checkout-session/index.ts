@@ -34,7 +34,7 @@ serve(async (req) => {
     // Get or create Stripe customer
     const { data: profile } = await supabase
       .from("profiles")
-      .select("stripe_customer_id, username")
+      .select("stripe_customer_id, username, trial_ends_at")
       .eq("id", userId)
       .single();
 
@@ -60,6 +60,17 @@ serve(async (req) => {
         .eq("id", userId);
     }
 
+    // Calculate trial end for Stripe (if user is still in trial)
+    let trialEnd: number | undefined;
+    if (profile?.trial_ends_at) {
+      const trialEndsAt = new Date(profile.trial_ends_at);
+      const now = new Date();
+      if (trialEndsAt > now) {
+        // Stripe expects Unix timestamp in seconds
+        trialEnd = Math.floor(trialEndsAt.getTime() / 1000);
+      }
+    }
+
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -82,6 +93,8 @@ serve(async (req) => {
           supabase_user_id: userId,
           username: username,
         },
+        // If user is in trial, don't charge until trial ends
+        ...(trialEnd && { trial_end: trialEnd }),
       },
     });
 
