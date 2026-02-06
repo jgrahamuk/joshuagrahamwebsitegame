@@ -49,7 +49,7 @@ export async function getProfileByUsername(username) {
     console.log('getProfileByUsername: querying for', username);
     const { data, error } = await sb
         .from('profiles')
-        .select('id, username, display_name, subscription_status')
+        .select('id, username, display_name, subscription_status, trial_ends_at')
         .eq('username', username)
         .limit(1);
 
@@ -209,21 +209,30 @@ export async function handleRoute() {
     const currentUser = getCurrentUser();
     const isOwner = currentUser && currentUser.id === profile.id;
 
+    // Check subscription status and trial
+    const subscriptionActive = profile.subscription_status?.toLowerCase() === 'active';
+    const trialEndsAt = profile.trial_ends_at ? new Date(profile.trial_ends_at) : null;
+    const now = new Date();
+    const inTrial = trialEndsAt && trialEndsAt > now;
+    const trialDaysRemaining = inTrial ? Math.ceil((trialEndsAt - now) / (1000 * 60 * 60 * 24)) : 0;
+
     // Debug logging for subscription check
     console.log('Route check:', {
         username,
         profileId: profile.id,
         currentUserId: currentUser?.id,
         isOwner,
-        subscriptionStatus: profile.subscription_status
+        subscriptionStatus: profile.subscription_status,
+        trialEndsAt: profile.trial_ends_at,
+        inTrial,
+        trialDaysRemaining
     });
 
-    // Check subscription - owners can always access, visitors need active subscription
-    // Use case-insensitive check for subscription status
-    const subscriptionActive = profile.subscription_status?.toLowerCase() === 'active';
-    if (!subscriptionActive && !isOwner) {
-        console.log('Access denied: subscription not active and not owner');
-        showNotFound("This user hasn't set up their world yet.");
+    // Check access - owners can always access, visitors need active subscription or trial
+    const hasAccess = subscriptionActive || inTrial;
+    if (!hasAccess && !isOwner) {
+        console.log('Access denied: no subscription, trial expired, and not owner');
+        showNotFound("This user's trial has expired.");
         return null;
     }
 
@@ -258,6 +267,8 @@ export async function handleRoute() {
         profile,
         isOwner,
         subscriptionActive,
+        inTrial,
+        trialDaysRemaining,
     };
 }
 

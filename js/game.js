@@ -316,6 +316,127 @@ function showUnpaidOwnerBanner() {
     });
 }
 
+// Show trial banner with days remaining
+function showTrialBanner(daysRemaining) {
+    const banner = document.createElement('div');
+    banner.id = 'trial-banner';
+
+    const daysText = daysRemaining === 1 ? '1 day' : `${daysRemaining} days`;
+    banner.innerHTML = `
+        <div class="trial-banner-content">
+            <span>🎉 Free trial: <strong>${daysText}</strong> remaining</span>
+            <button class="trial-banner-btn" id="add-payment-btn">Add Payment Method</button>
+        </div>
+        <button class="trial-banner-close">&times;</button>
+    `;
+
+    const style = document.createElement('style');
+    style.textContent = `
+        #trial-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 100%);
+            border-bottom: 2px solid #4CAF50;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            z-index: 10000;
+            font-family: "Jersey 10", system-ui, sans-serif;
+            color: #e0e0e0;
+        }
+        .trial-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .trial-banner-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+        .trial-banner-btn:hover {
+            background: #388e3c;
+        }
+        .trial-banner-btn:disabled {
+            background: #666;
+            cursor: wait;
+        }
+        .trial-banner-close {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+        .trial-banner-close:hover {
+            color: #fff;
+        }
+    `;
+    document.head.appendChild(style);
+    document.body.prepend(banner);
+
+    banner.querySelector('.trial-banner-close').addEventListener('click', () => {
+        banner.remove();
+    });
+
+    // Add payment button - go to Stripe
+    document.getElementById('add-payment-btn').addEventListener('click', async (e) => {
+        const btn = e.target;
+        btn.disabled = true;
+        btn.textContent = 'Redirecting...';
+
+        try {
+            const user = getCurrentUser();
+            const username = user?.user_metadata?.username || window.currentMapProfile?.username;
+
+            if (!user || !username) {
+                throw new Error('Unable to get user info');
+            }
+
+            const response = await fetch('/api/create-checkout-session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    priceId: config.STRIPE_PRICE_EARLY_BIRD,
+                    userId: user.id,
+                    username: username,
+                    successUrl: `${window.location.origin}/${username}?subscribed=1`,
+                    cancelUrl: `${window.location.origin}/${username}`
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+            if (!data.sessionId) throw new Error('No sessionId returned');
+
+            const stripe = Stripe(config.STRIPE_PUBLISHABLE_KEY);
+            const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
+            if (error) throw error;
+
+        } catch (err) {
+            console.error('Checkout error:', err);
+            btn.disabled = false;
+            btn.textContent = 'Add Payment Method';
+            alert('Failed to start checkout: ' + err.message);
+        }
+    });
+}
+
 const gameContainer = document.getElementById('game-container');
 const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 gameContainer.appendChild(svg);
@@ -828,9 +949,15 @@ preloadSprites().then(async () => {
                     }
                 }, 500);
 
-                // Show subscription banner if not paid
+                // Show appropriate banner based on subscription/trial status
                 if (!routeResult.subscriptionActive) {
-                    showUnpaidOwnerBanner();
+                    if (routeResult.inTrial) {
+                        // Show trial banner with days remaining
+                        showTrialBanner(routeResult.trialDaysRemaining);
+                    } else {
+                        // Trial expired - show subscribe banner
+                        showUnpaidOwnerBanner();
+                    }
                 }
             }
         }

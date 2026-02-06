@@ -206,7 +206,7 @@ async function handleSignup() {
             return;
         }
 
-        // Create Supabase auth user
+        // Create Supabase auth user with 7-day trial
         const { data: authData, error: authError } = await client.auth.signUp({
             email,
             password,
@@ -220,14 +220,14 @@ async function handleSignup() {
 
         if (authError) throw authError;
 
-        // Now redirect to Stripe Checkout
-        await redirectToCheckout(authData.user?.id, username);
+        // Redirect directly to their new map (trial starts automatically)
+        window.location.href = `/${username}?welcome=1`;
 
     } catch (err) {
         showError(signupError, err.message);
     } finally {
         signupSubmit.disabled = false;
-        signupSubmit.textContent = 'Create Account & Subscribe';
+        signupSubmit.textContent = 'Start Free Trial';
     }
 }
 
