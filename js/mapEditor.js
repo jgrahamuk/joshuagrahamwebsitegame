@@ -100,15 +100,17 @@ export class MapEditor {
         this.toolbarContainer = document.createElement('div');
         this.toolbarContainer.id = 'map-editor-toolbar';
 
-        // Add map mode toggle button first
-        const modeToggleButton = document.createElement('button');
-        modeToggleButton.innerHTML = '📱';
-        modeToggleButton.title = 'Toggle Portrait/Landscape Map';
-        modeToggleButton.className = 'mode-toggle-button' + (this.isEditingPortrait ? ' selected' : '');
-        modeToggleButton.addEventListener('click', () => {
-            this.toggleMapMode();
-        });
-        this.toolbarContainer.appendChild(modeToggleButton);
+        // Add map mode toggle button first (only for demo mode, not user maps)
+        if (!window.currentMapId) {
+            const modeToggleButton = document.createElement('button');
+            modeToggleButton.innerHTML = '📱';
+            modeToggleButton.title = 'Toggle Portrait/Landscape Map';
+            modeToggleButton.className = 'mode-toggle-button' + (this.isEditingPortrait ? ' selected' : '');
+            modeToggleButton.addEventListener('click', () => {
+                this.toggleMapMode();
+            });
+            this.toolbarContainer.appendChild(modeToggleButton);
+        }
 
         // Add existing tools
         this.tools.forEach(tool => {
