@@ -200,6 +200,73 @@ window.TILE_SIZE = 40;
 window.MAP_OFFSET_X = 0;
 window.MAP_OFFSET_Y = 0;
 
+// Show banner for unpaid owners
+function showUnpaidOwnerBanner() {
+    const banner = document.createElement('div');
+    banner.id = 'unpaid-owner-banner';
+    banner.innerHTML = `
+        <div class="unpaid-banner-content">
+            <span>Your world is not visible to others until you subscribe.</span>
+            <a href="/?signup=1" class="unpaid-banner-btn">Subscribe Now</a>
+        </div>
+        <button class="unpaid-banner-close">&times;</button>
+    `;
+
+    const style = document.createElement('style');
+    style.textContent = `
+        #unpaid-owner-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-bottom: 2px solid #f59e0b;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            z-index: 10000;
+            font-family: "Jersey 10", system-ui, sans-serif;
+            color: #e0e0e0;
+        }
+        .unpaid-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .unpaid-banner-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+        .unpaid-banner-btn:hover {
+            background: #388e3c;
+        }
+        .unpaid-banner-close {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+        .unpaid-banner-close:hover {
+            color: #fff;
+        }
+    `;
+    document.head.appendChild(style);
+    document.body.prepend(banner);
+
+    banner.querySelector('.unpaid-banner-close').addEventListener('click', () => {
+        banner.remove();
+    });
+}
+
 const gameContainer = document.getElementById('game-container');
 const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 gameContainer.appendChild(svg);
@@ -558,8 +625,8 @@ preloadSprites().then(async () => {
             window.currentMapId = routeResult.mapId;
             window.currentMapProfile = routeResult.profile;
 
-            // Check if current user is the owner
-            const isOwner = currentUser && routeResult.profile && currentUser.id === routeResult.profile.id;
+            // Use isOwner from route result
+            const isOwner = routeResult.isOwner;
 
             startGameWithMapData(mapData, {
                 isOwner,
@@ -575,6 +642,11 @@ preloadSprites().then(async () => {
                         window.mapEditor.toggleEditor();
                     }
                 }, 500);
+
+                // Show subscription banner if not paid
+                if (!routeResult.subscriptionActive) {
+                    showUnpaidOwnerBanner();
+                }
             }
         }
         // If routeResult is null, handleRoute already showed not-found screen

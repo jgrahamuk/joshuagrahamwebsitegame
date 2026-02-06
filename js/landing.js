@@ -791,6 +791,107 @@ if (urlParams.get('signup') === '1') {
     openModal('early_bird');
 }
 
+// ── Handle canceled checkout ──
+if (urlParams.get('canceled') === '1') {
+    showCanceledCheckoutBanner();
+}
+
+async function showCanceledCheckoutBanner() {
+    const client = getSupabase();
+    if (!client) return;
+
+    // Check if user is logged in
+    const { data: { session } } = await client.auth.getSession();
+    if (!session?.user) return;
+
+    // Get their username
+    const { data: profile } = await client
+        .from('profiles')
+        .select('username')
+        .eq('id', session.user.id)
+        .single();
+
+    // Create banner
+    const banner = document.createElement('div');
+    banner.className = 'canceled-banner';
+    banner.innerHTML = `
+        <div class="canceled-banner-content">
+            <p><strong>Payment not completed.</strong> You can still edit your world, but it won't be visible to others until you subscribe.</p>
+            <div class="canceled-banner-actions">
+                <button id="canceled-subscribe-btn" class="btn btn-primary btn-sm">Complete Subscription</button>
+                ${profile?.username ? `<a href="/${profile.username}" class="btn btn-outline btn-sm">Edit My World Anyway</a>` : ''}
+            </div>
+        </div>
+        <button class="canceled-banner-close">&times;</button>
+    `;
+
+    // Add styles
+    const style = document.createElement('style');
+    style.textContent = `
+        .canceled-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-bottom: 2px solid #f59e0b;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            z-index: 10000;
+            font-family: "Jersey 10", system-ui, sans-serif;
+        }
+        .canceled-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .canceled-banner-content p {
+            margin: 0;
+            color: #e0e0e0;
+        }
+        .canceled-banner-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+        .canceled-banner-close {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+        .canceled-banner-close:hover {
+            color: #fff;
+        }
+        body.has-canceled-banner {
+            padding-top: 80px;
+        }
+    `;
+    document.head.appendChild(style);
+    document.body.classList.add('has-canceled-banner');
+    document.body.prepend(banner);
+
+    // Wire up close button
+    banner.querySelector('.canceled-banner-close').addEventListener('click', () => {
+        banner.remove();
+        document.body.classList.remove('has-canceled-banner');
+        // Clean up URL
+        window.history.replaceState({}, '', window.location.pathname);
+    });
+
+    // Wire up subscribe button
+    document.getElementById('canceled-subscribe-btn')?.addEventListener('click', () => {
+        openModal('early_bird');
+        banner.remove();
+        document.body.classList.remove('has-canceled-banner');
+    });
+}
+
 // ── Check auth state and update nav ──
 async function checkAuthAndUpdateNav() {
     const client = getSupabase();

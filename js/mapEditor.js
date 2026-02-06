@@ -194,6 +194,20 @@ export class MapEditor {
         // Create bound event handlers that we can properly remove later
         this.handleMouseDown = (e) => {
             if (!this.selectedTool) return;
+
+            // Check if clicking on same resource type - skip to allow double-click
+            const rect = this.svg.getBoundingClientRect();
+            const offsetX = window.MAP_OFFSET_X || 0;
+            const offsetY = window.MAP_OFFSET_Y || 0;
+            const x = Math.floor((e.clientX - rect.left - offsetX) / window.TILE_SIZE);
+            const y = Math.floor((e.clientY - rect.top - offsetY) / window.TILE_SIZE);
+
+            if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
+                if (this.selectedTool.type === 'resource' && this.isSameResourceType(x, y, this.selectedTool.tileType)) {
+                    return; // Skip - let double-click handle it
+                }
+            }
+
             this.isDragging = true;
             this.handleMapInteraction(e);
         };
@@ -214,11 +228,26 @@ export class MapEditor {
             if (!this.selectedTool) return;
             e.stopPropagation();
             e.preventDefault();
-            this.handleMapInteraction(e);
+
+            // Check if clicking on an item of the same type as selected tool
+            const rect = this.svg.getBoundingClientRect();
+            const offsetX = window.MAP_OFFSET_X || 0;
+            const offsetY = window.MAP_OFFSET_Y || 0;
+            const x = Math.floor((e.clientX - rect.left - offsetX) / window.TILE_SIZE);
+            const y = Math.floor((e.clientY - rect.top - offsetY) / window.TILE_SIZE);
+
+            if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
+                // If clicking on the same type as selected tool, ignore (let double-click handle it)
+                if (this.selectedTool.type === 'resource' && this.isSameResourceType(x, y, this.selectedTool.tileType)) {
+                    return;
+                }
+                this.handleMapInteraction(e);
+            }
         };
 
         this.mapDblClickHandler = (e) => {
             e.stopPropagation();
+
             const rect = this.svg.getBoundingClientRect();
             const offsetX = window.MAP_OFFSET_X || 0;
             const offsetY = window.MAP_OFFSET_Y || 0;
@@ -501,6 +530,130 @@ export class MapEditor {
     placeResource(x, y, resourceType) {
         // Use the existing function from map.js
         placeResourceAtPosition(x, y, resourceType);
+
+        // Show tip for first collectable placement
+        const collectableTypes = [tileTypes.EGG, tileTypes.BADGE];
+        if (collectableTypes.includes(resourceType)) {
+            this.showCollectableTipOnce();
+        }
+    }
+
+    showCollectableTipOnce() {
+        // Only show once per user
+        if (localStorage.getItem('collectableTipShown')) {
+            return;
+        }
+        localStorage.setItem('collectableTipShown', 'true');
+
+        // Create tip element
+        const tip = document.createElement('div');
+        tip.id = 'collectable-tip';
+        tip.innerHTML = `
+            <div class="collectable-tip-content">
+                <span class="collectable-tip-icon">💡</span>
+                <span class="collectable-tip-text">
+                    <strong>Tip:</strong> Double-click on a collectable item to add a message that displays when someone collects it!
+                </span>
+            </div>
+            <button class="collectable-tip-close">&times;</button>
+        `;
+
+        const style = document.createElement('style');
+        style.id = 'collectable-tip-style';
+        style.textContent = `
+            #collectable-tip {
+                position: fixed;
+                bottom: 80px;
+                right: 20px;
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                border: 2px solid #4CAF50;
+                border-radius: 12px;
+                padding: 12px 16px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                z-index: 10000;
+                font-family: "Jersey 10", system-ui, sans-serif;
+                color: #e0e0e0;
+                max-width: 320px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+                animation: tipSlideIn 0.3s ease-out;
+            }
+            @keyframes tipSlideIn {
+                from {
+                    opacity: 0;
+                    transform: translateX(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+            @keyframes tipFadeOut {
+                from {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+                to {
+                    opacity: 0;
+                    transform: translateX(20px);
+                }
+            }
+            .collectable-tip-content {
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .collectable-tip-icon {
+                font-size: 1.5rem;
+                flex-shrink: 0;
+            }
+            .collectable-tip-text {
+                font-size: 0.95rem;
+                line-height: 1.4;
+            }
+            .collectable-tip-text strong {
+                color: #4CAF50;
+            }
+            .collectable-tip-close {
+                background: none;
+                border: none;
+                color: #888;
+                font-size: 1.5rem;
+                cursor: pointer;
+                padding: 0;
+                line-height: 1;
+                flex-shrink: 0;
+            }
+            .collectable-tip-close:hover {
+                color: #fff;
+            }
+        `;
+        document.head.appendChild(style);
+        document.body.appendChild(tip);
+
+        // Close button handler
+        const closeTip = () => {
+            tip.style.animation = 'tipFadeOut 0.3s ease-in forwards';
+            setTimeout(() => {
+                tip.remove();
+                style.remove();
+            }, 300);
+        };
+
+        tip.querySelector('.collectable-tip-close').addEventListener('click', closeTip);
+
+        // Auto-fade after 10 seconds
+        setTimeout(closeTip, 10000);
+    }
+
+    isSameResourceType(x, y, resourceType) {
+        // Check if the tile has the same resource type as specified
+        const tiles = map[y][x];
+        if (!tiles || tiles.length === 0) return false;
+
+        const topTile = tiles[tiles.length - 1];
+        return topTile === resourceType;
     }
 
     isConfigurableItem(x, y) {

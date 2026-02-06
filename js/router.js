@@ -81,6 +81,31 @@ export async function getUserPublicMap(userId) {
 }
 
 /**
+ * Get a user's primary map (any, including private) - for owner access
+ */
+async function getUserAnyMap(userId) {
+    if (!isConfigured()) return null;
+
+    const sb = getSupabase();
+    if (!sb) return null;
+
+    const { data, error } = await sb
+        .from('maps')
+        .select('*')
+        .eq('owner_id', userId)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+    if (error) {
+        console.error('Error fetching user map:', error);
+        return null;
+    }
+
+    return data;
+}
+
+/**
  * Update the page title based on the loaded profile
  */
 export function updatePageMeta(profile) {
@@ -169,20 +194,24 @@ export async function handleRoute() {
         return null;
     }
 
-    // Check subscription (optional - remove if you want free tier)
-    if (profile.subscription_status !== 'active') {
+    // Check if current user is the owner (before subscription check)
+    const currentUser = getCurrentUser();
+    const isOwner = currentUser && currentUser.id === profile.id;
+
+    // Check subscription - owners can always access, visitors need active subscription
+    if (profile.subscription_status !== 'active' && !isOwner) {
         showNotFound("This user hasn't set up their world yet.");
         return null;
     }
 
-    // Get their public map
-    let map = await getUserPublicMap(profile.id);
+    // Get their map (public for visitors, any for owner)
+    let map = isOwner
+        ? await getUserAnyMap(profile.id)
+        : await getUserPublicMap(profile.id);
 
     if (!map) {
-        // No map exists - check if the current user is the owner
-        const currentUser = getCurrentUser();
-
-        if (currentUser && currentUser.id === profile.id) {
+        // No map exists - owner can create one
+        if (isOwner) {
             // Owner is viewing their own page - create a starter map
             console.log('Creating starter map for user:', profile.username);
             map = await createStarterMapForUser(profile.id);
@@ -204,6 +233,8 @@ export async function handleRoute() {
         mapData: map.map_data,
         mapId: map.id,
         profile,
+        isOwner,
+        subscriptionActive: profile.subscription_status === 'active',
     };
 }
 
