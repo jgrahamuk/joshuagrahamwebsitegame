@@ -346,5 +346,227 @@ function cyclePreviewName() {
     }, 300);
 }
 
-previewNameEl.style.transition = 'opacity 0.3s';
-setInterval(cyclePreviewName, 3000);
+if (previewNameEl) {
+    previewNameEl.style.transition = 'opacity 0.3s';
+    setInterval(cyclePreviewName, 3000);
+}
+
+// ── Mini SVG Preview Map ──
+const previewSvg = document.getElementById('preview-svg');
+
+// Grid dimensions
+const COLS = 10;
+const ROWS = 8;
+
+// Island shape (1 = grass, 0 = water)
+const islandMap = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 1, 1, 0, 0, 0],
+    [0, 0, 1, 1, 1, 1, 1, 1, 0, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+    [0, 0, 1, 1, 1, 1, 1, 1, 0, 0],
+    [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+];
+
+// Objects to place on the map: { type, col, row, scale }
+const mapObjects = [
+    { type: 'tree.gif', col: 2, row: 2, scale: 1.8 },
+    { type: 'tree.gif', col: 7, row: 3, scale: 1.8 },
+    { type: 'farmhouse.gif', col: 4, row: 2, scale: 2 },
+];
+
+// Blocked tiles (where objects are)
+const blockedTiles = [
+    { col: 2, row: 2 },
+    { col: 7, row: 3 },
+    { col: 4, row: 2 },
+    { col: 5, row: 2 },
+];
+
+// Build grass tiles list
+const grassTiles = [];
+for (let row = 0; row < ROWS; row++) {
+    for (let col = 0; col < COLS; col++) {
+        if (islandMap[row][col] === 1) {
+            grassTiles.push({ col, row });
+        }
+    }
+}
+
+function isBlocked(col, row) {
+    return blockedTiles.some(t => t.col === col && t.row === row);
+}
+
+function isValidTile(col, row) {
+    return grassTiles.some(t => t.col === col && t.row === row) && !isBlocked(col, row);
+}
+
+// Preview state
+let tileSize = 0;
+let chickenElement = null;
+let chickenPos = { col: 5, row: 4 };
+let chickenDir = 'front';
+let pecksRemaining = 0;
+
+const chickenSprites = {
+    front: 'chicken-front.gif',
+    back: 'chicken-back.gif',
+    left: 'chicken-left.gif',
+    right: 'chicken-right.gif',
+    peckLeft: 'chicken-peck-left.gif',
+    peckRight: 'chicken-peck-right.gif',
+};
+
+function createSvgImage(src, x, y, width, height) {
+    const img = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+    img.setAttribute('href', `resources/images/${src}`);
+    img.setAttribute('x', x);
+    img.setAttribute('y', y);
+    img.setAttribute('width', width);
+    img.setAttribute('height', height);
+    img.style.imageRendering = 'pixelated';
+    return img;
+}
+
+function drawPreviewMap() {
+    if (!previewSvg) return;
+
+    const rect = previewSvg.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+
+    // Calculate tile size
+    tileSize = Math.min(width / COLS, height / ROWS);
+    const offsetX = (width - COLS * tileSize) / 2;
+    const offsetY = (height - ROWS * tileSize) / 2;
+
+    previewSvg.innerHTML = '';
+    previewSvg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+
+    // Draw base tiles
+    for (let row = 0; row < ROWS; row++) {
+        for (let col = 0; col < COLS; col++) {
+            const tile = islandMap[row][col] === 1 ? 'tile-grass.gif' : 'tile-water.gif';
+            const img = createSvgImage(
+                tile,
+                offsetX + col * tileSize,
+                offsetY + row * tileSize,
+                tileSize,
+                tileSize
+            );
+            previewSvg.appendChild(img);
+        }
+    }
+
+    // Draw objects
+    for (const obj of mapObjects) {
+        const scale = obj.scale || 1;
+        const objSize = tileSize * scale;
+        const offsetAdjust = (objSize - tileSize) / 2;
+        const img = createSvgImage(
+            obj.type,
+            offsetX + obj.col * tileSize - offsetAdjust,
+            offsetY + obj.row * tileSize - offsetAdjust,
+            objSize,
+            objSize
+        );
+        previewSvg.appendChild(img);
+    }
+
+    // Create chicken element
+    chickenElement = createSvgImage(
+        chickenSprites[chickenDir],
+        offsetX + chickenPos.col * tileSize,
+        offsetY + chickenPos.row * tileSize,
+        tileSize,
+        tileSize
+    );
+    previewSvg.appendChild(chickenElement);
+}
+
+function updateChickenPosition() {
+    if (!chickenElement || !previewSvg) return;
+    const rect = previewSvg.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    tileSize = Math.min(width / COLS, height / ROWS);
+    const offsetX = (width - COLS * tileSize) / 2;
+    const offsetY = (height - ROWS * tileSize) / 2;
+
+    chickenElement.setAttribute('x', offsetX + chickenPos.col * tileSize);
+    chickenElement.setAttribute('y', offsetY + chickenPos.row * tileSize);
+}
+
+function updateChickenSprite(isPecking = false) {
+    if (!chickenElement) return;
+    let sprite = chickenSprites[chickenDir];
+    if (isPecking && (chickenDir === 'left' || chickenDir === 'right')) {
+        sprite = chickenDir === 'left' ? chickenSprites.peckLeft : chickenSprites.peckRight;
+    }
+    chickenElement.setAttribute('href', `resources/images/${sprite}`);
+}
+
+function getAdjacentTiles() {
+    const adjacent = [];
+    const directions = [
+        { dc: 0, dr: -1, dir: 'back' },
+        { dc: 0, dr: 1, dir: 'front' },
+        { dc: -1, dr: 0, dir: 'left' },
+        { dc: 1, dr: 0, dir: 'right' },
+    ];
+    for (const { dc, dr, dir } of directions) {
+        const nc = chickenPos.col + dc;
+        const nr = chickenPos.row + dr;
+        if (isValidTile(nc, nr)) {
+            adjacent.push({ col: nc, row: nr, dir });
+        }
+    }
+    return adjacent;
+}
+
+function doPeck() {
+    if (pecksRemaining > 0) {
+        const isPeckPose = pecksRemaining % 2 === 1;
+        updateChickenSprite(isPeckPose);
+        pecksRemaining--;
+        setTimeout(doPeck, 150 + Math.random() * 100);
+    } else {
+        updateChickenSprite(false);
+        scheduleNextAction();
+    }
+}
+
+function moveChicken() {
+    const adjacent = getAdjacentTiles();
+    if (adjacent.length === 0) {
+        scheduleNextAction();
+        return;
+    }
+
+    const target = adjacent[Math.floor(Math.random() * adjacent.length)];
+    chickenDir = target.dir;
+    chickenPos = { col: target.col, row: target.row };
+    updateChickenSprite(false);
+    updateChickenPosition();
+
+    // Maybe peck after moving
+    if ((chickenDir === 'left' || chickenDir === 'right') && Math.random() > 0.5) {
+        pecksRemaining = 2 + Math.floor(Math.random() * 3);
+        setTimeout(doPeck, 300);
+    } else {
+        scheduleNextAction();
+    }
+}
+
+function scheduleNextAction() {
+    setTimeout(moveChicken, 1500 + Math.random() * 2000);
+}
+
+// Initialize
+if (previewSvg) {
+    drawPreviewMap();
+    scheduleNextAction();
+    window.addEventListener('resize', drawPreviewMap);
+}

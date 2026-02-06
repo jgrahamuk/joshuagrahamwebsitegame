@@ -175,6 +175,12 @@ footer {
   background: rgba(76, 175, 80, 0.1);
 }
 
+.btn-outline:disabled {
+  color: var(--text-dimmer);
+  border-color: var(--text-dimmer);
+  cursor: not-allowed;
+}
+
 .btn-ghost {
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-dim);
@@ -271,34 +277,17 @@ footer {
   color: var(--green);
 }
 
-.preview-tiles {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(4, 1fr);
-  gap: 0;
-}
-
-.ptile {
-  width: 100%;
-  aspect-ratio: 1;
-  display: block;
-  image-rendering: pixelated;
-  object-fit: cover;
-}
-
-.ptile-tree {
-  transform: scale(1.5);
-  z-index: 1;
+.preview-map {
   position: relative;
+  width: 100%;
+  aspect-ratio: 10 / 8;
 }
 
-.ptile-farm {
-  grid-column: span 2;
-  aspect-ratio: auto;
-}
-
-.ptile-chicken {
-  transform: scale(1.3);
+.preview-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 0 0 12px 12px;
 }
 
 /* ---- How it works ---- */
@@ -394,6 +383,15 @@ footer {
 .pricing-card.early-bird {
   border-color: var(--gold);
   box-shadow: 0 0 30px rgba(255, 213, 79, 0.1);
+}
+
+.pricing-card.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.pricing-card.disabled .card-badge {
+  background: var(--text-dimmer);
 }
 
 .card-badge {
