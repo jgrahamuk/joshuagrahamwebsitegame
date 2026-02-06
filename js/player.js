@@ -119,8 +119,17 @@ export class Player {
         // Create chatbox container
         this.introMessageContainer = document.createElement('div');
         this.introMessageContainer.className = 'chatbox-container';
+
+        // Calculate chatbox position - above character but clamped to viewport
+        const isLandscape = window.innerWidth > window.innerHeight;
+        const chatboxHeight = isLandscape ? 310 : 192;
+        let topPos = characterY - chatboxHeight - 20;
+
+        // Clamp to viewport - minimum 10px from top
+        topPos = Math.max(10, topPos);
+
         this.introMessageContainer.style.left = '50%';
-        this.introMessageContainer.style.top = `${characterY - window.TILE_SIZE * 12}px`;
+        this.introMessageContainer.style.top = `${topPos}px`;
         this.introMessageContainer.style.transform = 'translateX(-50%)';
 
         // Create chatbox
@@ -208,6 +217,8 @@ export class Player {
             if (scale <= 1) {
                 scale = 1;
                 this.updatePosition();
+                // Center viewport on player after intro (for mobile)
+                if (window.updateViewport) window.updateViewport();
                 return;
             }
 
@@ -277,6 +288,9 @@ export class Player {
             this.x = point.x;
             this.y = point.y;
             this.updatePosition();
+
+            // Update viewport to follow player on mobile
+            if (window.updateViewport) window.updateViewport();
 
             // Check if we've reached our destination and should interact
             if (this.targetResource && this.isAdjacentToResource(this.targetResource)) {

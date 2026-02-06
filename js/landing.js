@@ -263,10 +263,14 @@ async function handleSignin() {
             .eq('id', data.user.id)
             .single();
 
-        if (profile?.username) {
-            window.location.href = `/${profile.username}`;
+        // Try profile username, then user metadata username, then demo
+        const username = profile?.username || data.user?.user_metadata?.username;
+        if (username) {
+            window.location.href = `/${username}`;
         } else {
-            window.location.href = '/game.html';
+            // No username found - go to demo (this shouldn't normally happen)
+            console.warn('No username found for user, redirecting to demo');
+            window.location.href = '/demo';
         }
 
     } catch (err) {
@@ -895,27 +899,39 @@ async function showCanceledCheckoutBanner() {
 // ── Check auth state and update nav ──
 async function checkAuthAndUpdateNav() {
     const client = getSupabase();
-    if (!client) return;
+    if (!client) {
+        console.log('checkAuthAndUpdateNav: No Supabase client');
+        return;
+    }
 
     try {
-        const { data: { session } } = await client.auth.getSession();
+        const { data: { session }, error: sessionError } = await client.auth.getSession();
+        console.log('checkAuthAndUpdateNav: session check', { hasSession: !!session, userId: session?.user?.id, sessionError });
 
         if (session?.user) {
             // User is logged in - get their username
-            const { data: profile } = await client
+            const { data: profile, error: profileError } = await client
                 .from('profiles')
                 .select('username')
                 .eq('id', session.user.id)
                 .single();
 
+            console.log('checkAuthAndUpdateNav: profile check', { profile, profileError });
+
             const navSigninBtn = document.getElementById('nav-signin-btn');
-            if (navSigninBtn && profile?.username) {
+
+            // Try profile username, then user metadata as fallback
+            const username = profile?.username || session.user.user_metadata?.username;
+
+            if (navSigninBtn && username) {
                 // Replace button with a link to their world
                 const myMaapLink = document.createElement('a');
-                myMaapLink.href = `/${profile.username}`;
+                myMaapLink.href = `/${username}`;
                 myMaapLink.className = 'btn btn-outline btn-sm';
                 myMaapLink.textContent = 'My Maap';
                 navSigninBtn.replaceWith(myMaapLink);
+            } else {
+                console.log('checkAuthAndUpdateNav: no button or username', { hasBtn: !!navSigninBtn, username });
             }
         }
     } catch (err) {

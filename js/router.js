@@ -35,23 +35,34 @@ export function parseRoute() {
  * Look up a user's profile by username
  */
 export async function getProfileByUsername(username) {
-    if (!isConfigured()) return null;
+    if (!isConfigured()) {
+        console.log('getProfileByUsername: not configured');
+        return null;
+    }
 
     const sb = getSupabase();
-    if (!sb) return null;
+    if (!sb) {
+        console.log('getProfileByUsername: no supabase client');
+        return null;
+    }
 
+    console.log('getProfileByUsername: querying for', username);
     const { data, error } = await sb
         .from('profiles')
         .select('id, username, display_name, subscription_status')
         .eq('username', username)
-        .single();
+        .limit(1);
+
+    console.log('getProfileByUsername: result', { data, error });
 
     if (error) {
         console.error('Error fetching profile:', error);
         return null;
     }
 
-    return data;
+    // Handle both array and single object responses
+    const profile = Array.isArray(data) ? data[0] : data;
+    return profile || null;
 }
 
 /**
@@ -198,8 +209,20 @@ export async function handleRoute() {
     const currentUser = getCurrentUser();
     const isOwner = currentUser && currentUser.id === profile.id;
 
+    // Debug logging for subscription check
+    console.log('Route check:', {
+        username,
+        profileId: profile.id,
+        currentUserId: currentUser?.id,
+        isOwner,
+        subscriptionStatus: profile.subscription_status
+    });
+
     // Check subscription - owners can always access, visitors need active subscription
-    if (profile.subscription_status !== 'active' && !isOwner) {
+    // Use case-insensitive check for subscription status
+    const subscriptionActive = profile.subscription_status?.toLowerCase() === 'active';
+    if (!subscriptionActive && !isOwner) {
+        console.log('Access denied: subscription not active and not owner');
         showNotFound("This user hasn't set up their world yet.");
         return null;
     }
@@ -234,7 +257,7 @@ export async function handleRoute() {
         mapId: map.id,
         profile,
         isOwner,
-        subscriptionActive: profile.subscription_status === 'active',
+        subscriptionActive,
     };
 }
 

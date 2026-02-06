@@ -13,14 +13,19 @@ export function onAuthChange(callback) {
 
 export async function initAuth() {
     if (!isConfigured()) {
+        console.log('initAuth: Supabase not configured');
         return null;
     }
 
     const sb = getSupabase();
-    if (!sb) return null;
+    if (!sb) {
+        console.log('initAuth: No Supabase client');
+        return null;
+    }
 
     // Listen for auth state changes
     sb.auth.onAuthStateChange((event, session) => {
+        console.log('initAuth: onAuthStateChange', { event, userId: session?.user?.id });
         currentUser = session?.user || null;
         updateAuthUI();
         if (onAuthChangeCallback) {
@@ -29,7 +34,8 @@ export async function initAuth() {
     });
 
     // Check for existing session
-    const { data: { session } } = await sb.auth.getSession();
+    const { data: { session }, error } = await sb.auth.getSession();
+    console.log('initAuth: getSession result', { hasSession: !!session, userId: session?.user?.id, error });
     currentUser = session?.user || null;
     return currentUser;
 }

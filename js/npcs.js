@@ -147,9 +147,30 @@ export class NPC {
         const npcScreenY = (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE;
         const isLandscape = window.innerWidth > window.innerHeight;
         const chatboxHeight = isLandscape ? 310 : 192; // Match the CSS heights
+        const chatboxWidth = isLandscape ? 620 : 384;
 
-        this.messageContainer.style.left = `${npcScreenX}px`;
-        this.messageContainer.style.top = `${npcScreenY - chatboxHeight}px`; // Position directly above NPC
+        // Calculate desired top position (above NPC)
+        let topPos = npcScreenY - chatboxHeight;
+
+        // Clamp to viewport bounds
+        const minTop = 10; // Small margin from top
+        const maxTop = window.innerHeight - chatboxHeight - 10;
+
+        // If chatbox would go off top, position it below the NPC instead
+        if (topPos < minTop) {
+            topPos = npcScreenY + window.TILE_SIZE * 2 + 10; // Below the NPC
+        }
+
+        // Ensure it doesn't go off bottom either
+        topPos = Math.min(topPos, maxTop);
+
+        // Clamp horizontal position
+        let leftPos = npcScreenX;
+        const halfWidth = chatboxWidth / 2;
+        leftPos = Math.max(halfWidth + 10, Math.min(leftPos, window.innerWidth - halfWidth - 10));
+
+        this.messageContainer.style.left = `${leftPos}px`;
+        this.messageContainer.style.top = `${topPos}px`;
         this.messageContainer.style.transform = 'translateX(-50%)'; // Center horizontally
 
         // Create chatbox

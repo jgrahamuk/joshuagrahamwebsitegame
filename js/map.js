@@ -203,23 +203,28 @@ export function drawMap(svg) {
     const svgWidth = window.innerWidth;
     const svgHeight = window.innerHeight;
 
-    // Calculate the tile size that would fit the map in both dimensions
-    const horizontalTileSize = svgWidth / MAP_WIDTH_TILES;
-    const verticalTileSize = svgHeight / MAP_HEIGHT_TILES;
+    // For mobile viewport, use pre-calculated tile size and offsets from game.js
+    // For desktop, calculate to fit entire map on screen
+    if (!window.mobileViewport) {
+        // Calculate the tile size that would fit the map in both dimensions
+        const horizontalTileSize = svgWidth / MAP_WIDTH_TILES;
+        const verticalTileSize = svgHeight / MAP_HEIGHT_TILES;
 
-    // Use the smaller tile size to ensure the map fits in both dimensions
-    window.TILE_SIZE = Math.min(horizontalTileSize, verticalTileSize);
+        // Use the smaller tile size to ensure the map fits in both dimensions
+        window.TILE_SIZE = Math.min(horizontalTileSize, verticalTileSize);
+
+        // Calculate the total map dimensions
+        const totalMapWidth = MAP_WIDTH_TILES * window.TILE_SIZE;
+        const totalMapHeight = MAP_HEIGHT_TILES * window.TILE_SIZE;
+
+        // Center the map
+        window.MAP_OFFSET_X = Math.max(0, (svgWidth - totalMapWidth) / 2);
+        window.MAP_OFFSET_Y = Math.max(0, (svgHeight - totalMapHeight) / 2);
+    }
+
     const tileSize = window.TILE_SIZE;
-
-    // Calculate the total map dimensions
-    const totalMapWidth = MAP_WIDTH_TILES * tileSize;
-    const totalMapHeight = MAP_HEIGHT_TILES * tileSize;
-
-    // Center the map
-    window.MAP_OFFSET_X = Math.max(0, (svgWidth - totalMapWidth) / 2);
-    window.MAP_OFFSET_Y = Math.max(0, (svgHeight - totalMapHeight) / 2);
-    const offsetX = window.MAP_OFFSET_X;
-    const offsetY = window.MAP_OFFSET_Y;
+    const offsetX = window.MAP_OFFSET_X || 0;
+    const offsetY = window.MAP_OFFSET_Y || 0;
 
     // Fill the entire SVG area with water tiles (no gaps)
     const numXTiles = Math.ceil(svgWidth / tileSize);

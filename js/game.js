@@ -19,13 +19,9 @@ import { fetchMyMaps, saveMapToSupabase } from './mapBrowser.js';
 // Add at the start of the file, before any other code
 function updateOrientation() {
     const isPortrait = window.innerHeight > window.innerWidth;
-    const viewport = document.querySelector('meta[name="viewport"]');
     const orientation = isPortrait ? 'portrait' : 'landscape';
 
-    // Update viewport meta tag
-    viewport.setAttribute('content', `width=device-width, initial-scale=1.0, viewport-fit=cover, orientation=${orientation}`);
-
-    // Update body class
+    // Update body class for CSS targeting
     document.body.classList.remove('portrait', 'landscape');
     document.body.classList.add(orientation);
 }
@@ -335,31 +331,107 @@ const TICK_INTERVAL = 50; // 50ms between game logic updates
 let lastFrameTime = 0;
 let lastTickTime = 0;
 
+// Mobile viewport settings
+const MOBILE_BREAKPOINT = 768;
+const MOBILE_VISIBLE_TILES = 24; // How many tiles to show along the longest screen dimension
+
+function isMobileView() {
+    return window.innerWidth < MOBILE_BREAKPOINT;
+}
+
 function updateTileSize() {
     const w = window.innerWidth;
     const h = window.innerHeight;
 
-    // Always use the width to determine tile size
-    const tileSizeX = w / MAP_WIDTH_TILES;
-    window.TILE_SIZE = tileSizeX;
+    // Check if we should use mobile viewport
+    window.mobileViewport = isMobileView();
+
+    console.log('updateTileSize:', { w, h, isMobile: window.mobileViewport, breakpoint: MOBILE_BREAKPOINT });
+
+    if (window.mobileViewport) {
+        // Mobile: calculate tile size based on the longer screen dimension
+        // In portrait (h > w), fit tiles to height; in landscape, fit to width
+        // This ensures tiles are large enough to see and interact with
+        const isPortrait = h > w;
+        if (isPortrait) {
+            window.TILE_SIZE = h / MOBILE_VISIBLE_TILES;
+        } else {
+            window.TILE_SIZE = w / MOBILE_VISIBLE_TILES;
+        }
+        console.log('Mobile tile size:', { isPortrait, tileSize: window.TILE_SIZE, visibleTiles: MOBILE_VISIBLE_TILES });
+
+        // Set initial offsets to center the map (will be updated by updateViewport when player exists)
+        const mapPixelWidth = MAP_WIDTH_TILES * window.TILE_SIZE;
+        const mapPixelHeight = MAP_HEIGHT_TILES * window.TILE_SIZE;
+        window.MAP_OFFSET_X = (w - mapPixelWidth) / 2;
+        window.MAP_OFFSET_Y = (h - mapPixelHeight) / 2;
+    } else {
+        // Desktop: fit entire map width on screen
+        window.TILE_SIZE = w / MAP_WIDTH_TILES;
+        console.log('Desktop tile size:', { tileSize: window.TILE_SIZE, mapWidth: MAP_WIDTH_TILES });
+
+        // Center the map vertically
+        const mapPixelHeight = MAP_HEIGHT_TILES * window.TILE_SIZE;
+        window.MAP_OFFSET_X = 0;
+        window.MAP_OFFSET_Y = Math.max(0, (h - mapPixelHeight) / 2);
+    }
 
     // Set SVG size to fill the entire screen
     svg.setAttribute('width', w);
     svg.setAttribute('height', h);
 
-    // Calculate map pixel dimensions
-    const mapPixelWidth = MAP_WIDTH_TILES * window.TILE_SIZE;
-    const mapPixelHeight = MAP_HEIGHT_TILES * window.TILE_SIZE;
-
-    // Center the map vertically
-    window.MAP_OFFSET_X = 0;
-    window.MAP_OFFSET_Y = Math.max(0, (window.innerHeight - mapPixelHeight) / 2);
-
-    // Reset positioning since we're filling the screen
+    // Reset positioning
     svg.style.position = 'static';
     svg.style.left = '';
     svg.style.top = '';
 }
+
+// Update viewport to center on player (for mobile)
+function updateViewport() {
+    if (!window.mobileViewport || !window.player) return;
+
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const tileSize = window.TILE_SIZE;
+
+    // Calculate map dimensions in pixels
+    const mapPixelWidth = MAP_WIDTH_TILES * tileSize;
+    const mapPixelHeight = MAP_HEIGHT_TILES * tileSize;
+
+    // Calculate player's pixel position (center of player tile)
+    const playerCenterX = (window.player.x + 1) * tileSize; // +1 because player sprite is 2 tiles wide
+    const playerCenterY = (window.player.y + 1) * tileSize;
+
+    // Calculate offset to center player on screen
+    let offsetX = (w / 2) - playerCenterX;
+    let offsetY = (h / 2) - playerCenterY;
+
+    // Clamp offsets to keep map edges from showing empty space
+    // Don't scroll past right edge of map
+    offsetX = Math.min(offsetX, 0);
+    // Don't scroll past left edge of map
+    offsetX = Math.max(offsetX, w - mapPixelWidth);
+    // Don't scroll past bottom edge of map
+    offsetY = Math.min(offsetY, 0);
+    // Don't scroll past top edge of map
+    offsetY = Math.max(offsetY, h - mapPixelHeight);
+
+    window.MAP_OFFSET_X = offsetX;
+    window.MAP_OFFSET_Y = offsetY;
+
+    // Redraw map with new offsets
+    window.drawMap();
+
+    // Redraw player and entities with new positions
+    if (window.player) window.player.updatePosition();
+    if (window.npcs) window.npcs.forEach(npc => npc.updatePosition());
+    if (window.chickens) window.chickens.forEach(c => c.updatePosition());
+    if (window.cockerels) window.cockerels.forEach(c => c.updatePosition());
+    if (window.chicks) window.chicks.forEach(c => c.updatePosition());
+}
+
+// Make updateViewport globally accessible
+window.updateViewport = updateViewport;
 
 // Make drawMap globally accessible (wrapper to use window.svg by default)
 window.drawMap = (svgArg) => drawMap(svgArg || window.svg);
@@ -569,11 +641,16 @@ function startGameWithMapData(mapData, options = {}) {
         attributeFilter: ['style']
     });
 
+    // Center viewport on player for mobile (if skipping intro)
+    if (playerOptions.skipIntro) {
+        updateViewport();
+    }
+
     // Start the game loop
     requestAnimationFrame(gameLoop);
 
-    // Player movement and interaction
-    svg.addEventListener('click', (e) => {
+    // Player movement and interaction - handle both click and touch
+    function handleMapInteraction(clientX, clientY) {
         // If player is in intro sequence, ignore map clicks
         if (window.player.isInIntro) return;
 
@@ -581,8 +658,13 @@ function startGameWithMapData(mapData, options = {}) {
         if (window.mapEditor && window.mapEditor.isActive && window.mapEditor.selectedTool) return;
 
         const rect = svg.getBoundingClientRect();
-        const x = Math.floor((e.clientX - rect.left - (window.MAP_OFFSET_X || 0)) / window.TILE_SIZE);
-        const y = Math.floor((e.clientY - rect.top - (window.MAP_OFFSET_Y || 0)) / window.TILE_SIZE);
+        const x = Math.floor((clientX - rect.left - (window.MAP_OFFSET_X || 0)) / window.TILE_SIZE);
+        const y = Math.floor((clientY - rect.top - (window.MAP_OFFSET_Y || 0)) / window.TILE_SIZE);
+
+        handleMapClick(x, y);
+    }
+
+    function handleMapClick(x, y) {
 
         if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
             // Check if clicking on an NPC or surrounding tiles
@@ -653,6 +735,9 @@ function startGameWithMapData(mapData, options = {}) {
 
         // Re-create NPCs
         window.npcs = resizeMapData.npcs.map(npcData => new NPC(svg, npcData.name, npcData.message, npcData.x, npcData.y));
+
+        // Update viewport for mobile after resize
+        updateViewport();
     });
 }
 
@@ -669,7 +754,7 @@ preloadSprites().then(async () => {
 
     if (isConfigured() && username) {
         // Initialize auth first so we know if the current user is the owner
-        const currentUser = await initAuth();
+        await initAuth();
 
         // Direct link to a user's world - load it (may create map if owner has none)
         const routeResult = await handleRoute();
