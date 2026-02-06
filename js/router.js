@@ -3,6 +3,7 @@
 import { getSupabase, isConfigured } from './supabase.js';
 import { getCurrentUser } from './auth.js';
 import { generateStarterIsland } from './mapGenerator.js';
+import { getUserTier, getMaxMapSize } from './tiers.js';
 
 /**
  * Parse the current URL path to get the username
@@ -209,6 +210,11 @@ export async function handleRoute() {
     const currentUser = getCurrentUser();
     const isOwner = currentUser && currentUser.id === profile.id;
 
+    // Set profile globally so tier system can use it (needed before createStarterMapForUser)
+    if (isOwner) {
+        window.currentMapProfile = profile;
+    }
+
     // Check subscription status and trial
     const subscriptionActive = profile.subscription_status?.toLowerCase() === 'active';
     const trialEndsAt = profile.trial_ends_at ? new Date(profile.trial_ends_at) : null;
@@ -273,13 +279,42 @@ export async function handleRoute() {
 }
 
 /**
+ * Fetch the current signed-in user's profile (for tier/subscription info)
+ */
+export async function fetchCurrentUserProfile() {
+    if (!isConfigured()) return null;
+
+    const user = getCurrentUser();
+    if (!user) return null;
+
+    const sb = getSupabase();
+    if (!sb) return null;
+
+    const { data, error } = await sb
+        .from('profiles')
+        .select('id, username, display_name, subscription_status, trial_ends_at')
+        .eq('id', user.id)
+        .single();
+
+    if (error) {
+        console.error('Error fetching current user profile:', error);
+        return null;
+    }
+
+    return data;
+}
+
+/**
  * Create a starter map for a user
  */
 async function createStarterMapForUser(userId) {
     const sb = getSupabase();
     if (!sb) return null;
 
-    const starterMap = generateStarterIsland(50, 30);
+    // Use tier-appropriate map size
+    const tier = getUserTier();
+    const maxSize = getMaxMapSize(tier);
+    const starterMap = generateStarterIsland(maxSize.maxWidth, maxSize.maxHeight);
 
     const { data, error } = await sb
         .from('maps')

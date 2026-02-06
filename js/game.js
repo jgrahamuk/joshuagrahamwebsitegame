@@ -11,10 +11,11 @@ import { isConfigured } from './supabase.js';
 import { initAuth, onAuthChange, showAuthScreen, getCurrentUser } from './auth.js';
 import { showMapBrowser, onMapSelected } from './mapBrowser.js';
 import { loadMapFromSupabase, convertMapDataToGameFormat } from './mapLoader.js';
-import { handleRoute, parseRoute } from './router.js';
+import { handleRoute, parseRoute, fetchCurrentUserProfile } from './router.js';
 import { config } from './config.js';
 import { generateStarterIsland } from './mapGenerator.js';
 import { fetchMyMaps, saveMapToSupabase } from './mapBrowser.js';
+import { getUserTier, getMaxMapSize, TIERS } from './tiers.js';
 
 // Add at the start of the file, before any other code
 function updateOrientation() {
@@ -553,8 +554,9 @@ function updateViewport() {
     if (window.chicks) window.chicks.forEach(c => c.updatePosition());
 }
 
-// Make updateViewport globally accessible
+// Make updateViewport and updateTileSize globally accessible
 window.updateViewport = updateViewport;
+window.updateTileSize = updateTileSize;
 
 // Make drawMap globally accessible (wrapper to use window.svg by default)
 window.drawMap = (svgArg) => drawMap(svgArg || window.svg);
@@ -688,6 +690,32 @@ function startGameWithMapData(mapData, options = {}) {
 
     // Initialize map editor (hidden by default)
     window.mapEditor = new MapEditor(svg, gameContainer);
+
+    // Add "Get Your Own World" button for guests viewing user worlds
+    if (options.isUserWorld && !options.isOwner) {
+        const getWorldBtn = document.createElement('button');
+        getWorldBtn.id = 'guest-get-world-button';
+        getWorldBtn.textContent = 'Get Your Own World';
+        getWorldBtn.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: "Jersey 10", system-ui, sans-serif;
+            font-size: 1.1rem;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        `;
+        getWorldBtn.addEventListener('click', () => {
+            window.location.href = '/';
+        });
+        document.body.appendChild(getWorldBtn);
+    }
 
     // Add buttons for demo mode
     if (!options.isUserWorld) {
@@ -978,12 +1006,18 @@ preloadSprites().then(async () => {
                 return;
             }
 
+            // Fetch user profile for tier/subscription info
+            const profile = await fetchCurrentUserProfile();
+            window.currentMapProfile = profile;
+
             // Check if user has a map
             const myMaps = await fetchMyMaps();
 
             if (myMaps.length === 0) {
-                // New user - generate starter island
-                const starterMap = generateStarterIsland(50, 30);
+                // New user - generate starter island sized to their tier
+                const tier = getUserTier();
+                const maxSize = getMaxMapSize(tier);
+                const starterMap = generateStarterIsland(maxSize.maxWidth, maxSize.maxHeight);
 
                 // Save it to Supabase
                 const savedMap = await saveMapToSupabase(

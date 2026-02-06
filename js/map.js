@@ -32,6 +32,13 @@ export function setMapSize(width, height) {
     MAP_HEIGHT_TILES = height;
 }
 
+export function replaceMap(newMap, newWidth, newHeight) {
+    MAP_WIDTH_TILES = newWidth;
+    MAP_HEIGHT_TILES = newHeight;
+    map.length = 0;
+    newMap.forEach(row => map.push(row));
+}
+
 export async function initializeMap(forcePortrait = false) {
     // Determine if we should use landscape or portrait orientation
     const aspectRatio = window.innerWidth / window.innerHeight;
