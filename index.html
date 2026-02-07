@@ -128,9 +128,31 @@
       <section id="pricing" class="pricing-section">
         <h2>Pricing</h2>
         <p class="pricing-sub">
-          One plan. Everything included. Cancel anytime.
+          Start free. Upgrade when you're ready.
         </p>
         <div class="pricing-cards">
+          <div class="pricing-card free-tier">
+            <div class="card-badge free-badge">Free</div>
+            <div class="card-price">
+              <span class="price-currency">$</span>
+              <span class="price-amount">0</span>
+              <span class="price-period">/month</span>
+            </div>
+            <div class="price-note">No credit card required</div>
+            <ul class="card-features">
+              <li>Your own world at maap.to/name</li>
+              <li>Small map (50 &times; 30)</li>
+              <li>Core map editor tools</li>
+              <li>Public or private worlds</li>
+            </ul>
+            <button
+              class="btn btn-outline btn-lg card-cta"
+              data-plan="free"
+            >
+              Get Started Free
+            </button>
+          </div>
+
           <div class="pricing-card early-bird">
             <div class="card-badge">Early Bird</div>
             <div class="card-price">
@@ -140,10 +162,10 @@
             </div>
             <div class="price-original">$5/month after early bird ends</div>
             <ul class="card-features">
-              <li>Your own world at maap.to/name</li>
-              <li>Full map editor access</li>
-              <li>Public or private worlds</li>
+              <li>Everything in Free, plus:</li>
+              <li>Larger maps (up to 100 &times; 60)</li>
               <li>Custom NPCs & messages</li>
+              <li>All editor tools & structures</li>
               <li>Lock in this price forever</li>
             </ul>
             <button
@@ -154,24 +176,7 @@
             </button>
           </div>
 
-          <div class="pricing-card standard disabled">
-            <div class="card-badge">Standard Price</div>
-            <div class="card-price">
-              <span class="price-currency">$</span>
-              <span class="price-amount">5</span>
-              <span class="price-period">/month</span>
-            </div>
-            <div class="price-note">Standard price</div>
-            <ul class="card-features">
-              <li>Your own world at maap.to/name</li>
-              <li>Full map editor access</li>
-              <li>Public or private worlds</li>
-              <li>Custom NPCs & messages</li>
-            </ul>
-            <button class="btn btn-outline btn-lg card-cta" disabled>
-              Get Started - $5/mo
-            </button>
-          </div>
+
         </div>
       </section>
 
@@ -281,7 +286,7 @@
             id="signup-submit-btn"
             class="btn btn-primary btn-lg btn-full"
           >
-            Start 7-Day Free Trial
+            Create Account
           </button>
           <p class="signup-hint">
             Already have an account?
@@ -326,7 +331,7 @@
 
         <div id="signup-step-processing" style="display: none">
           <div class="processing-spinner"></div>
-          <p>Redirecting to checkout...</p>
+          <p id="processing-text">Setting up your world...</p>
         </div>
       </div>
     </div>

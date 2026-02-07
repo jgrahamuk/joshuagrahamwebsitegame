@@ -985,7 +985,10 @@ preloadSprites().then(async () => {
                 }, 500);
 
                 // Show appropriate banner based on subscription/trial status
-                if (!routeResult.subscriptionActive) {
+                // Free plan users don't see trial or payment banners
+                const paidPlans = ['early_bird', 'standard'];
+                const isPaidPlan = paidPlans.includes(routeResult.profile?.subscription_plan);
+                if (!routeResult.subscriptionActive && isPaidPlan) {
                     if (routeResult.inTrial) {
                         // Show trial banner with days remaining
                         showTrialBanner(routeResult.trialDaysRemaining);

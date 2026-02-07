@@ -62,6 +62,14 @@ function openModal(plan) {
     selectedPlan = plan || 'early_bird';
     modal.style.display = 'flex';
     showStep('signup');
+
+    // Update button text based on selected plan
+    if (selectedPlan === 'free') {
+        signupSubmit.textContent = 'Create Free Account';
+    } else {
+        signupSubmit.textContent = 'Start 7-Day Free Trial';
+    }
+
     usernameInput.focus();
 }
 
@@ -206,28 +214,35 @@ async function handleSignup() {
             return;
         }
 
-        // Create Supabase auth user with 7-day trial
+        // Create Supabase auth user
         const { data: authData, error: authError } = await client.auth.signUp({
             email,
             password,
             options: {
                 data: {
                     display_name: username,
-                    username: username
+                    username: username,
+                    plan: selectedPlan
                 }
             }
         });
 
         if (authError) throw authError;
 
-        // Redirect directly to their new map (trial starts automatically)
+        // Ensure we have an active session (signUp may not return one if email confirmation is on)
+        if (!authData.session) {
+            const { error: signInError } = await client.auth.signInWithPassword({ email, password });
+            if (signInError) throw signInError;
+        }
+
+        // Redirect directly to their new map
         window.location.href = `/${username}?welcome=1`;
 
     } catch (err) {
         showError(signupError, err.message);
     } finally {
         signupSubmit.disabled = false;
-        signupSubmit.textContent = 'Start Free Trial';
+        signupSubmit.textContent = selectedPlan === 'free' ? 'Create Free Account' : 'Start 7-Day Free Trial';
     }
 }
 

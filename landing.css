@@ -385,6 +385,15 @@ footer {
   box-shadow: 0 0 30px rgba(255, 213, 79, 0.1);
 }
 
+.pricing-card.free-tier {
+  border-color: var(--green);
+}
+
+.free-badge {
+  background: var(--green) !important;
+  color: #fff !important;
+}
+
 .pricing-card.disabled {
   opacity: 0.5;
   pointer-events: none;

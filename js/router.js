@@ -50,7 +50,7 @@ export async function getProfileByUsername(username) {
     console.log('getProfileByUsername: querying for', username);
     const { data, error } = await sb
         .from('profiles')
-        .select('id, username, display_name, subscription_status, trial_ends_at, subscription_ends_at')
+        .select('id, username, display_name, subscription_status, subscription_plan, trial_ends_at, subscription_ends_at')
         .eq('username', username)
         .limit(1);
 
@@ -234,11 +234,13 @@ export async function handleRoute() {
         trialDaysRemaining
     });
 
-    // Check access - owners can always access, visitors need active subscription or trial
-    const hasAccess = subscriptionActive || inTrial;
-    if (!hasAccess && !isOwner) {
-        console.log('Access denied: no subscription, trial expired, and not owner');
-        showNotFound("This user's trial has expired.");
+    // Check access - owners can always access, free plan users are accessible,
+    // paid plan users need active subscription or trial
+    const paidPlans = ['early_bird', 'standard'];
+    const isPaidPlanExpired = paidPlans.includes(profile.subscription_plan) && !subscriptionActive && !inTrial;
+    if (isPaidPlanExpired && !isOwner) {
+        console.log('Access denied: paid plan expired and not owner');
+        showNotFound("This user's subscription has expired.");
         return null;
     }
 
@@ -292,7 +294,7 @@ export async function fetchCurrentUserProfile() {
 
     const { data, error } = await sb
         .from('profiles')
-        .select('id, username, display_name, subscription_status, trial_ends_at, subscription_ends_at')
+        .select('id, username, display_name, subscription_status, subscription_plan, trial_ends_at, subscription_ends_at')
         .eq('id', user.id)
         .single();
 
