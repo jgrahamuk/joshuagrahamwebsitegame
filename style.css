@@ -448,6 +448,170 @@ body.portrait .chatbox-text {
   color: #fff;
 }
 
+/* Header upgrade button for free users */
+.auth-upgrade-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.85rem;
+  font-family: "Jersey 10", sans-serif;
+  cursor: pointer;
+  animation: upgradeGlow 2s ease-in-out infinite alternate;
+}
+
+.auth-upgrade-btn:hover {
+  background: #388e3c;
+}
+
+@keyframes upgradeGlow {
+  from { box-shadow: 0 0 4px rgba(76, 175, 80, 0.3); }
+  to { box-shadow: 0 0 10px rgba(76, 175, 80, 0.6); }
+}
+
+/* Clickable name button for paid users */
+.auth-user-name-btn {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 0.9rem;
+  font-family: "Jersey 10", sans-serif;
+  cursor: pointer;
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+}
+
+.auth-user-name-btn:hover {
+  background: #333;
+  color: #fff;
+}
+
+/* Plan ending notice in header */
+.auth-plan-ending {
+  color: #f59e0b;
+  font-size: 0.8rem;
+}
+
+/* Change Plan Dialog */
+#change-plan-dialog {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  font-family: "Jersey 10", system-ui, sans-serif;
+}
+
+.change-plan-panel {
+  max-width: 420px;
+  width: 95vw;
+}
+
+.plan-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.plan-option {
+  background: #1a1a2e;
+  border: 2px solid #333;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.plan-option.plan-current {
+  border-color: #4CAF50;
+}
+
+.plan-option-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.plan-option-name {
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: #e0e0e0;
+}
+
+.plan-option-price {
+  font-size: 1rem;
+  color: #888;
+}
+
+.plan-option-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px 0;
+}
+
+.plan-option-features li {
+  color: #888;
+  font-size: 0.85rem;
+  padding: 2px 0;
+}
+
+.plan-option-features li::before {
+  content: "\2022 ";
+  color: #4CAF50;
+}
+
+.plan-option-badge {
+  display: inline-block;
+  font-size: 0.8rem;
+  padding: 3px 10px;
+  border-radius: 4px;
+  background: #4CAF50;
+  color: white;
+}
+
+.plan-ending-badge {
+  background: #f59e0b;
+  color: #1a1a2e;
+}
+
+.plan-option-btn {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-family: "Jersey 10", system-ui, sans-serif;
+  font-size: 0.9rem;
+}
+
+.plan-option-btn:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.plan-option-btn-primary {
+  background: #4CAF50;
+  color: white;
+}
+
+.plan-option-btn-primary:hover {
+  background: #388e3c;
+}
+
+.plan-option-btn-secondary {
+  background: #333;
+  color: #ccc;
+  border: 1px solid #555;
+}
+
+.plan-option-btn-secondary:hover {
+  background: #444;
+  color: #fff;
+}
+
 /* Map Browser Overlay */
 #map-browser-overlay {
   position: fixed;

@@ -50,7 +50,7 @@ export async function getProfileByUsername(username) {
     console.log('getProfileByUsername: querying for', username);
     const { data, error } = await sb
         .from('profiles')
-        .select('id, username, display_name, subscription_status, trial_ends_at')
+        .select('id, username, display_name, subscription_status, trial_ends_at, subscription_ends_at')
         .eq('username', username)
         .limit(1);
 
@@ -292,7 +292,7 @@ export async function fetchCurrentUserProfile() {
 
     const { data, error } = await sb
         .from('profiles')
-        .select('id, username, display_name, subscription_status, trial_ends_at')
+        .select('id, username, display_name, subscription_status, trial_ends_at, subscription_ends_at')
         .eq('id', user.id)
         .single();
 

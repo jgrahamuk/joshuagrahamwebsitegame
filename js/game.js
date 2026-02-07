@@ -8,7 +8,7 @@ import { drawStructures } from './structures.js';
 import { MapEditor } from './mapEditor.js';
 import { badgeSystem } from './badgeSystem.js';
 import { isConfigured } from './supabase.js';
-import { initAuth, onAuthChange, showAuthScreen, getCurrentUser } from './auth.js';
+import { initAuth, onAuthChange, showAuthScreen, getCurrentUser, updateHeaderForTier } from './auth.js';
 import { showMapBrowser, onMapSelected } from './mapBrowser.js';
 import { loadMapFromSupabase, convertMapDataToGameFormat } from './mapLoader.js';
 import { handleRoute, parseRoute, fetchCurrentUserProfile } from './router.js';
@@ -964,6 +964,11 @@ preloadSprites().then(async () => {
             // Use isOwner from route result
             const isOwner = routeResult.isOwner;
 
+            // Update header with tier-specific UI for owners
+            if (isOwner) {
+                updateHeaderForTier();
+            }
+
             startGameWithMapData(mapData, {
                 isOwner,
                 isUserWorld: true,
@@ -1009,6 +1014,9 @@ preloadSprites().then(async () => {
             // Fetch user profile for tier/subscription info
             const profile = await fetchCurrentUserProfile();
             window.currentMapProfile = profile;
+
+            // Update header with tier-specific UI
+            updateHeaderForTier();
 
             // Check if user has a map
             const myMaps = await fetchMyMaps();
