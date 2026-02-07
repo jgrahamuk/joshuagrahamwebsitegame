@@ -310,43 +310,44 @@ function showChangePlanDialog() {
     const isFreeCurrent = tier === TIERS.FREE;
     const isPaidCurrent = tier === TIERS.PAID;
 
+    const canSelectFree = !isFreeCurrent && !isCanceling;
+    const canSelectPaid = !isPaidCurrent || isCanceling;
+
     dialog.innerHTML = `
         <div class="cloud-save-panel change-plan-panel">
             <h3>Change Plan</h3>
 
             <div class="plan-options">
-                <div class="plan-option ${isFreeCurrent ? 'plan-current' : ''}" id="plan-option-free">
+                <div class="plan-option ${isFreeCurrent ? 'plan-current' : ''} ${canSelectFree ? 'plan-selectable' : ''}" id="plan-option-free">
                     <div class="plan-option-header">
                         <span class="plan-option-name">Free</span>
                         <span class="plan-option-price">$0</span>
                     </div>
                     <ul class="plan-option-features">
                         <li>Map size: 50 x 30</li>
-                        <li>Basic terrain & resource tools</li>
+                        <li>Terrain, resources & structures</li>
                     </ul>
                     ${isFreeCurrent
                         ? '<span class="plan-option-badge">Current Plan</span>'
                         : isCanceling
                             ? `<span class="plan-option-badge plan-ending-badge">Switching ${endsAtStr}</span>`
-                            : '<button class="plan-option-btn plan-option-btn-secondary" id="plan-select-free">Switch to Free</button>'
+                            : ''
                     }
                 </div>
 
-                <div class="plan-option ${isPaidCurrent && !isCanceling ? 'plan-current' : ''}" id="plan-option-paid">
+                <div class="plan-option ${isPaidCurrent && !isCanceling ? 'plan-current' : ''} ${canSelectPaid ? 'plan-selectable' : ''}" id="plan-option-paid">
                     <div class="plan-option-header">
                         <span class="plan-option-name">Early Bird</span>
-                        <span class="plan-option-price" id="plan-paid-price">Loading...</span>
+                        <span class="plan-option-price">$2/month</span>
                     </div>
                     <ul class="plan-option-features">
                         <li>Map size: up to 100 x 60</li>
-                        <li>NPCs & structures</li>
-                        <li>All editor tools</li>
+                        <li>NPCs & all editor tools</li>
+                        <li>No ads for visitors</li>
                     </ul>
                     ${isPaidCurrent && !isCanceling
                         ? '<span class="plan-option-badge">Current Plan</span>'
-                        : isFreeCurrent || isCanceling
-                            ? '<button class="plan-option-btn plan-option-btn-primary" id="plan-select-paid">Subscribe</button>'
-                            : ''
+                        : ''
                     }
                 </div>
             </div>
@@ -358,9 +359,6 @@ function showChangePlanDialog() {
     `;
     document.body.appendChild(dialog);
 
-    // Fetch the real price from Stripe
-    fetchPaidPlanPrice();
-
     // Wire up close
     document.getElementById('change-plan-close').addEventListener('click', () => {
         dialog.remove();
@@ -370,65 +368,34 @@ function showChangePlanDialog() {
         if (e.target === dialog) dialog.remove();
     });
 
-    // Wire up free plan selection (downgrade)
-    const freeBtn = document.getElementById('plan-select-free');
-    if (freeBtn) {
-        freeBtn.addEventListener('click', () => handleDowngradeToFree(dialog));
+    // Clicking the free plan card triggers downgrade
+    if (canSelectFree) {
+        document.getElementById('plan-option-free').addEventListener('click', () => handleDowngradeToFree(dialog));
     }
 
-    // Wire up paid plan selection (upgrade)
-    const paidBtn = document.getElementById('plan-select-paid');
-    if (paidBtn) {
-        paidBtn.addEventListener('click', () => handleUpgradeToPaid(dialog));
+    // Clicking the paid plan card triggers checkout directly
+    if (canSelectPaid) {
+        document.getElementById('plan-option-paid').addEventListener('click', () => handleUpgradeToPaid(dialog));
     }
 }
 
 /**
  * Fetch the paid plan price from Stripe and update the dialog.
  */
-async function fetchPaidPlanPrice() {
-    const priceEl = document.getElementById('plan-paid-price');
-    if (!priceEl) return;
-
-    try {
-        const response = await fetch('/api/get-prices', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ priceIds: [config.STRIPE_PRICE_EARLY_BIRD] })
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            if (data.prices && data.prices.length > 0) {
-                const price = data.prices[0];
-                const amount = (price.unitAmount / 100).toFixed(2);
-                const currency = price.currency.toUpperCase();
-                const interval = price.interval || 'month';
-                priceEl.textContent = `$${amount}/${interval}`;
-                return;
-            }
-        }
-    } catch (err) {
-        console.error('Error fetching price:', err);
-    }
-
-    priceEl.textContent = 'See pricing';
-}
-
 /**
  * Handle downgrading from paid to free (cancel subscription at period end).
  */
 async function handleDowngradeToFree(dialog) {
-    const freeBtn = document.getElementById('plan-select-free');
-    if (!freeBtn) return;
+    const freeCard = document.getElementById('plan-option-free');
+    if (!freeCard) return;
 
     // Confirm
     if (!confirm('Switch to Free? You\'ll keep your current plan until the end of this billing period.')) {
         return;
     }
 
-    freeBtn.disabled = true;
-    freeBtn.textContent = 'Canceling...';
+    freeCard.style.opacity = '0.6';
+    freeCard.style.pointerEvents = 'none';
 
     try {
         const user = currentUser;
@@ -459,8 +426,8 @@ async function handleDowngradeToFree(dialog) {
 
     } catch (err) {
         console.error('Error canceling subscription:', err);
-        freeBtn.disabled = false;
-        freeBtn.textContent = 'Switch to Free';
+        freeCard.style.opacity = '1';
+        freeCard.style.pointerEvents = 'auto';
         alert('Failed to cancel: ' + err.message);
     }
 }
@@ -469,11 +436,11 @@ async function handleDowngradeToFree(dialog) {
  * Handle upgrading from free to paid (redirect to Stripe checkout).
  */
 async function handleUpgradeToPaid(dialog) {
-    const paidBtn = document.getElementById('plan-select-paid');
-    if (!paidBtn) return;
+    const paidCard = document.getElementById('plan-option-paid');
+    if (!paidCard) return;
 
-    paidBtn.disabled = true;
-    paidBtn.textContent = 'Redirecting...';
+    paidCard.style.opacity = '0.6';
+    paidCard.style.pointerEvents = 'none';
 
     try {
         const user = currentUser;
@@ -517,8 +484,8 @@ async function handleUpgradeToPaid(dialog) {
 
     } catch (err) {
         console.error('Checkout error:', err);
-        paidBtn.disabled = false;
-        paidBtn.textContent = 'Subscribe';
+        paidCard.style.opacity = '1';
+        paidCard.style.pointerEvents = 'auto';
         alert('Failed to start checkout: ' + err.message);
     }
 }

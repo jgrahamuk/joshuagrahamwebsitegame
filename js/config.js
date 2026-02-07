@@ -7,6 +7,6 @@ export const config = {
 
     // Stripe
     STRIPE_PUBLISHABLE_KEY: 'pk_live_51Sxlhv9VtrGMJaBFtUvUYKHKuCQ4Z0f114TSrqqU7QVAYK6yS1a294H7P67gPwNznG21k8AI9nwTELhb6vQUtGMh00zWvgCv4s',
-    STRIPE_PRICE_EARLY_BIRD: 'price_1Sxnd79VtrGMJaBFi1YAtmi8',
+    STRIPE_PRICE_EARLY_BIRD: 'price_1SyAfL7xp3tVxoE1CbHNKsyA',
     STRIPE_PRICE_STANDARD: 'price_1SxoBq9VtrGMJaBFWMSOX0Qi',
 };

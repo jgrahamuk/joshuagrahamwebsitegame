@@ -69,6 +69,32 @@ export class MapEditor {
         // Currently expanded flyout group id
         this.expandedGroup = null;
 
+        // Help system
+        this.toolTips = {
+            'delete': 'Click or drag to remove items and resources.',
+            'grass': 'Click or drag to place grass tiles.',
+            'dirt': 'Click or drag to place dirt paths.',
+            'water': 'Click or drag to place water. Impassable for visitors.',
+            'large_tree': 'Click to place trees. Double-click any item to configure.',
+            'bush': 'Click to place bushes. Double-click to configure.',
+            'pine_tree': 'Click to place pine trees. Double-click to configure.',
+            'rock': 'Click to place rocks. Double-click to configure.',
+            'flower': 'Click to place flowers. Double-click to configure.',
+            'egg': 'Place an egg. Chickens also lay eggs that hatch into chicks!',
+            'badge': 'Place a collectable badge. Double-click to add a message.',
+            'farmhouse': 'Place a farmhouse (10\u00d76). Needs clear space.',
+            'chicken_coop': 'Place a chicken coop (5\u00d73). Needs clear space.',
+            'npc_joshua': 'Click to place an NPC. Double-click to edit name and dialog.',
+            'chicken': 'Place a hen. Hens wander and lay eggs that hatch!',
+            'cockerel': 'Place a rooster. Roosters wander and peck.',
+            'image': 'Place image tiles next to each other, then double-click to upload.',
+        };
+        this.tipsCollapsed = localStorage.getItem('editorTipsCollapsed') === 'true';
+        this.helpSystemEl = null;
+        this.tipBubble = null;
+        this.statusEl = null;
+        this.statusTimeout = null;
+
     }
 
     toggleEditor() {
@@ -82,6 +108,7 @@ export class MapEditor {
     showToolbar() {
         this.isActive = true;
         this.createToolbar();
+        this.createHelpSystem();
         this.setupMapClickHandler();
 
         // Hide inventory UI when editing
@@ -103,6 +130,7 @@ export class MapEditor {
             this.gameContainer.removeChild(this.toolbarContainer);
             this.toolbarContainer = null;
         }
+        this.destroyHelpSystem();
         this.removeMapClickHandler();
 
         // Show inventory UI when done editing
@@ -256,27 +284,16 @@ export class MapEditor {
             }
         });
 
-        // Add intro text button
-        const introButton = document.createElement('button');
-        introButton.innerHTML = '💬';
-        introButton.title = 'Edit Welcome Message';
-        introButton.className = 'export-button intro-button';
-        introButton.addEventListener('click', () => {
+        // Add world settings button
+        const settingsButton = document.createElement('button');
+        settingsButton.innerHTML = '\u2699\uFE0F';
+        settingsButton.title = 'World Settings';
+        settingsButton.className = 'export-button settings-button';
+        settingsButton.addEventListener('click', () => {
             this.collapseAllFlyouts();
-            this.showIntroTextDialog();
+            this.showWorldSettingsDialog();
         });
-        this.toolbarContainer.appendChild(introButton);
-
-        // Add page title button
-        const titleButton = document.createElement('button');
-        titleButton.innerHTML = '📝';
-        titleButton.title = 'Edit Page Title';
-        titleButton.className = 'export-button title-button';
-        titleButton.addEventListener('click', () => {
-            this.collapseAllFlyouts();
-            this.showPageTitleDialog();
-        });
-        this.toolbarContainer.appendChild(titleButton);
+        this.toolbarContainer.appendChild(settingsButton);
 
         // Close flyouts when clicking outside
         this._documentClickHandler = (e) => {
@@ -296,6 +313,7 @@ export class MapEditor {
             this.toolbarContainer.querySelectorAll('button.selected').forEach(btn => {
                 btn.classList.remove('selected');
             });
+            this.updateToolTip();
             return;
         }
 
@@ -321,6 +339,7 @@ export class MapEditor {
         }
 
         this.selectedTool = tool;
+        this.updateToolTip();
     }
 
     setupMapClickHandler() {
@@ -444,6 +463,9 @@ export class MapEditor {
                 this.lastTileX = x;
                 this.lastTileY = y;
             }
+        } else if (this.selectedTool) {
+            this.showSaveIndicator('Outside map area');
+            setTimeout(() => this.hideSaveIndicator(), 1500);
         }
     }
 
@@ -698,130 +720,6 @@ export class MapEditor {
     placeResource(x, y, resourceType) {
         // Use the existing function from map.js
         placeResourceAtPosition(x, y, resourceType);
-
-        // Show tip for first collectable placement
-        const collectableTypes = [tileTypes.EGG, tileTypes.BADGE];
-        if (collectableTypes.includes(resourceType)) {
-            this.showCollectableTipOnce();
-        }
-    }
-
-    showCollectableTipOnce() {
-        this.showEditTipOnce('collectable', 'Double-click on a collectable item to add a message that displays when someone collects it!');
-    }
-
-    showNPCTipOnce() {
-        this.showEditTipOnce('npc', 'Double-click on an NPC to change their name and what they say!');
-    }
-
-    showEditTipOnce(type, message) {
-        // Only show once per type
-        const storageKey = `${type}TipShown`;
-        if (localStorage.getItem(storageKey)) {
-            return;
-        }
-        localStorage.setItem(storageKey, 'true');
-
-        // Create tip element
-        const tip = document.createElement('div');
-        tip.id = 'collectable-tip';
-        tip.innerHTML = `
-            <div class="collectable-tip-content">
-                <span class="collectable-tip-icon">💡</span>
-                <span class="collectable-tip-text">
-                    <strong>Tip:</strong> ${message}
-                </span>
-            </div>
-            <button class="collectable-tip-close">&times;</button>
-        `;
-
-        const style = document.createElement('style');
-        style.id = 'collectable-tip-style';
-        style.textContent = `
-            #collectable-tip {
-                position: fixed;
-                bottom: 80px;
-                right: 20px;
-                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-                border: 2px solid #4CAF50;
-                border-radius: 12px;
-                padding: 12px 16px;
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                z-index: 10000;
-                font-family: "Jersey 10", system-ui, sans-serif;
-                color: #e0e0e0;
-                max-width: 320px;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-                animation: tipSlideIn 0.3s ease-out;
-            }
-            @keyframes tipSlideIn {
-                from {
-                    opacity: 0;
-                    transform: translateX(20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateX(0);
-                }
-            }
-            @keyframes tipFadeOut {
-                from {
-                    opacity: 1;
-                    transform: translateX(0);
-                }
-                to {
-                    opacity: 0;
-                    transform: translateX(20px);
-                }
-            }
-            .collectable-tip-content {
-                display: flex;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            .collectable-tip-icon {
-                font-size: 1.5rem;
-                flex-shrink: 0;
-            }
-            .collectable-tip-text {
-                font-size: 0.95rem;
-                line-height: 1.4;
-            }
-            .collectable-tip-text strong {
-                color: #4CAF50;
-            }
-            .collectable-tip-close {
-                background: none;
-                border: none;
-                color: #888;
-                font-size: 1.5rem;
-                cursor: pointer;
-                padding: 0;
-                line-height: 1;
-                flex-shrink: 0;
-            }
-            .collectable-tip-close:hover {
-                color: #fff;
-            }
-        `;
-        document.head.appendChild(style);
-        document.body.appendChild(tip);
-
-        // Close button handler
-        const closeTip = () => {
-            tip.style.animation = 'tipFadeOut 0.3s ease-in forwards';
-            setTimeout(() => {
-                tip.remove();
-                style.remove();
-            }, 300);
-        };
-
-        tip.querySelector('.collectable-tip-close').addEventListener('click', closeTip);
-
-        // Auto-fade after 10 seconds
-        setTimeout(closeTip, 10000);
     }
 
     isSameResourceType(x, y, resourceType) {
@@ -1192,7 +1090,6 @@ export class MapEditor {
         }
 
         this.isSaving = true;
-        this.showSaveIndicator('Saving...');
 
         try {
             const mapData = this.convertMapToJSON();
@@ -1203,8 +1100,6 @@ export class MapEditor {
                 true,
                 window.currentMapId
             );
-            this.showSaveIndicator('Saved');
-            setTimeout(() => this.hideSaveIndicator(), 1500);
         } catch (err) {
             console.error('Auto-save failed:', err);
             this.showSaveIndicator('Save failed');
@@ -1214,34 +1109,82 @@ export class MapEditor {
         }
     }
 
-    showSaveIndicator(text) {
-        let indicator = document.getElementById('autosave-indicator');
-        if (!indicator) {
-            indicator = document.createElement('div');
-            indicator.id = 'autosave-indicator';
-            indicator.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background: rgba(0, 0, 0, 0.8);
-                color: #4caf50;
-                padding: 8px 16px;
-                border-radius: 4px;
-                font-family: "Jersey 10", system-ui, sans-serif;
-                font-size: 14px;
-                z-index: 9999;
-            `;
-            document.body.appendChild(indicator);
+    // Help system: ? button with tool tips and status messages
+    createHelpSystem() {
+        this.helpSystemEl = document.createElement('div');
+        this.helpSystemEl.id = 'editor-help-system';
+
+        this.tipBubble = document.createElement('div');
+        this.tipBubble.className = 'editor-tip-bubble hidden';
+        this.helpSystemEl.appendChild(this.tipBubble);
+
+        const helpBtn = document.createElement('button');
+        helpBtn.className = 'editor-help-btn';
+        helpBtn.textContent = '?';
+        helpBtn.title = 'Toggle tool tips';
+        if (this.tipsCollapsed) helpBtn.classList.add('collapsed');
+        helpBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.tipsCollapsed = !this.tipsCollapsed;
+            localStorage.setItem('editorTipsCollapsed', this.tipsCollapsed);
+            helpBtn.classList.toggle('collapsed', this.tipsCollapsed);
+            this.updateToolTip();
+        });
+        this.helpSystemEl.appendChild(helpBtn);
+
+        this.statusEl = document.createElement('div');
+        this.statusEl.className = 'editor-status-msg';
+
+        document.body.appendChild(this.helpSystemEl);
+        document.body.appendChild(this.statusEl);
+    }
+
+    destroyHelpSystem() {
+        if (this.helpSystemEl) {
+            this.helpSystemEl.remove();
+            this.helpSystemEl = null;
+            this.tipBubble = null;
         }
-        indicator.textContent = text;
-        indicator.style.display = 'block';
+        if (this.statusEl) {
+            this.statusEl.remove();
+            this.statusEl = null;
+        }
+        if (this.statusTimeout) {
+            clearTimeout(this.statusTimeout);
+            this.statusTimeout = null;
+        }
+        const old = document.getElementById('autosave-indicator');
+        if (old) old.remove();
+    }
+
+    updateToolTip() {
+        if (!this.tipBubble) return;
+        if (this.tipsCollapsed || !this.selectedTool) {
+            this.tipBubble.classList.add('hidden');
+            return;
+        }
+        const tip = this.toolTips[this.selectedTool.id];
+        if (tip) {
+            this.tipBubble.textContent = tip;
+            this.tipBubble.classList.remove('hidden');
+        } else {
+            this.tipBubble.classList.add('hidden');
+        }
+    }
+
+    showSaveIndicator(text) {
+        if (!this.statusEl) return;
+        if (this.statusTimeout) {
+            clearTimeout(this.statusTimeout);
+            this.statusTimeout = null;
+        }
+        this.statusEl.textContent = text;
+        this.statusEl.classList.add('visible');
     }
 
     hideSaveIndicator() {
-        const indicator = document.getElementById('autosave-indicator');
-        if (indicator) {
-            indicator.style.display = 'none';
-        }
+        if (!this.statusEl) return;
+        this.statusEl.classList.remove('visible');
     }
 
     placeStructure(x, y, tool) {
@@ -1320,11 +1263,6 @@ export class MapEditor {
 
         // Ensure the NPC is visible by redrawing it
         npc.updatePosition();
-
-        // Show tip about double-click to edit
-        this.showNPCTipOnce();
-
-        console.log(`NPC ${tool.npcType} placed at (${x}, ${y}). Total NPCs: ${window.npcs.length}`);
     }
 
     placeChicken(x, y) {
@@ -1403,9 +1341,6 @@ export class MapEditor {
 
         // Register in image tile system
         imageTilesSystem.addTile(x, y);
-
-        // Show tip once
-        this.showEditTipOnce('image', 'Double-click on an image block to upload an image! Place tiles next to each other to make a larger image area.');
     }
 
     removeStructureAt(x, y) {
@@ -1680,100 +1615,46 @@ export class MapEditor {
         };
     }
 
-    showIntroTextDialog() {
-        // Remove existing dialog if present
-        const existing = document.getElementById('intro-text-dialog');
-        if (existing) existing.remove();
-
-        const currentText = window.currentMapIntroText || '';
-
-        const dialog = document.createElement('div');
-        dialog.id = 'intro-text-dialog';
-        dialog.innerHTML = `
-            <div class="cloud-save-panel intro-text-panel">
-                <h3>Welcome Message</h3>
-                <p style="color: #888; font-size: 0.9rem; margin-bottom: 12px;">
-                    This message is shown to visitors when they first arrive at your world.
-                    Leave blank to use the default message.
-                </p>
-                <textarea id="intro-text-input" rows="6" placeholder="Enter your welcome message...">${currentText}</textarea>
-                <div class="cloud-save-actions">
-                    <button id="intro-text-confirm" class="auth-btn auth-btn-primary">Save</button>
-                    <button id="intro-text-cancel" class="auth-btn auth-btn-secondary">Cancel</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(dialog);
-
-        // Add styles for the textarea
-        const textarea = document.getElementById('intro-text-input');
-        textarea.style.cssText = `
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #333;
-            border-radius: 6px;
-            background: #1a1a2e;
-            color: #e0e0e0;
-            font-family: inherit;
-            font-size: 1rem;
-            resize: vertical;
-            margin-bottom: 12px;
-        `;
-
-        document.getElementById('intro-text-cancel').addEventListener('click', () => {
-            dialog.remove();
-        });
-
-        document.getElementById('intro-text-confirm').addEventListener('click', () => {
-            const newText = document.getElementById('intro-text-input').value.trim();
-            window.currentMapIntroText = newText || null;
-            dialog.remove();
-
-            // Trigger auto-save if configured
-            this.scheduleAutoSave();
-        });
-
-        // Close on click outside
-        dialog.addEventListener('click', (e) => {
-            if (e.target === dialog) {
-                dialog.remove();
-            }
-        });
-    }
-
-    showPageTitleDialog() {
-        // Remove existing dialog if present
-        const existing = document.getElementById('page-title-dialog');
+    showWorldSettingsDialog() {
+        const existing = document.getElementById('world-settings-dialog');
         if (existing) existing.remove();
 
         const currentTitle = window.currentMapPageTitle || '';
+        const currentIntro = window.currentMapIntroText || '';
 
         const dialog = document.createElement('div');
-        dialog.id = 'page-title-dialog';
+        dialog.id = 'world-settings-dialog';
         dialog.innerHTML = `
-            <div class="cloud-save-panel page-title-panel">
-                <h3>Page Title</h3>
-                <p style="color: #888; font-size: 0.9rem; margin-bottom: 12px;">
-                    This is the title shown in the browser tab when visitors view your world.
-                </p>
-                <input type="text" id="page-title-input" placeholder="My World" value="${currentTitle}" />
+            <div class="cloud-save-panel world-settings-panel">
+                <h3>World Settings</h3>
+
+                <label class="world-settings-label">Page Title</label>
+                <p class="world-settings-hint">Shown in the browser tab for visitors.</p>
+                <input type="text" id="world-settings-title" placeholder="My World" value="${currentTitle}" />
+
+                <label class="world-settings-label">Welcome Message</label>
+                <p class="world-settings-hint">Shown when visitors first arrive. Leave blank for default.</p>
+                <textarea id="world-settings-intro" rows="4" placeholder="Enter your welcome message...">${currentIntro}</textarea>
+
                 <div class="cloud-save-actions">
-                    <button id="page-title-confirm" class="auth-btn auth-btn-primary">Save</button>
-                    <button id="page-title-cancel" class="auth-btn auth-btn-secondary">Cancel</button>
+                    <button id="world-settings-save" class="auth-btn auth-btn-primary">Save</button>
+                    <button id="world-settings-cancel" class="auth-btn auth-btn-secondary">Cancel</button>
                 </div>
             </div>
         `;
         document.body.appendChild(dialog);
 
-        document.getElementById('page-title-cancel').addEventListener('click', () => {
+        document.getElementById('world-settings-cancel').addEventListener('click', () => {
             dialog.remove();
         });
 
-        document.getElementById('page-title-confirm').addEventListener('click', () => {
-            const newTitle = document.getElementById('page-title-input').value.trim();
-            window.currentMapPageTitle = newTitle || null;
+        document.getElementById('world-settings-save').addEventListener('click', () => {
+            const newTitle = document.getElementById('world-settings-title').value.trim();
+            const newIntro = document.getElementById('world-settings-intro').value.trim();
 
-            // Update the current page title
+            window.currentMapPageTitle = newTitle || null;
+            window.currentMapIntroText = newIntro || null;
+
             if (newTitle) {
                 document.title = `${newTitle} - maap.to`;
             }
@@ -1782,7 +1663,6 @@ export class MapEditor {
             this.scheduleAutoSave();
         });
 
-        // Close on click outside
         dialog.addEventListener('click', (e) => {
             if (e.target === dialog) {
                 dialog.remove();
@@ -1801,7 +1681,7 @@ export class MapEditor {
                 <h3>Paid Feature</h3>
                 <p style="color: #888; font-size: 0.9rem; margin-bottom: 12px;">
                     <strong>${featureName}</strong> is available on the paid plan.
-                    Upgrade to unlock NPCs, structures, and larger maps.
+                    Upgrade to unlock NPCs, larger maps, and an ad-free experience for your visitors.
                 </p>
                 <div class="cloud-save-actions">
                     <button id="upgrade-prompt-subscribe" class="auth-btn auth-btn-primary">Subscribe</button>

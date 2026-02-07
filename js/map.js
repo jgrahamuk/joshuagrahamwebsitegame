@@ -365,23 +365,36 @@ export function drawMap(svg) {
         }
     });
 
-    // If map editor is active, draw grid and border
+    // If map editor is active, darken water outside the map boundary
     if (window.mapEditor && window.mapEditor.isActive) {
-        // Create a group for editor overlay elements
         const editorGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         editorGroup.setAttribute('pointer-events', 'none');
         editorGroup.style.zIndex = '3';
 
-        // Draw border around actual map area
-        const border = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        border.setAttribute('x', offsetX);
-        border.setAttribute('y', offsetY);
-        border.setAttribute('width', MAP_WIDTH_TILES * tileSize);
-        border.setAttribute('height', MAP_HEIGHT_TILES * tileSize);
-        border.setAttribute('fill', 'none');
-        border.setAttribute('stroke', '#ff4444');
-        border.setAttribute('stroke-width', '2');
-        editorGroup.appendChild(border);
+        const mapLeft = offsetX;
+        const mapTop = offsetY;
+        const mapRight = offsetX + MAP_WIDTH_TILES * tileSize;
+        const mapBottom = offsetY + MAP_HEIGHT_TILES * tileSize;
+
+        // Dark overlay rectangles around the map area (top, bottom, left, right)
+        const overlayColor = 'rgba(0, 0, 0, 0.35)';
+        const regions = [
+            { x: 0, y: 0, w: svgWidth, h: mapTop },                          // top
+            { x: 0, y: mapBottom, w: svgWidth, h: svgHeight - mapBottom },     // bottom
+            { x: 0, y: mapTop, w: mapLeft, h: mapBottom - mapTop },            // left
+            { x: mapRight, y: mapTop, w: svgWidth - mapRight, h: mapBottom - mapTop } // right
+        ];
+        regions.forEach(r => {
+            if (r.w > 0 && r.h > 0) {
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', r.x);
+                rect.setAttribute('y', r.y);
+                rect.setAttribute('width', r.w);
+                rect.setAttribute('height', r.h);
+                rect.setAttribute('fill', overlayColor);
+                editorGroup.appendChild(rect);
+            }
+        });
 
         svg.appendChild(editorGroup);
     }

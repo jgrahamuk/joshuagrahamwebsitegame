@@ -42,8 +42,8 @@ class DevHandler(http.server.SimpleHTTPRequestHandler):
         """Handle CORS preflight requests."""
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, apikey, x-client-info')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, apikey, x-client-info, prefer')
         self.end_headers()
 
     def is_supabase_path(self, path):
@@ -80,6 +80,36 @@ class DevHandler(http.server.SimpleHTTPRequestHandler):
 
         if self.is_supabase_path(path):
             self.proxy_to_supabase('POST')
+            return
+
+        self.send_error(405, 'Method Not Allowed')
+
+    def do_PATCH(self):
+        """Handle PATCH requests (Supabase uses PATCH for updates)."""
+        path = urlparse(self.path).path
+
+        if self.is_supabase_path(path):
+            self.proxy_to_supabase('PATCH')
+            return
+
+        self.send_error(405, 'Method Not Allowed')
+
+    def do_PUT(self):
+        """Handle PUT requests."""
+        path = urlparse(self.path).path
+
+        if self.is_supabase_path(path):
+            self.proxy_to_supabase('PUT')
+            return
+
+        self.send_error(405, 'Method Not Allowed')
+
+    def do_DELETE(self):
+        """Handle DELETE requests."""
+        path = urlparse(self.path).path
+
+        if self.is_supabase_path(path):
+            self.proxy_to_supabase('DELETE')
             return
 
         self.send_error(405, 'Method Not Allowed')
@@ -155,9 +185,9 @@ class DevHandler(http.server.SimpleHTTPRequestHandler):
         print(f"  ↳ Proxying to: {target_url}")
 
         try:
-            # Read request body for POST
+            # Read request body for methods that carry a payload
             body = None
-            if method == 'POST':
+            if method in ('POST', 'PATCH', 'PUT'):
                 content_length = int(self.headers.get('Content-Length', 0))
                 body = self.rfile.read(content_length) if content_length > 0 else None
 
@@ -165,7 +195,7 @@ class DevHandler(http.server.SimpleHTTPRequestHandler):
             req = urllib.request.Request(target_url, data=body, method=method)
 
             # Forward relevant headers
-            for header in ['Content-Type', 'Authorization', 'apikey', 'x-client-info']:
+            for header in ['Content-Type', 'Authorization', 'apikey', 'x-client-info', 'prefer']:
                 if header in self.headers:
                     req.add_header(header, self.headers[header])
 

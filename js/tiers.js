@@ -31,7 +31,7 @@ export const POPULATION_LIMITS = {
 };
 
 // Tool IDs restricted to paid tier
-export const PAID_ONLY_TOOLS = ['npc_joshua', 'farmhouse', 'chicken_coop'];
+export const PAID_ONLY_TOOLS = ['npc_joshua'];
 
 /**
  * Determine the user's tier based on their profile data.
