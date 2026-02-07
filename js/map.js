@@ -504,6 +504,39 @@ export function drawMap(svg) {
         svg.appendChild(editorGroup);
     }
 
+    // Draw dark overlay over tiles outside effective (tier-limited) bounds
+    const effW = window.effectiveMapWidth || MAP_WIDTH_TILES;
+    const effH = window.effectiveMapHeight || MAP_HEIGHT_TILES;
+    if (effW < MAP_WIDTH_TILES || effH < MAP_HEIGHT_TILES) {
+        const restrictedGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        restrictedGroup.setAttribute('pointer-events', 'none');
+        const overlayColor = 'rgba(0, 0, 0, 0.4)';
+
+        // Right strip: columns effW..MAP_WIDTH_TILES, rows 0..effH
+        if (effW < MAP_WIDTH_TILES) {
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', offsetX + effW * tileSize);
+            rect.setAttribute('y', offsetY);
+            rect.setAttribute('width', (MAP_WIDTH_TILES - effW) * tileSize);
+            rect.setAttribute('height', effH * tileSize);
+            rect.setAttribute('fill', overlayColor);
+            restrictedGroup.appendChild(rect);
+        }
+
+        // Bottom strip: rows effH..MAP_HEIGHT_TILES, full width
+        if (effH < MAP_HEIGHT_TILES) {
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', offsetX);
+            rect.setAttribute('y', offsetY + effH * tileSize);
+            rect.setAttribute('width', MAP_WIDTH_TILES * tileSize);
+            rect.setAttribute('height', (MAP_HEIGHT_TILES - effH) * tileSize);
+            rect.setAttribute('fill', overlayColor);
+            restrictedGroup.appendChild(rect);
+        }
+
+        svg.appendChild(restrictedGroup);
+    }
+
     // Create a group for dynamic elements (player, NPCs, chickens)
     const dynamicGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     dynamicGroup.setAttribute('id', 'dynamic-elements');

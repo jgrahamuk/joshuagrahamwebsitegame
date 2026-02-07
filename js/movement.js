@@ -61,10 +61,12 @@ function reconstructPath(cameFrom, current) {
 export function getNeighbors(node, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, all = false) {
     const neighbors = [];
     const directions = [{ x: 0, y: -1 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 1, y: 0 }];
+    const effW = window.effectiveMapWidth || MAP_WIDTH_TILES;
+    const effH = window.effectiveMapHeight || MAP_HEIGHT_TILES;
     directions.forEach(dir => {
         const x = node.x + dir.x;
         const y = node.y + dir.y;
-        if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
+        if (x >= 0 && x < effW && y >= 0 && y < effH) {
             if (all || getTile(x, y).passable) {
                 neighbors.push({ x, y });
             }
@@ -75,13 +77,15 @@ export function getNeighbors(node, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, a
 
 export function findAdjacentTile(targetX, targetY, playerX, playerY, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES) {
     const editorMode = window.mapEditor && window.mapEditor.isActive;
+    const effW = window.effectiveMapWidth || MAP_WIDTH_TILES;
+    const effH = window.effectiveMapHeight || MAP_HEIGHT_TILES;
     const adjacentTiles = [];
     for (let dx = -1; dx <= 1; dx++) {
         for (let dy = -1; dy <= 1; dy++) {
             if (dx === 0 && dy === 0) continue;
             const nx = targetX + dx;
             const ny = targetY + dy;
-            if (nx >= 0 && ny >= 0 && nx < MAP_WIDTH_TILES && ny < MAP_HEIGHT_TILES) {
+            if (nx >= 0 && ny >= 0 && nx < effW && ny < effH) {
                 const adjacentTile = getTile(nx, ny);
                 if (editorMode || (adjacentTile && adjacentTile.passable)) {
                     adjacentTiles.push({ x: nx, y: ny });

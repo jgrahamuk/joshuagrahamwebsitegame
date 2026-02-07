@@ -478,7 +478,18 @@ export class MapEditor {
         const y = Math.floor((e.clientY - rect.top - offsetY) / window.TILE_SIZE);
 
         // Check if we're within map bounds
+        const effW = window.effectiveMapWidth || MAP_WIDTH_TILES;
+        const effH = window.effectiveMapHeight || MAP_HEIGHT_TILES;
+
         if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
+            // Check if within effective (tier-allowed) bounds
+            if (x >= effW || y >= effH) {
+                if (this.selectedTool) {
+                    this.showSaveIndicator('Upgrade to edit this area');
+                    setTimeout(() => this.hideSaveIndicator(), 1500);
+                }
+                return;
+            }
             // Only apply the tool if this is a new tile position
             if (x !== this.lastTileX || y !== this.lastTileY) {
                 this.applyTool(x, y);
@@ -526,6 +537,9 @@ export class MapEditor {
             this.placeResource(x, y, this.selectedTool.tileType);
         } else if (this.selectedTool.type === 'structure') {
             this.placeStructure(x, y, this.selectedTool);
+            window.drawMap();
+            this.scheduleAutoSave();
+            return;
         } else if (this.selectedTool.type === 'npc') {
             this.placeNPC(x, y, this.selectedTool);
             // Redraw the entire map to ensure NPCs are properly displayed
@@ -700,6 +714,7 @@ export class MapEditor {
         if (isStructureTile) {
             // Find and remove the entire structure
             this.removeStructureAt(x, y);
+            needsRedraw = true;
         } else if (tiles.length > 1) {
             // Remove the top layer (resource or tile)
             tiles.pop();
@@ -1402,9 +1417,6 @@ export class MapEditor {
             if (!window.portals) window.portals = [];
             window.portals.push({ x, y, w: width, h: height, url: '' });
         }
-
-        // Redraw structures
-        this.redrawStructures();
     }
 
     placeNPC(x, y, tool) {
@@ -1688,9 +1700,6 @@ export class MapEditor {
                 }
             }
         }
-
-        // Redraw structures
-        this.redrawStructures();
     }
 
     redrawStructures() {
@@ -2175,5 +2184,45 @@ export class MapEditor {
 
         this.showSaveIndicator(`Resized to ${newWidth}x${newHeight}`);
         setTimeout(() => this.hideSaveIndicator(), 2000);
+    }
+
+    expandMap(newWidth, newHeight) {
+        const oldWidth = MAP_WIDTH_TILES;
+        const oldHeight = MAP_HEIGHT_TILES;
+
+        // Only expand, never shrink
+        const targetWidth = Math.max(oldWidth, newWidth);
+        const targetHeight = Math.max(oldHeight, newHeight);
+
+        if (targetWidth === oldWidth && targetHeight === oldHeight) return;
+
+        // Create new map filled with water, copy existing tiles at (0,0) origin
+        const newMap = Array(targetHeight).fill(null).map((_, y) =>
+            Array(targetWidth).fill(null).map((_, x) => {
+                if (y < oldHeight && x < oldWidth) {
+                    return map[y][x];
+                }
+                return [tileTypes.WATER];
+            })
+        );
+
+        // Update the map — no coordinate shifting needed
+        replaceMap(newMap, targetWidth, targetHeight);
+
+        // Recalculate tile size and redraw
+        if (window.updateTileSize) window.updateTileSize();
+        window.drawMap();
+
+        // Update entity positions visually (coordinates unchanged, pixel positions may shift due to tile size)
+        if (window.player) window.player.updatePosition();
+        if (window.npcs) window.npcs.forEach(npc => npc.updatePosition());
+        if (window.chickens) window.chickens.forEach(c => c.updatePosition());
+        if (window.cockerels) window.cockerels.forEach(c => c.updatePosition());
+
+        // Update viewport for mobile
+        if (window.updateViewport) window.updateViewport();
+
+        // Auto-save the expanded map
+        this.scheduleAutoSave();
     }
 }

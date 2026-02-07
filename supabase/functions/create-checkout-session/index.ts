@@ -14,13 +14,20 @@ serve(async (req) => {
   }
 
   try {
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    console.log("STRIPE_SECRET_KEY present:", !!stripeKey);
+    console.log("STRIPE_SECRET_KEY prefix:", stripeKey ? stripeKey.substring(0, 7) + "..." : "MISSING");
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    console.log("SUPABASE_URL:", supabaseUrl || "MISSING");
+    console.log("SUPABASE_SERVICE_ROLE_KEY present:", !!supabaseServiceKey);
+
+    const stripe = new Stripe(stripeKey || "", {
       apiVersion: "2023-10-16",
     });
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createClient(supabaseUrl || "", supabaseServiceKey || "");
 
     const { priceId, userId, username, successUrl, cancelUrl } = await req.json();
 

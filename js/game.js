@@ -11,11 +11,11 @@ import { isConfigured, getSupabase } from './supabase.js';
 import { initAuth, onAuthChange, showAuthScreen, getCurrentUser, updateHeaderForTier } from './auth.js';
 import { showMapBrowser, onMapSelected } from './mapBrowser.js';
 import { loadMapFromSupabase, convertMapDataToGameFormat } from './mapLoader.js';
-import { handleRoute, parseRoute, fetchCurrentUserProfile } from './router.js';
+import { handleRoute, parseRoute, fetchCurrentUserProfile, getProfileByUsername } from './router.js';
 import { config } from './config.js';
 import { generateStarterIsland } from './mapGenerator.js';
 import { fetchMyMaps, saveMapToSupabase } from './mapBrowser.js';
-import { getUserTier, getMaxMapSize, TIERS } from './tiers.js';
+import { getUserTier, getMaxMapSize, getEffectiveBounds, TIERS } from './tiers.js';
 
 // Add at the start of the file, before any other code
 function updateOrientation() {
@@ -495,8 +495,9 @@ function updateTileSize() {
             window.TILE_SIZE = w / MOBILE_VISIBLE_TILES;
         }
     } else {
-        // Desktop: fit map width on screen, zoomed in 25%
-        window.TILE_SIZE = (w / MAP_WIDTH_TILES) * 1.25;
+        // Desktop: fixed zoom level based on 50-tile reference width, zoomed in 25%
+        const REFERENCE_WIDTH = 50;
+        window.TILE_SIZE = (w / REFERENCE_WIDTH) * 1.25;
     }
 
     // Set initial offsets to center the map (updateViewport will adjust when player exists)
@@ -611,6 +612,67 @@ async function startGame(supabaseMapId) {
     startGameWithMapData(mapData);
 }
 
+// Verify subscription with Stripe and activate in DB if needed.
+// Called after returning from Stripe checkout to handle the case
+// where the webhook hasn't fired yet.
+async function verifyAndActivateSubscription(userId) {
+    try {
+        const sb = getSupabase();
+        const { data: { session } } = await sb.auth.getSession();
+        const accessToken = session?.access_token;
+
+        const response = await fetch('/api/verify-subscription', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'apikey': config.SUPABASE_ANON_KEY,
+                ...(accessToken && { 'Authorization': `Bearer ${accessToken}` })
+            },
+            body: JSON.stringify({ userId })
+        });
+
+        if (!response.ok) {
+            console.error('verify-subscription error:', response.status);
+            return null;
+        }
+
+        const result = await response.json();
+        if (result.active) {
+            // Re-fetch the profile to get the updated data
+            const freshProfile = await getProfileByUsername(
+                window.currentMapProfile?.username
+            );
+            return freshProfile;
+        }
+        return null;
+    } catch (err) {
+        console.error('Error verifying subscription:', err);
+        return null;
+    }
+}
+
+// Apply tier-based map size: auto-expand for PAID owners, set effective bounds
+function applyTierMapSize(isOwner) {
+    if (isOwner) {
+        const tierLimits = getEffectiveBounds();
+
+        // If PAID tier and map is smaller than limits, auto-expand
+        if (MAP_WIDTH_TILES < tierLimits.width || MAP_HEIGHT_TILES < tierLimits.height) {
+            if (window.mapEditor) {
+                window.mapEditor.expandMap(tierLimits.width, tierLimits.height);
+            }
+        }
+
+        // Set effective bounds: clamp map dimensions to tier limits
+        window.effectiveMapWidth = Math.min(MAP_WIDTH_TILES, tierLimits.width);
+        window.effectiveMapHeight = Math.min(MAP_HEIGHT_TILES, tierLimits.height);
+    } else {
+        // Non-owners/guests: full map is accessible
+        window.effectiveMapWidth = MAP_WIDTH_TILES;
+        window.effectiveMapHeight = MAP_HEIGHT_TILES;
+    }
+}
+
 // Start the game with pre-converted map data
 // options: { skipIntro: false, introText: null, pageTitle: null, isOwner: false, isUserWorld: false }
 function startGameWithMapData(mapData, options = {}) {
@@ -698,6 +760,9 @@ function startGameWithMapData(mapData, options = {}) {
 
     // Initialize map editor (hidden by default)
     window.mapEditor = new MapEditor(svg, gameContainer);
+
+    // Apply tier-based map sizing and set effective bounds
+    applyTierMapSize(options.isOwner || false);
 
     // Add "Get Your Own World" button for guests viewing user worlds
     if (options.isUserWorld && !options.isOwner) {
@@ -820,7 +885,10 @@ function startGameWithMapData(mapData, options = {}) {
         const x = Math.floor((clientX - rect.left - (window.MAP_OFFSET_X || 0)) / window.TILE_SIZE);
         const y = Math.floor((clientY - rect.top - (window.MAP_OFFSET_Y || 0)) / window.TILE_SIZE);
 
-        if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
+        const effW = window.effectiveMapWidth || MAP_WIDTH_TILES;
+        const effH = window.effectiveMapHeight || MAP_HEIGHT_TILES;
+
+        if (x >= 0 && x < effW && y >= 0 && y < effH) {
             // Check if clicking on a portal
             if (window.portals) {
                 const clickedPortal = window.portals.find(p =>
@@ -994,6 +1062,38 @@ preloadSprites().then(async () => {
                     } else {
                         // Trial expired - show subscribe banner
                         showUnpaidOwnerBanner();
+                    }
+                }
+
+                // Handle return from Stripe checkout — verify subscription directly with Stripe
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('subscribed') || urlParams.has('welcome')) {
+                    // Clean the URL immediately
+                    const cleanUrl = window.location.pathname;
+                    window.history.replaceState({}, '', cleanUrl);
+
+                    if (!routeResult.subscriptionActive) {
+                        // Check Stripe directly and activate if payment went through
+                        const currentUser = getCurrentUser();
+                        if (currentUser) {
+                            console.log('Returned from Stripe checkout, verifying subscription...');
+                            verifyAndActivateSubscription(currentUser.id).then(updatedProfile => {
+                                if (updatedProfile) {
+                                    console.log('Subscription verified and activated!');
+                                    window.currentMapProfile = updatedProfile;
+                                    updateHeaderForTier();
+                                    applyTierMapSize(true);
+
+                                    // Remove any unpaid/trial banners
+                                    const unpaidBanner = document.getElementById('unpaid-owner-banner');
+                                    if (unpaidBanner) unpaidBanner.remove();
+                                    const trialBanner = document.getElementById('trial-banner');
+                                    if (trialBanner) trialBanner.remove();
+                                } else {
+                                    console.warn('Could not verify subscription — user may need to refresh');
+                                }
+                            });
+                        }
                     }
                 }
             }

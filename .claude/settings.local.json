@@ -4,7 +4,8 @@
       "Bash(node --check:*)",
       "WebFetch(domain:maap.to)",
       "mcp__ide__getDiagnostics",
-      "Bash(identify:*)"
+      "Bash(identify:*)",
+      "Bash(python3:*)"
     ]
   }
 }

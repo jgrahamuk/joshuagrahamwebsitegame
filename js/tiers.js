@@ -73,3 +73,12 @@ export function canUseMapSize(width, height, tier) {
 export function getMaxMapSize(tier) {
     return MAP_SIZE_LIMITS[tier || TIERS.FREE];
 }
+
+/**
+ * Get the effective playable bounds based on the current user's tier.
+ * Returns { width, height } clamped to the tier's max dimensions.
+ */
+export function getEffectiveBounds() {
+    const limits = MAP_SIZE_LIMITS[getUserTier()];
+    return { width: limits.maxWidth, height: limits.maxHeight };
+}
