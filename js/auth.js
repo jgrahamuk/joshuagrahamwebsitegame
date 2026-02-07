@@ -483,9 +483,17 @@ async function handleUpgradeToPaid(dialog) {
             throw new Error('Unable to get user info');
         }
 
+        const sb = getSupabase();
+        const { data: { session } } = await sb.auth.getSession();
+        const accessToken = session?.access_token;
+
         const response = await fetch('/api/create-checkout-session', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'apikey': config.SUPABASE_ANON_KEY,
+                ...(accessToken && { 'Authorization': `Bearer ${accessToken}` })
+            },
             body: JSON.stringify({
                 priceId: config.STRIPE_PRICE_EARLY_BIRD,
                 userId: user.id,

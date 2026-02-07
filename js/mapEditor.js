@@ -4,10 +4,11 @@ import { NPC } from './npcs.js';
 import { Chicken, Cockerel } from './chickens.js';
 import { saveMapToSupabase } from './mapBrowser.js';
 import { getCurrentUser } from './auth.js';
-import { isConfigured } from './supabase.js';
+import { isConfigured, getSupabase } from './supabase.js';
 import { collectablesSystem } from './collectables.js';
 import { imageTilesSystem } from './imageTiles.js';
 import { getUserTier, isPaidTool, canUseMapSize, getMaxMapSize, MAP_SIZE_PRESETS, TIERS } from './tiers.js';
+import { config } from './config.js';
 
 export class MapEditor {
     constructor(svg, gameContainer) {
@@ -54,7 +55,8 @@ export class MapEditor {
             { id: 'nature', label: 'Nature', toolIds: ['large_tree', 'bush', 'pine_tree', 'rock', 'flower'] },
             { id: 'collectables', label: 'Collectables', toolIds: ['egg', 'badge'] },
             { id: 'buildings', label: 'Buildings', toolIds: ['farmhouse', 'chicken_coop'] },
-            { id: 'creatures', label: 'Creatures', toolIds: ['npc_joshua', 'chicken', 'cockerel'] },
+            { id: 'creatures', label: 'Creatures', toolIds: ['chicken', 'cockerel'] },
+            { id: 'npcs', label: 'NPCs', toolIds: ['npc_joshua'], standalone: true },
             { id: 'image', label: 'Image', toolIds: ['image'], standalone: true },
         ];
 
@@ -166,7 +168,9 @@ export class MapEditor {
     collapseAllFlyouts() {
         this.expandedGroup = null;
         if (!this.toolbarContainer) return;
-        this.toolbarContainer.querySelectorAll('.tool-group-flyout').forEach(f => f.classList.remove('open'));
+        this.toolbarContainer.querySelectorAll('.tool-group-flyout').forEach(f => {
+            f.style.display = 'none';
+        });
     }
 
     createToolbar() {
@@ -210,9 +214,9 @@ export class MapEditor {
                     } else {
                         this.collapseAllFlyouts();
                         this.expandedGroup = group.id;
-                        flyout.classList.add('open');
+                        flyout.style.display = 'flex';
                     }
-                    // Auto-select the primary tool
+                    // Auto-select the primary tool (force — don't toggle off)
                     const currentPrimaryId = this.groupPrimaries[group.id];
                     const currentPrimary = this.tools.find(t => t.id === currentPrimaryId);
                     const locked = isPaidTool(currentPrimary.id) && userTier !== TIERS.PAID;
@@ -220,13 +224,14 @@ export class MapEditor {
                         this.showUpgradePrompt(currentPrimary.name);
                         return;
                     }
-                    this.selectTool(currentPrimary);
+                    this.selectTool(currentPrimary, true);
                 });
                 wrapper.appendChild(primaryBtn);
 
-                // Flyout container
+                // Flyout container (hidden by default via inline style)
                 const flyout = document.createElement('div');
                 flyout.className = 'tool-group-flyout';
+                flyout.style.display = 'none';
 
                 toolsInGroup.forEach(tool => {
                     const { toolButton: flyBtn, locked } = this.createToolButton(tool, userTier);
@@ -240,7 +245,7 @@ export class MapEditor {
                         this.groupPrimaries[group.id] = tool.id;
                         this.setButtonContent(primaryBtn, tool, userTier);
                         primaryBtn.classList.add('tool-group-primary');
-                        this.selectTool(tool);
+                        this.selectTool(tool, true);
                         this.collapseAllFlyouts();
                     });
                     flyout.appendChild(flyBtn);
@@ -297,9 +302,9 @@ export class MapEditor {
         this.gameContainer.appendChild(this.toolbarContainer);
     }
 
-    selectTool(tool) {
-        // If clicking on already selected tool, deselect it
-        if (this.selectedTool && this.selectedTool.id === tool.id) {
+    selectTool(tool, forceSelect = false) {
+        // If clicking on already selected tool, deselect it (unless forced)
+        if (!forceSelect && this.selectedTool && this.selectedTool.id === tool.id) {
             this.selectedTool = null;
             this.toolbarContainer.querySelectorAll('button.selected').forEach(btn => {
                 btn.classList.remove('selected');
@@ -1817,14 +1822,57 @@ export class MapEditor {
             dialog.remove();
         });
 
-        document.getElementById('upgrade-prompt-subscribe').addEventListener('click', () => {
-            dialog.remove();
-            // Trigger the subscribe flow if available
-            const subscribeBtn = document.getElementById('subscribe-now-btn') || document.getElementById('add-payment-btn');
-            if (subscribeBtn) {
-                subscribeBtn.click();
-            } else {
-                window.location.href = '/?signup=1';
+        document.getElementById('upgrade-prompt-subscribe').addEventListener('click', async () => {
+            const btn = document.getElementById('upgrade-prompt-subscribe');
+            btn.disabled = true;
+            btn.textContent = 'Redirecting...';
+
+            try {
+                const user = getCurrentUser();
+                const username = user?.user_metadata?.username || window.currentMapProfile?.username;
+
+                if (!user || !username) {
+                    throw new Error('Unable to get user info');
+                }
+
+                // Get auth token for Supabase edge function
+                const sb = getSupabase();
+                const { data: { session } } = await sb.auth.getSession();
+                const accessToken = session?.access_token;
+
+                const response = await fetch('/api/create-checkout-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': config.SUPABASE_ANON_KEY,
+                        ...(accessToken && { 'Authorization': `Bearer ${accessToken}` })
+                    },
+                    body: JSON.stringify({
+                        priceId: config.STRIPE_PRICE_EARLY_BIRD,
+                        userId: user.id,
+                        username: username,
+                        successUrl: `${window.location.origin}/${username}?welcome=1`,
+                        cancelUrl: `${window.location.origin}/${username}?canceled=1`
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+                if (!data.sessionId) throw new Error('No sessionId returned');
+
+                const stripe = Stripe(config.STRIPE_PUBLISHABLE_KEY);
+                const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
+                if (error) throw error;
+
+            } catch (err) {
+                console.error('Checkout error:', err);
+                btn.disabled = false;
+                btn.textContent = 'Subscribe';
+                alert('Failed to start checkout: ' + err.message);
             }
         });
 

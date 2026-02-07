@@ -1,5 +1,6 @@
 // Pathfinding and movement helpers
 export function findPath(start, end, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES) {
+    const editorMode = window.mapEditor && window.mapEditor.isActive;
     const closedSet = new Set();
     const openSet = [start];
     const cameFrom = new Map();
@@ -20,7 +21,7 @@ export function findPath(start, end, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES)
         openSet.splice(openSet.indexOf(current), 1);
         closedSet.add(`${current.x},${current.y}`);
 
-        getNeighbors(current, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES).forEach(neighbor => {
+        getNeighbors(current, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, editorMode).forEach(neighbor => {
             const neighborId = `${neighbor.x},${neighbor.y}`;
             if (closedSet.has(neighborId)) {
                 return;
@@ -73,6 +74,7 @@ export function getNeighbors(node, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, a
 }
 
 export function findAdjacentTile(targetX, targetY, playerX, playerY, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES) {
+    const editorMode = window.mapEditor && window.mapEditor.isActive;
     const adjacentTiles = [];
     for (let dx = -1; dx <= 1; dx++) {
         for (let dy = -1; dy <= 1; dy++) {
@@ -81,7 +83,7 @@ export function findAdjacentTile(targetX, targetY, playerX, playerY, getTile, MA
             const ny = targetY + dy;
             if (nx >= 0 && ny >= 0 && nx < MAP_WIDTH_TILES && ny < MAP_HEIGHT_TILES) {
                 const adjacentTile = getTile(nx, ny);
-                if (adjacentTile && adjacentTile.passable) {
+                if (editorMode || (adjacentTile && adjacentTile.passable)) {
                     adjacentTiles.push({ x: nx, y: ny });
                 }
             }
@@ -111,9 +113,10 @@ export function moveToTarget(targetX, targetY, player, getTile, MAP_WIDTH_TILES,
     let end = { x: targetX, y: targetY };
     let path = null;
 
-    // Check if target is passable
+    // Check if target is passable (in editor mode, all tiles are walkable)
+    const editorMode = window.mapEditor && window.mapEditor.isActive;
     const targetTile = getTile(targetX, targetY);
-    if (targetTile && targetTile.passable) {
+    if (editorMode || (targetTile && targetTile.passable)) {
         // Direct path to target
         path = findPath(start, end, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
     } else {

@@ -7,7 +7,7 @@ import { preloadSprites, getSpriteUrl } from './spriteCache.js';
 import { drawStructures } from './structures.js';
 import { MapEditor } from './mapEditor.js';
 import { badgeSystem } from './badgeSystem.js';
-import { isConfigured } from './supabase.js';
+import { isConfigured, getSupabase } from './supabase.js';
 import { initAuth, onAuthChange, showAuthScreen, getCurrentUser, updateHeaderForTier } from './auth.js';
 import { showMapBrowser, onMapSelected } from './mapBrowser.js';
 import { loadMapFromSupabase, convertMapDataToGameFormat } from './mapLoader.js';
@@ -284,9 +284,17 @@ function showUnpaidOwnerBanner() {
                 throw new Error('Unable to get user info');
             }
 
+            const sb = getSupabase();
+            const { data: { session } } = await sb.auth.getSession();
+            const accessToken = session?.access_token;
+
             const response = await fetch('/api/create-checkout-session', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': config.SUPABASE_ANON_KEY,
+                    ...(accessToken && { 'Authorization': `Bearer ${accessToken}` })
+                },
                 body: JSON.stringify({
                     priceId: config.STRIPE_PRICE_EARLY_BIRD,
                     userId: user.id,
@@ -407,9 +415,17 @@ function showTrialBanner(daysRemaining) {
                 throw new Error('Unable to get user info');
             }
 
+            const sb = getSupabase();
+            const { data: { session } } = await sb.auth.getSession();
+            const accessToken = session?.access_token;
+
             const response = await fetch('/api/create-checkout-session', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': config.SUPABASE_ANON_KEY,
+                    ...(accessToken && { 'Authorization': `Bearer ${accessToken}` })
+                },
                 body: JSON.stringify({
                     priceId: config.STRIPE_PRICE_EARLY_BIRD,
                     userId: user.id,
@@ -849,8 +865,9 @@ function startGameWithMapData(mapData, options = {}) {
                 return;
             }
 
-            // Otherwise, move to empty tile
-            if (tile && tile.passable) {
+            // Otherwise, move to empty tile (in editor mode, allow moving to any tile)
+            const editorMode = window.mapEditor && window.mapEditor.isActive;
+            if (tile && (tile.passable || editorMode)) {
                 moveToTarget(x, y, window.player, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, 'move');
             }
         }
