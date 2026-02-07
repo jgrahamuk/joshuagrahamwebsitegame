@@ -14,11 +14,9 @@ export function setCurrentMapId(id) {
     currentMapId = id;
 }
 
-export async function loadMapData(isLandscape) {
-    const mapFile = isLandscape ? 'maps/map.json' : 'maps/map-portrait.json';
-
+export async function loadMapData() {
     try {
-        const response = await fetch(mapFile);
+        const response = await fetch('maps/map.json');
         if (!response.ok) {
             throw new Error(`Failed to load map: ${response.statusText}`);
         }

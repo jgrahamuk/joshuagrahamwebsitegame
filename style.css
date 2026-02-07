@@ -96,6 +96,29 @@ body {
   pointer-events: none;
 }
 
+/* Tool group with flyout */
+.tool-group {
+  position: relative;
+}
+
+.tool-group-flyout {
+  display: none;
+  position: absolute;
+  left: calc(100% + 6px);
+  top: 0;
+  flex-direction: row;
+  gap: 5px;
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 10px;
+  padding: 0.4rem;
+  z-index: 1001;
+  white-space: nowrap;
+}
+
+.tool-group-flyout.open {
+  display: flex;
+}
+
 #map-editor-toolbar .export-button {
   margin-top: 10px;
 }
@@ -252,6 +275,15 @@ body {
     top: 0;
     left: 0;
     right: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    transform: none;
+  }
+
+  .tool-group-flyout {
+    left: 0;
+    top: calc(100% + 6px);
+    flex-direction: row;
   }
 }
 
@@ -303,6 +335,15 @@ body.portrait #map-editor-toolbar {
   top: 0;
   left: 0;
   right: 0;
+  flex-direction: row;
+  flex-wrap: wrap;
+  transform: none;
+}
+
+body.portrait .tool-group-flyout {
+  left: 0;
+  top: calc(100% + 6px);
+  flex-direction: row;
 }
 
 body.portrait .chatbox-text {

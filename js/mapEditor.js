@@ -2,7 +2,6 @@ import { tileTypes, placeResourceAtPosition, removeResource, map, MAP_WIDTH_TILE
 import { getSpriteUrl } from './spriteCache.js';
 import { NPC } from './npcs.js';
 import { Chicken, Cockerel } from './chickens.js';
-import { initializeMap } from './map.js';
 import { saveMapToSupabase } from './mapBrowser.js';
 import { getCurrentUser } from './auth.js';
 import { isConfigured } from './supabase.js';
@@ -18,8 +17,6 @@ export class MapEditor {
         this.selectedTool = null;
         this.toolbar = null;
         this.toolbarContainer = null;
-        this.isEditingPortrait = false;
-        this.originalMapData = null;
         this.isDragging = false;
         this.lastTileX = null;
         this.lastTileY = null;
@@ -50,6 +47,26 @@ export class MapEditor {
             { id: 'image', name: 'Image', icon: '🖼️', type: 'image', tileType: tileTypes.IMAGE }
         ];
 
+        // Tool groups for the toolbar flyout UI
+        this.toolGroups = [
+            { id: 'delete', label: 'Delete', toolIds: ['delete'], standalone: true },
+            { id: 'terrain', label: 'Terrain', toolIds: ['grass', 'dirt', 'water'] },
+            { id: 'nature', label: 'Nature', toolIds: ['large_tree', 'bush', 'pine_tree', 'rock', 'flower'] },
+            { id: 'collectables', label: 'Collectables', toolIds: ['egg', 'badge'] },
+            { id: 'buildings', label: 'Buildings', toolIds: ['farmhouse', 'chicken_coop'] },
+            { id: 'creatures', label: 'Creatures', toolIds: ['npc_joshua', 'chicken', 'cockerel'] },
+            { id: 'image', label: 'Image', toolIds: ['image'], standalone: true },
+        ];
+
+        // Track which tool is the "primary" (visible) for each group
+        this.groupPrimaries = {};
+        this.toolGroups.forEach(g => {
+            this.groupPrimaries[g.id] = g.toolIds[0];
+        });
+
+        // Currently expanded flyout group id
+        this.expandedGroup = null;
+
     }
 
     toggleEditor() {
@@ -75,23 +92,16 @@ export class MapEditor {
     hideToolbar() {
         this.isActive = false;
         this.selectedTool = null;
+        this.expandedGroup = null;
+        if (this._documentClickHandler) {
+            document.removeEventListener('click', this._documentClickHandler);
+            this._documentClickHandler = null;
+        }
         if (this.toolbarContainer) {
             this.gameContainer.removeChild(this.toolbarContainer);
             this.toolbarContainer = null;
         }
         this.removeMapClickHandler();
-
-        // If we were editing the portrait map, switch back to landscape if appropriate
-        if (this.isEditingPortrait) {
-            const aspectRatio = window.innerWidth / window.innerHeight;
-            if (aspectRatio > 1) {  // If we're in landscape orientation
-                this.restoreOriginalMap();
-            }
-        }
-
-        // Clear saved state
-        this.originalMapData = null;
-        this.isEditingPortrait = false;
 
         // Show inventory UI when done editing
         const uiContainer = document.getElementById('ui-container');
@@ -100,57 +110,145 @@ export class MapEditor {
         }
     }
 
+    createToolButton(tool, userTier) {
+        const toolButton = document.createElement('button');
+        toolButton.setAttribute('data-tool-id', tool.id);
+        const locked = isPaidTool(tool.id) && userTier !== TIERS.PAID;
+
+        if (tool.icon.endsWith('.gif')) {
+            const img = document.createElement('img');
+            img.src = getSpriteUrl(tool.icon);
+            toolButton.appendChild(img);
+        } else {
+            toolButton.innerHTML = tool.icon;
+        }
+
+        if (locked) {
+            toolButton.classList.add('tool-locked');
+            const lockBadge = document.createElement('span');
+            lockBadge.className = 'tool-lock-badge';
+            lockBadge.textContent = '\u{1F512}';
+            toolButton.appendChild(lockBadge);
+            toolButton.title = `${tool.name} (Paid)`;
+        } else {
+            toolButton.title = tool.name;
+        }
+
+        return { toolButton, locked };
+    }
+
+    setButtonContent(button, tool, userTier) {
+        const locked = isPaidTool(tool.id) && userTier !== TIERS.PAID;
+        button.innerHTML = '';
+        button.setAttribute('data-tool-id', tool.id);
+
+        if (tool.icon.endsWith('.gif')) {
+            const img = document.createElement('img');
+            img.src = getSpriteUrl(tool.icon);
+            button.appendChild(img);
+        } else {
+            button.innerHTML = tool.icon;
+        }
+
+        if (locked) {
+            button.classList.add('tool-locked');
+            const lockBadge = document.createElement('span');
+            lockBadge.className = 'tool-lock-badge';
+            lockBadge.textContent = '\u{1F512}';
+            button.appendChild(lockBadge);
+            button.title = `${tool.name} (Paid)`;
+        } else {
+            button.classList.remove('tool-locked');
+            button.title = tool.name;
+        }
+    }
+
+    collapseAllFlyouts() {
+        this.expandedGroup = null;
+        if (!this.toolbarContainer) return;
+        this.toolbarContainer.querySelectorAll('.tool-group-flyout').forEach(f => f.classList.remove('open'));
+    }
+
     createToolbar() {
         this.toolbarContainer = document.createElement('div');
         this.toolbarContainer.id = 'map-editor-toolbar';
 
-        // Add map mode toggle button first (only for demo mode, not user maps)
-        if (!window.currentMapId) {
-            const modeToggleButton = document.createElement('button');
-            modeToggleButton.innerHTML = '📱';
-            modeToggleButton.title = 'Toggle Portrait/Landscape Map';
-            modeToggleButton.className = 'mode-toggle-button' + (this.isEditingPortrait ? ' selected' : '');
-            modeToggleButton.addEventListener('click', () => {
-                this.toggleMapMode();
-            });
-            this.toolbarContainer.appendChild(modeToggleButton);
-        }
-
-        // Determine user tier for tool restrictions
         const userTier = getUserTier();
 
-        // Add existing tools
-        this.tools.forEach(tool => {
-            const toolButton = document.createElement('button');
-            const locked = isPaidTool(tool.id) && userTier !== TIERS.PAID;
+        this.toolGroups.forEach(group => {
+            const toolsInGroup = group.toolIds.map(id => this.tools.find(t => t.id === id));
+            const primaryToolId = this.groupPrimaries[group.id];
+            const primaryTool = this.tools.find(t => t.id === primaryToolId);
 
-            if (tool.icon.endsWith('.gif')) {
-                const img = document.createElement('img');
-                img.src = getSpriteUrl(tool.icon);
-                toolButton.appendChild(img);
+            if (group.standalone) {
+                // Standalone: single button, no flyout
+                const { toolButton, locked } = this.createToolButton(primaryTool, userTier);
+                toolButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.collapseAllFlyouts();
+                    if (locked) {
+                        this.showUpgradePrompt(primaryTool.name);
+                        return;
+                    }
+                    this.selectTool(primaryTool);
+                });
+                this.toolbarContainer.appendChild(toolButton);
             } else {
-                toolButton.innerHTML = tool.icon;
-            }
+                // Multi-tool group with flyout
+                const wrapper = document.createElement('div');
+                wrapper.className = 'tool-group';
+                wrapper.setAttribute('data-group-id', group.id);
 
-            if (locked) {
-                toolButton.classList.add('tool-locked');
-                const lockBadge = document.createElement('span');
-                lockBadge.className = 'tool-lock-badge';
-                lockBadge.textContent = '\u{1F512}';
-                toolButton.appendChild(lockBadge);
-                toolButton.title = `${tool.name} (Paid)`;
-            } else {
-                toolButton.title = tool.name;
-            }
+                // Primary button (always visible)
+                const { toolButton: primaryBtn } = this.createToolButton(primaryTool, userTier);
+                primaryBtn.classList.add('tool-group-primary');
+                primaryBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (this.expandedGroup === group.id) {
+                        // Already open - collapse
+                        this.collapseAllFlyouts();
+                    } else {
+                        this.collapseAllFlyouts();
+                        this.expandedGroup = group.id;
+                        flyout.classList.add('open');
+                    }
+                    // Auto-select the primary tool
+                    const currentPrimaryId = this.groupPrimaries[group.id];
+                    const currentPrimary = this.tools.find(t => t.id === currentPrimaryId);
+                    const locked = isPaidTool(currentPrimary.id) && userTier !== TIERS.PAID;
+                    if (locked) {
+                        this.showUpgradePrompt(currentPrimary.name);
+                        return;
+                    }
+                    this.selectTool(currentPrimary);
+                });
+                wrapper.appendChild(primaryBtn);
 
-            toolButton.addEventListener('click', () => {
-                if (locked) {
-                    this.showUpgradePrompt(tool.name);
-                    return;
-                }
-                this.selectTool(tool);
-            });
-            this.toolbarContainer.appendChild(toolButton);
+                // Flyout container
+                const flyout = document.createElement('div');
+                flyout.className = 'tool-group-flyout';
+
+                toolsInGroup.forEach(tool => {
+                    const { toolButton: flyBtn, locked } = this.createToolButton(tool, userTier);
+                    flyBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (locked) {
+                            this.showUpgradePrompt(tool.name);
+                            return;
+                        }
+                        // Update group primary
+                        this.groupPrimaries[group.id] = tool.id;
+                        this.setButtonContent(primaryBtn, tool, userTier);
+                        primaryBtn.classList.add('tool-group-primary');
+                        this.selectTool(tool);
+                        this.collapseAllFlyouts();
+                    });
+                    flyout.appendChild(flyBtn);
+                });
+
+                wrapper.appendChild(flyout);
+                this.toolbarContainer.appendChild(wrapper);
+            }
         });
 
         // Add intro text button
@@ -159,6 +257,7 @@ export class MapEditor {
         introButton.title = 'Edit Welcome Message';
         introButton.className = 'export-button intro-button';
         introButton.addEventListener('click', () => {
+            this.collapseAllFlyouts();
             this.showIntroTextDialog();
         });
         this.toolbarContainer.appendChild(introButton);
@@ -169,6 +268,7 @@ export class MapEditor {
         titleButton.title = 'Edit Page Title';
         titleButton.className = 'export-button title-button';
         titleButton.addEventListener('click', () => {
+            this.collapseAllFlyouts();
             this.showPageTitleDialog();
         });
         this.toolbarContainer.appendChild(titleButton);
@@ -180,10 +280,19 @@ export class MapEditor {
             resizeButton.title = 'Map Size';
             resizeButton.className = 'export-button resize-button';
             resizeButton.addEventListener('click', () => {
+                this.collapseAllFlyouts();
                 this.showMapSizeDialog();
             });
             this.toolbarContainer.appendChild(resizeButton);
         }
+
+        // Close flyouts when clicking outside
+        this._documentClickHandler = (e) => {
+            if (this.expandedGroup && !e.target.closest('.tool-group')) {
+                this.collapseAllFlyouts();
+            }
+        };
+        document.addEventListener('click', this._documentClickHandler);
 
         this.gameContainer.appendChild(this.toolbarContainer);
     }
@@ -192,34 +301,31 @@ export class MapEditor {
         // If clicking on already selected tool, deselect it
         if (this.selectedTool && this.selectedTool.id === tool.id) {
             this.selectedTool = null;
-            const buttons = this.toolbarContainer.querySelectorAll('button');
-            buttons.forEach(btn => {
-                if (!btn.classList.contains('mode-toggle-button') &&
-                    !btn.classList.contains('export-button')) {
-                    btn.classList.remove('selected');
-                }
+            this.toolbarContainer.querySelectorAll('button.selected').forEach(btn => {
+                btn.classList.remove('selected');
             });
             return;
         }
 
         // Reset all button styles
-        const buttons = this.toolbarContainer.querySelectorAll('button');
-        buttons.forEach(btn => {
-            if (!btn.classList.contains('mode-toggle-button') &&
-                !btn.classList.contains('export-button')) {
-                btn.classList.remove('selected');
-            }
+        this.toolbarContainer.querySelectorAll('button.selected').forEach(btn => {
+            btn.classList.remove('selected');
         });
 
-        // Find the button for this tool and highlight it
-        const toolIndex = this.tools.findIndex(t => t.id === tool.id);
-        if (toolIndex >= 0) {
-            // Add 1 to account for the mode toggle button at the start
-            const buttonIndex = toolIndex + 1;
-            const button = buttons[buttonIndex];
-            if (button) {
-                button.classList.add('selected');
+        // Highlight the matching tool button(s) — both flyout button and primary button
+        // Find the group this tool belongs to
+        const group = this.toolGroups.find(g => g.toolIds.includes(tool.id));
+        if (group && !group.standalone) {
+            // Highlight the primary button for the group
+            const wrapper = this.toolbarContainer.querySelector(`.tool-group[data-group-id="${group.id}"]`);
+            if (wrapper) {
+                const primaryBtn = wrapper.querySelector('.tool-group-primary');
+                if (primaryBtn) primaryBtn.classList.add('selected');
             }
+        } else {
+            // Standalone tool — highlight the button directly
+            const btn = this.toolbarContainer.querySelector(`button[data-tool-id="${tool.id}"]`);
+            if (btn) btn.classList.add('selected');
         }
 
         this.selectedTool = tool;
@@ -1399,21 +1505,6 @@ export class MapEditor {
         }
     }
 
-    async toggleMapMode() {
-        const modeButton = this.toolbarContainer.querySelector('.mode-toggle-button');
-        this.isEditingPortrait = !this.isEditingPortrait;
-        modeButton.classList.toggle('selected', this.isEditingPortrait);
-
-        try {
-            await initializeMap(this.isEditingPortrait);
-            window.drawMap(this.svg);
-
-        } catch (error) {
-            console.error('Error loading map:', error);
-            alert('Failed to load map. Check console for details.');
-        }
-    }
-
     convertMapDataToGameFormat(mapData) {
         // Initialize empty map array
         const gameMap = Array(mapData.height).fill().map(() =>
@@ -1459,55 +1550,6 @@ export class MapEditor {
             chickens: mapData.chickens || [],
             cockerels: mapData.cockerels || []
         };
-    }
-
-    async saveCurrentMapState() {
-        return {
-            map: JSON.parse(JSON.stringify(window.map)),
-            width: window.MAP_WIDTH_TILES,
-            height: window.MAP_HEIGHT_TILES,
-            farmhouse: window.farmhouse ? { ...window.farmhouse } : null,
-            chickenCoop: window.chickenCoop ? { ...window.chickenCoop } : null,
-            signObj: window.signObj ? { ...window.signObj } : null,
-            npcs: window.npcs ? window.npcs.map(npc => ({
-                name: npc.name,
-                message: npc.message,
-                x: npc.x,
-                y: npc.y
-            })) : [],
-            chickens: window.chickens ? window.chickens.map(chicken => ({
-                x: chicken.x,
-                y: chicken.y
-            })) : [],
-            cockerels: window.cockerels ? window.cockerels.map(cockerel => ({
-                x: cockerel.x,
-                y: cockerel.y
-            })) : []
-        };
-    }
-
-    async restoreOriginalMap() {
-        if (this.originalMapData) {
-            // Restore map dimensions
-            window.MAP_WIDTH_TILES = this.originalMapData.width;
-            window.MAP_HEIGHT_TILES = this.originalMapData.height;
-
-            // Restore map data
-            window.map = this.originalMapData.map;
-
-            // Restore structures
-            window.farmhouse = this.originalMapData.farmhouse;
-            window.chickenCoop = this.originalMapData.chickenCoop;
-            window.signObj = this.originalMapData.signObj;
-
-            // Restore NPCs and chickens
-            window.npcs = this.originalMapData.npcs.map(npc => new NPC(this.svg, npc.name, npc.message, npc.x, npc.y));
-            window.chickens = this.originalMapData.chickens.map(chicken => new Chicken(this.svg, chicken.x, chicken.y));
-            window.cockerels = this.originalMapData.cockerels.map(cockerel => new Cockerel(this.svg, cockerel.x, cockerel.y));
-
-            // Redraw the map
-            window.drawMap();
-        }
     }
 
     convertMapToJSON() {

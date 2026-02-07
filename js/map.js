@@ -41,13 +41,9 @@ export function replaceMap(newMap, newWidth, newHeight) {
     newMap.forEach(row => map.push(row));
 }
 
-export async function initializeMap(forcePortrait = false) {
-    // Determine if we should use landscape or portrait orientation
-    const aspectRatio = window.innerWidth / window.innerHeight;
-    const isLandscape = aspectRatio > 1 && !forcePortrait;
-
+export async function initializeMap() {
     // Load map data from JSON
-    const mapData = await loadMapData(isLandscape);
+    const mapData = await loadMapData();
     const gameData = convertMapDataToGameFormat(mapData);
 
     // Update map dimensions
@@ -212,25 +208,7 @@ export function drawMap(svg) {
     const svgWidth = window.innerWidth;
     const svgHeight = window.innerHeight;
 
-    // For mobile viewport, use pre-calculated tile size and offsets from game.js
-    // For desktop, calculate to fit entire map on screen
-    if (!window.mobileViewport) {
-        // Calculate the tile size that would fit the map in both dimensions
-        const horizontalTileSize = svgWidth / MAP_WIDTH_TILES;
-        const verticalTileSize = svgHeight / MAP_HEIGHT_TILES;
-
-        // Use the smaller tile size to ensure the map fits in both dimensions
-        window.TILE_SIZE = Math.min(horizontalTileSize, verticalTileSize);
-
-        // Calculate the total map dimensions
-        const totalMapWidth = MAP_WIDTH_TILES * window.TILE_SIZE;
-        const totalMapHeight = MAP_HEIGHT_TILES * window.TILE_SIZE;
-
-        // Center the map
-        window.MAP_OFFSET_X = Math.max(0, (svgWidth - totalMapWidth) / 2);
-        window.MAP_OFFSET_Y = Math.max(0, (svgHeight - totalMapHeight) / 2);
-    }
-
+    // Use pre-calculated tile size and offsets from updateTileSize/updateViewport
     const tileSize = window.TILE_SIZE;
     const offsetX = window.MAP_OFFSET_X || 0;
     const offsetY = window.MAP_OFFSET_Y || 0;
@@ -404,30 +382,6 @@ export function drawMap(svg) {
         border.setAttribute('stroke', '#ff4444');
         border.setAttribute('stroke-width', '2');
         editorGroup.appendChild(border);
-
-        // Draw vertical grid lines
-        for (let x = 0; x <= MAP_WIDTH_TILES; x++) {
-            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', offsetX + x * tileSize);
-            line.setAttribute('y1', offsetY);
-            line.setAttribute('x2', offsetX + x * tileSize);
-            line.setAttribute('y2', offsetY + MAP_HEIGHT_TILES * tileSize);
-            line.setAttribute('stroke', 'rgba(255, 255, 255, 0.2)');
-            line.setAttribute('stroke-width', '1');
-            editorGroup.appendChild(line);
-        }
-
-        // Draw horizontal grid lines
-        for (let y = 0; y <= MAP_HEIGHT_TILES; y++) {
-            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', offsetX);
-            line.setAttribute('y1', offsetY + y * tileSize);
-            line.setAttribute('x2', offsetX + MAP_WIDTH_TILES * tileSize);
-            line.setAttribute('y2', offsetY + y * tileSize);
-            line.setAttribute('stroke', 'rgba(255, 255, 255, 0.2)');
-            line.setAttribute('stroke-width', '1');
-            editorGroup.appendChild(line);
-        }
 
         svg.appendChild(editorGroup);
     }

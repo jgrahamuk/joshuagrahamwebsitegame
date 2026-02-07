@@ -467,38 +467,27 @@ function updateTileSize() {
     const w = window.innerWidth;
     const h = window.innerHeight;
 
-    // Check if we should use mobile viewport
-    window.mobileViewport = isMobileView();
+    // Always enable viewport scrolling (camera follows player)
+    window.mobileViewport = true;
 
-    console.log('updateTileSize:', { w, h, isMobile: window.mobileViewport, breakpoint: MOBILE_BREAKPOINT });
-
-    if (window.mobileViewport) {
+    if (isMobileView()) {
         // Mobile: calculate tile size based on the longer screen dimension
-        // In portrait (h > w), fit tiles to height; in landscape, fit to width
-        // This ensures tiles are large enough to see and interact with
         const isPortrait = h > w;
         if (isPortrait) {
             window.TILE_SIZE = h / MOBILE_VISIBLE_TILES;
         } else {
             window.TILE_SIZE = w / MOBILE_VISIBLE_TILES;
         }
-        console.log('Mobile tile size:', { isPortrait, tileSize: window.TILE_SIZE, visibleTiles: MOBILE_VISIBLE_TILES });
-
-        // Set initial offsets to center the map (will be updated by updateViewport when player exists)
-        const mapPixelWidth = MAP_WIDTH_TILES * window.TILE_SIZE;
-        const mapPixelHeight = MAP_HEIGHT_TILES * window.TILE_SIZE;
-        window.MAP_OFFSET_X = (w - mapPixelWidth) / 2;
-        window.MAP_OFFSET_Y = (h - mapPixelHeight) / 2;
     } else {
-        // Desktop: fit entire map width on screen
-        window.TILE_SIZE = w / MAP_WIDTH_TILES;
-        console.log('Desktop tile size:', { tileSize: window.TILE_SIZE, mapWidth: MAP_WIDTH_TILES });
-
-        // Center the map vertically
-        const mapPixelHeight = MAP_HEIGHT_TILES * window.TILE_SIZE;
-        window.MAP_OFFSET_X = 0;
-        window.MAP_OFFSET_Y = Math.max(0, (h - mapPixelHeight) / 2);
+        // Desktop: fit map width on screen, zoomed in 25%
+        window.TILE_SIZE = (w / MAP_WIDTH_TILES) * 1.25;
     }
+
+    // Set initial offsets to center the map (updateViewport will adjust when player exists)
+    const mapPixelWidth = MAP_WIDTH_TILES * window.TILE_SIZE;
+    const mapPixelHeight = MAP_HEIGHT_TILES * window.TILE_SIZE;
+    window.MAP_OFFSET_X = (w - mapPixelWidth) / 2;
+    window.MAP_OFFSET_Y = (h - mapPixelHeight) / 2;
 
     // Set SVG size to fill the entire screen
     svg.setAttribute('width', w);
@@ -900,33 +889,9 @@ function startGameWithMapData(mapData, options = {}) {
         }
     });
 
-    window.addEventListener('resize', async () => {
-        const resizeMapData = await initializeMap();
+    window.addEventListener('resize', () => {
         updateTileSize();
         drawMap(svg);
-
-        // Re-create player at last known position (default to 0,0 if not available)
-        let resizeStart = { x: window.player?.x || 0, y: window.player?.y || 0 };
-        window.player = new Player(svg, resizeStart.x, resizeStart.y);
-
-        // Re-create chickens
-        window.chickens = [];
-        resizeMapData.chickens.forEach(chickenData => {
-            const chicken = new Chicken(svg, chickenData.x, chickenData.y);
-            window.chickens.push(chicken);
-        });
-
-        // Re-create cockerels
-        window.cockerels = [];
-        if (resizeMapData.cockerels) {
-            resizeMapData.cockerels.forEach(cockerelData => {
-                const cockerel = new Cockerel(svg, cockerelData.x, cockerelData.y);
-                window.cockerels.push(cockerel);
-            });
-        }
-
-        // Re-create NPCs
-        window.npcs = resizeMapData.npcs.map(npcData => new NPC(svg, npcData.name, npcData.message, npcData.x, npcData.y));
 
         // Update viewport for mobile after resize
         updateViewport();
