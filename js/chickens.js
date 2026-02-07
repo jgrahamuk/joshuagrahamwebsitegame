@@ -1,6 +1,7 @@
 import { tileTypes, getTile, randomGrassOrDirt, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, placeResourceAtPosition, removeResource } from './map.js';
 import { findPath } from './movement.js';
 import { getSpriteUrl } from './spriteCache.js';
+import { getUserTier, POPULATION_LIMITS, TIERS } from './tiers.js';
 
 const chickenSprites = {
     front: 'chicken-front.gif',
@@ -32,21 +33,41 @@ if (!window.eggTimers) window.eggTimers = {};
 if (!window.chicks) window.chicks = [];
 if (!window.cockerels) window.cockerels = [];
 
-// Population control
-const MAX_TOTAL_POPULATION = 50;
+// Population control - tier-based limits
+function getPopulationLimits() {
+    const tier = getUserTier();
+    return POPULATION_LIMITS[tier] || POPULATION_LIMITS[TIERS.FREE];
+}
 
-function getCurrentPopulation() {
-    const numChickens = window.chickens ? window.chickens.length : 0;
-    const numCockerels = window.cockerels ? window.cockerels.length : 0;
-    const numChicks = window.chicks ? window.chicks.length : 0;
-    const numEggs = Object.keys(window.eggTimers).length;
-    return numChickens + numCockerels + numChicks + numEggs;
+function getHenCount() {
+    return window.chickens ? window.chickens.length : 0;
+}
+
+function getRoosterCount() {
+    return window.cockerels ? window.cockerels.length : 0;
+}
+
+function getTotalCreatureCount() {
+    const hens = window.chickens ? window.chickens.length : 0;
+    const roosters = window.cockerels ? window.cockerels.length : 0;
+    const chicks = window.chicks ? window.chicks.length : 0;
+    return hens + roosters + chicks;
+}
+
+export function canPlaceHen() {
+    const limits = getPopulationLimits();
+    return getHenCount() < limits.maxHens && getTotalCreatureCount() < limits.maxTotal;
+}
+
+export function canPlaceRooster() {
+    const limits = getPopulationLimits();
+    return getRoosterCount() < limits.maxRoosters && getTotalCreatureCount() < limits.maxTotal;
 }
 
 export class Chicken {
     constructor(svg, startX, startY) {
-        // Check population limit before creating new chicken
-        if (getCurrentPopulation() >= MAX_TOTAL_POPULATION) {
+        // Check population limit before creating new chicken (hen)
+        if (!canPlaceHen()) {
             return null;
         }
 
@@ -112,7 +133,7 @@ export class Chicken {
         if (this.isLayingEgg) {
             if (now - this.eggLayStartTime >= this.eggLayDuration) {
                 // Check population limit before laying egg
-                if (getCurrentPopulation() < MAX_TOTAL_POPULATION) {
+                if (canPlaceHen()) {
                     // Finish laying egg
                     this.isLayingEgg = false;
                     this.state = 'walk';
@@ -241,8 +262,8 @@ export class Chicken {
 
 export class Cockerel {
     constructor(svg, startX, startY) {
-        // Check population limit before creating new cockerel
-        if (getCurrentPopulation() >= MAX_TOTAL_POPULATION) {
+        // Check population limit before creating new cockerel (rooster)
+        if (!canPlaceRooster()) {
             return null;
         }
 
@@ -377,8 +398,8 @@ export class Cockerel {
 
 export class Chick {
     constructor(svg, startX, startY) {
-        // Check population limit before creating new chick
-        if (getCurrentPopulation() >= MAX_TOTAL_POPULATION) {
+        // Check population limit before creating new chick (counts toward hen limit)
+        if (!canPlaceHen()) {
             return null;
         }
 
@@ -434,7 +455,7 @@ export class Chick {
                 if (idx !== -1) window.chicks.splice(idx, 1);
             }
             // Add a new Chicken (hen) at this position only if under population limit
-            if (window.chickens && getCurrentPopulation() < MAX_TOTAL_POPULATION) {
+            if (window.chickens && canPlaceHen()) {
                 const chicken = new Chicken(window.svg, this.x, this.y);
                 if (chicken) {  // Only add if constructor succeeded
                     window.chickens.push(chicken);
@@ -510,7 +531,7 @@ function hatchEggsTick() {
                 });
 
                 // Only spawn a chick if under population limit
-                if (getCurrentPopulation() < MAX_TOTAL_POPULATION) {
+                if (canPlaceHen()) {
                     const chick = new Chick(window.svg, x, y);
                     if (chick) {  // Only add if constructor succeeded
                         window.chicks.push(chick);

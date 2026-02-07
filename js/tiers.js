@@ -22,6 +22,14 @@ export const MAP_SIZE_PRESETS = [
     { label: 'Large', width: 100, height: 60, tier: TIERS.PAID }
 ];
 
+// Population limits per tier
+// FREE: separate hen/rooster caps
+// PAID: single total creature cap (any mix of hens, roosters, chicks)
+export const POPULATION_LIMITS = {
+    [TIERS.FREE]: { maxHens: 5, maxRoosters: 1, maxTotal: Infinity },
+    [TIERS.PAID]: { maxHens: Infinity, maxRoosters: Infinity, maxTotal: 50 }
+};
+
 // Tool IDs restricted to paid tier
 export const PAID_ONLY_TOOLS = ['npc_joshua', 'farmhouse', 'chicken_coop'];
 

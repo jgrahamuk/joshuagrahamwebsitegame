@@ -1,13 +1,13 @@
 import { tileTypes, placeResourceAtPosition, removeResource, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, replaceMap } from './map.js';
 import { getSpriteUrl } from './spriteCache.js';
 import { NPC } from './npcs.js';
-import { Chicken, Cockerel } from './chickens.js';
+import { Chicken, Cockerel, canPlaceHen, canPlaceRooster } from './chickens.js';
 import { saveMapToSupabase } from './mapBrowser.js';
 import { getCurrentUser } from './auth.js';
 import { isConfigured, getSupabase } from './supabase.js';
 import { collectablesSystem } from './collectables.js';
 import { imageTilesSystem } from './imageTiles.js';
-import { getUserTier, isPaidTool, canUseMapSize, getMaxMapSize, MAP_SIZE_PRESETS, TIERS } from './tiers.js';
+import { getUserTier, isPaidTool, TIERS } from './tiers.js';
 import { config } from './config.js';
 
 export class MapEditor {
@@ -277,19 +277,6 @@ export class MapEditor {
             this.showPageTitleDialog();
         });
         this.toolbarContainer.appendChild(titleButton);
-
-        // Add map resize button (only for user maps, not demo)
-        if (window.currentMapId) {
-            const resizeButton = document.createElement('button');
-            resizeButton.innerHTML = '\u{1F4D0}';
-            resizeButton.title = 'Map Size';
-            resizeButton.className = 'export-button resize-button';
-            resizeButton.addEventListener('click', () => {
-                this.collapseAllFlyouts();
-                this.showMapSizeDialog();
-            });
-            this.toolbarContainer.appendChild(resizeButton);
-        }
 
         // Close flyouts when clicking outside
         this._documentClickHandler = (e) => {
@@ -1341,18 +1328,23 @@ export class MapEditor {
     }
 
     placeChicken(x, y) {
+        // Check population limit
+        if (!canPlaceHen()) {
+            this.showSaveIndicator('Hen limit reached');
+            setTimeout(() => this.hideSaveIndicator(), 2000);
+            return;
+        }
+
         // Check if the tile is passable
         const tiles = map[y][x];
         const topTile = tiles[tiles.length - 1];
         if (!topTile.passable) {
-            console.log('Cannot place chicken on impassable tile');
             return;
         }
 
         // Check if there's already a chicken at this position
         if (window.chickens && window.chickens.find(chicken => chicken.x === x && chicken.y === y)) {
-            console.log('Chicken already exists at this position');
-            return; // Chicken already exists at this position
+            return;
         }
 
         // Create chicken at the specified position
@@ -1361,22 +1353,25 @@ export class MapEditor {
         // Add to global chickens array
         if (!window.chickens) window.chickens = [];
         window.chickens.push(chicken);
-
-        console.log(`Chicken placed at (${x}, ${y}). Total chickens: ${window.chickens.length}`);
     }
 
     placeCockerel(x, y) {
+        // Check population limit
+        if (!canPlaceRooster()) {
+            this.showSaveIndicator('Rooster limit reached');
+            setTimeout(() => this.hideSaveIndicator(), 2000);
+            return;
+        }
+
         // Check if the tile is passable
         const tiles = map[y][x];
         const topTile = tiles[tiles.length - 1];
         if (!topTile.passable) {
-            console.log('Cannot place cockerel on impassable tile');
             return;
         }
 
         // Check if there's already a cockerel at this position
         if (window.cockerels && window.cockerels.find(cockerel => cockerel.x === x && cockerel.y === y)) {
-            console.log('Cockerel already exists at this position');
             return;
         }
 
@@ -1386,8 +1381,6 @@ export class MapEditor {
         // Add to global cockerels array
         if (!window.cockerels) window.cockerels = [];
         window.cockerels.push(cockerel);
-
-        console.log(`Cockerel placed at (${x}, ${y}). Total cockerels: ${window.cockerels.length}`);
     }
 
     placeImageTile(x, y) {
@@ -1874,87 +1867,6 @@ export class MapEditor {
                 btn.textContent = 'Subscribe';
                 alert('Failed to start checkout: ' + err.message);
             }
-        });
-
-        dialog.addEventListener('click', (e) => {
-            if (e.target === dialog) {
-                dialog.remove();
-            }
-        });
-    }
-
-    showMapSizeDialog() {
-        const existing = document.getElementById('map-size-dialog');
-        if (existing) existing.remove();
-
-        const userTier = getUserTier();
-        const currentWidth = MAP_WIDTH_TILES;
-        const currentHeight = MAP_HEIGHT_TILES;
-
-        const dialog = document.createElement('div');
-        dialog.id = 'map-size-dialog';
-
-        let presetsHtml = '';
-        MAP_SIZE_PRESETS.forEach((preset, index) => {
-            const isCurrent = currentWidth === preset.width && currentHeight === preset.height;
-            const isLocked = preset.tier === TIERS.PAID && userTier !== TIERS.PAID;
-            const tileCount = preset.width * preset.height;
-            const btnClass = isCurrent ? 'map-size-option current' : isLocked ? 'map-size-option locked' : 'map-size-option';
-
-            presetsHtml += `
-                <button class="${btnClass}" data-index="${index}" ${isCurrent ? 'disabled' : ''}>
-                    <span class="map-size-label">${preset.label}</span>
-                    <span class="map-size-dims">${preset.width} x ${preset.height}</span>
-                    <span class="map-size-tiles">${tileCount.toLocaleString()} tiles</span>
-                    ${isCurrent ? '<span class="map-size-badge">Current</span>' : ''}
-                    ${isLocked ? '<span class="map-size-badge locked-badge">\u{1F512} Paid</span>' : ''}
-                </button>
-            `;
-        });
-
-        dialog.innerHTML = `
-            <div class="cloud-save-panel map-size-panel">
-                <h3>Map Size</h3>
-                <p style="color: #888; font-size: 0.9rem; margin-bottom: 12px;">
-                    Current size: ${currentWidth} x ${currentHeight} (${(currentWidth * currentHeight).toLocaleString()} tiles)
-                </p>
-                <div class="map-size-options">
-                    ${presetsHtml}
-                </div>
-                <p style="color: #666; font-size: 0.8rem; margin-top: 12px;">
-                    Expanding your map adds water around the edges. Your existing content stays in place.
-                </p>
-                <div class="cloud-save-actions">
-                    <button id="map-size-cancel" class="auth-btn auth-btn-secondary">Close</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(dialog);
-
-        // Wire up size option buttons
-        dialog.querySelectorAll('.map-size-option').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const index = parseInt(btn.dataset.index);
-                const preset = MAP_SIZE_PRESETS[index];
-                const isLocked = preset.tier === TIERS.PAID && userTier !== TIERS.PAID;
-
-                if (isLocked) {
-                    dialog.remove();
-                    this.showUpgradePrompt('Larger maps');
-                    return;
-                }
-
-                if (preset.width === currentWidth && preset.height === currentHeight) {
-                    return;
-                }
-
-                dialog.remove();
-                this.resizeMap(preset.width, preset.height);
-            });
-        });
-
-        document.getElementById('map-size-cancel').addEventListener('click', () => {
-            dialog.remove();
         });
 
         dialog.addEventListener('click', (e) => {
