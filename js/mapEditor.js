@@ -11,6 +11,31 @@ import { textTilesSystem } from './textTiles.js';
 import { getUserTier, isPaidTool, TIERS } from './tiers.js';
 import { config } from './config.js';
 
+const WEB_SAFE_FONTS = [
+    { label: 'Arial', value: 'Arial, sans-serif' },
+    { label: 'Arial Black', value: '"Arial Black", sans-serif' },
+    { label: 'Book Antiqua', value: '"Book Antiqua", serif' },
+    { label: 'Brush Script MT', value: '"Brush Script MT", cursive' },
+    { label: 'Comic Sans MS', value: '"Comic Sans MS", cursive' },
+    { label: 'Courier New', value: '"Courier New", monospace' },
+    { label: 'Garamond', value: 'Garamond, serif' },
+    { label: 'Georgia', value: 'Georgia, serif' },
+    { label: 'Helvetica', value: 'Helvetica, sans-serif' },
+    { label: 'Impact', value: 'Impact, sans-serif' },
+    { label: 'Lucida Console', value: '"Lucida Console", monospace' },
+    { label: 'Lucida Sans Unicode', value: '"Lucida Sans Unicode", sans-serif' },
+    { label: 'Palatino Linotype', value: '"Palatino Linotype", serif' },
+    { label: 'Tahoma', value: 'Tahoma, sans-serif' },
+    { label: 'Times New Roman', value: '"Times New Roman", serif' },
+    { label: 'Trebuchet MS', value: '"Trebuchet MS", sans-serif' },
+    { label: 'Verdana', value: 'Verdana, sans-serif' },
+    { label: 'sans-serif', value: 'sans-serif' },
+    { label: 'serif', value: 'serif' },
+    { label: 'monospace', value: 'monospace' },
+    { label: 'cursive', value: 'cursive' },
+    { label: 'fantasy', value: 'fantasy' },
+];
+
 export class MapEditor {
     constructor(svg, gameContainer) {
         this.svg = svg;
@@ -24,6 +49,8 @@ export class MapEditor {
         this.lastTileY = null;
         this.autoSaveTimeout = null;
         this.isSaving = false;
+        this.inlineTextEditor = null;
+        this._inlineTextClickOutsideHandler = null;
 
         this.tools = [
             { id: 'delete', name: 'Delete', icon: '🗑️', type: 'delete' },
@@ -351,6 +378,7 @@ export class MapEditor {
     setupMapClickHandler() {
         // Create bound event handlers that we can properly remove later
         this.handleMouseDown = (e) => {
+            if (this.inlineTextEditor) return;
             if (!this.selectedTool) return;
 
             // Check if clicking on same resource type - skip to allow double-click
@@ -399,6 +427,7 @@ export class MapEditor {
         };
 
         this.mapClickHandler = (e) => {
+            if (this.inlineTextEditor) return;
             // If no tool selected, let the click pass through for player movement
             if (!this.selectedTool) return;
             e.stopPropagation();
@@ -437,6 +466,7 @@ export class MapEditor {
         };
 
         this.mapDblClickHandler = (e) => {
+            if (this.inlineTextEditor) return;
             e.stopPropagation();
             console.log('Double-click detected in map editor');
 
@@ -859,7 +889,7 @@ export class MapEditor {
 
         // Check if it's a text tile
         if (textTilesSystem.hasTile(x, y)) {
-            this.showTextEditDialog(x, y);
+            this.showInlineTextEditor(x, y);
             return;
         }
 
@@ -1546,100 +1576,315 @@ export class MapEditor {
         textTilesSystem.addTile(x, y);
     }
 
-    showTextEditDialog(x, y) {
-        // Remove existing dialog if present
-        const existing = document.getElementById('text-edit-dialog');
-        if (existing) existing.remove();
+    showInlineTextEditor(x, y) {
+        // Close any existing editor (saves it)
+        if (this.inlineTextEditor) {
+            this.saveInlineTextEditor();
+        }
+
+        const groupId = textTilesSystem.getGroupId(x, y);
+        if (!groupId) return;
 
         const group = textTilesSystem.getGroup(x, y);
         const currentHtml = (group && group.htmlContent) || '';
 
-        const dialog = document.createElement('div');
-        dialog.id = 'text-edit-dialog';
-        dialog.innerHTML = `
-            <div class="cloud-save-panel text-edit-panel">
-                <h3>Edit Text</h3>
-                <div class="text-edit-toolbar">
-                    <select id="text-font-family">
-                        <option value="sans-serif">Sans-serif</option>
-                        <option value="serif">Serif</option>
-                        <option value="monospace">Monospace</option>
-                        <option value="'Comic Sans MS', cursive">Comic Sans</option>
-                        <option value="Georgia, serif">Georgia</option>
-                    </select>
-                    <select id="text-font-size">
-                        <option value="2">Small</option>
-                        <option value="3" selected>Medium</option>
-                        <option value="5">Large</option>
-                        <option value="7">XL</option>
-                    </select>
-                    <button class="text-format-btn" data-cmd="bold" title="Bold"><b>B</b></button>
-                    <button class="text-format-btn" data-cmd="italic" title="Italic"><i>I</i></button>
-                    <button class="text-format-btn" data-cmd="underline" title="Underline"><u>U</u></button>
-                    <input type="color" id="text-color-picker" value="#ffffff" title="Text color" style="width:32px;height:32px;border:none;background:none;cursor:pointer;" />
-                </div>
-                <div id="text-edit-area" contenteditable="true">${currentHtml}</div>
-                <div class="cloud-save-actions">
-                    <button id="text-edit-save" class="auth-btn auth-btn-primary">Save</button>
-                    <button id="text-edit-cancel" class="auth-btn auth-btn-secondary">Cancel</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(dialog);
+        // Get group bounds from the text tiles system
+        const allGroups = textTilesSystem.getAllGroups();
+        const groupInfo = allGroups.find(g => g.groupId === groupId);
+        if (!groupInfo) return;
 
-        const editArea = document.getElementById('text-edit-area');
+        const svgRect = this.svg.getBoundingClientRect();
+        const offsetX = window.MAP_OFFSET_X || 0;
+        const offsetY = window.MAP_OFFSET_Y || 0;
+        const tileSize = window.TILE_SIZE || 32;
 
-        // Toolbar: format buttons
-        dialog.querySelectorAll('.text-format-btn').forEach(btn => {
-            btn.addEventListener('mousedown', (e) => {
-                e.preventDefault(); // Keep focus on contenteditable
-                document.execCommand(btn.dataset.cmd, false, null);
-            });
-        });
+        const screenLeft = svgRect.left + offsetX + groupInfo.x * tileSize;
+        const screenTop = svgRect.top + offsetY + groupInfo.y * tileSize;
+        const blockWidth = Math.max(200, groupInfo.width * tileSize);
+        const blockHeight = groupInfo.height * tileSize;
+        const fontSize = Math.max(12, tileSize * 0.5);
 
-        // Font family
-        document.getElementById('text-font-family').addEventListener('change', (e) => {
-            editArea.focus();
-            document.execCommand('fontName', false, e.target.value);
-        });
+        // Hide SVG text block elements
+        const svgElements = this.svg.querySelectorAll(`[data-text-block="${groupId}"]`);
+        svgElements.forEach(el => el.style.display = 'none');
 
-        // Font size
-        document.getElementById('text-font-size').addEventListener('change', (e) => {
-            editArea.focus();
-            document.execCommand('fontSize', false, e.target.value);
-        });
+        // Create inline editor container
+        const container = document.createElement('div');
+        container.id = 'inline-text-editor';
+        container.style.left = screenLeft + 'px';
+        container.style.top = screenTop + 'px';
+        container.style.width = blockWidth + 'px';
+        container.style.minHeight = blockHeight + 'px';
 
-        // Color picker
-        document.getElementById('text-color-picker').addEventListener('input', (e) => {
-            editArea.focus();
-            document.execCommand('foreColor', false, e.target.value);
-        });
+        // Create contenteditable area
+        const editArea = document.createElement('div');
+        editArea.id = 'text-edit-area';
+        editArea.contentEditable = 'true';
+        editArea.style.fontSize = fontSize + 'px';
+        editArea.style.lineHeight = '1.3';
+        editArea.style.minHeight = blockHeight + 'px';
+        editArea.innerHTML = currentHtml;
+        container.appendChild(editArea);
 
-        // Save
-        document.getElementById('text-edit-save').addEventListener('click', () => {
-            const html = editArea.innerHTML.trim();
-            textTilesSystem.setGroupHtml(x, y, html || null);
-            dialog.remove();
-            window.drawMap();
-            this.scheduleAutoSave();
-            this.showSaveIndicator('Text saved');
-            setTimeout(() => this.hideSaveIndicator(), 1500);
-        });
+        document.body.appendChild(container);
 
-        // Cancel
-        document.getElementById('text-edit-cancel').addEventListener('click', () => {
-            dialog.remove();
-        });
+        // Create toolbar
+        this.showInlineTextToolbar(screenLeft, screenTop, blockWidth, blockHeight);
 
-        // Close on click outside
-        dialog.addEventListener('click', (e) => {
-            if (e.target === dialog) {
-                dialog.remove();
+        // Wrap drawMap to keep SVG elements hidden and reposition editor during editing
+        const originalDrawMap = window.drawMap;
+        window.drawMap = (...args) => {
+            originalDrawMap(...args);
+            // Re-hide SVG elements after redraw
+            const els = this.svg.querySelectorAll(`[data-text-block="${groupId}"]`);
+            els.forEach(el => el.style.display = 'none');
+            // Reposition editor based on new SVG position
+            const newSvgRect = this.svg.getBoundingClientRect();
+            const newOffsetX = window.MAP_OFFSET_X || 0;
+            const newOffsetY = window.MAP_OFFSET_Y || 0;
+            const newTileSize = window.TILE_SIZE || 32;
+            const newLeft = newSvgRect.left + newOffsetX + groupInfo.x * newTileSize;
+            const newTop = newSvgRect.top + newOffsetY + groupInfo.y * newTileSize;
+            container.style.left = newLeft + 'px';
+            container.style.top = newTop + 'px';
+            const toolbar = document.getElementById('inline-text-toolbar');
+            if (toolbar) {
+                toolbar.style.left = newLeft + 'px';
+                const toolbarAboveTop = newTop - toolbar.offsetHeight - 6;
+                toolbar.style.top = (toolbarAboveTop < 4 ? newTop + (groupInfo.height * newTileSize) + 6 : toolbarAboveTop) + 'px';
+            }
+        };
+
+        // Click-outside handler (capture phase, delayed)
+        setTimeout(() => {
+            this._inlineTextClickOutsideHandler = (e) => {
+                const editorEl = document.getElementById('inline-text-editor');
+                const toolbarEl = document.getElementById('inline-text-toolbar');
+                if (editorEl && editorEl.contains(e.target)) return;
+                if (toolbarEl && toolbarEl.contains(e.target)) return;
+                this.saveInlineTextEditor();
+            };
+            window.addEventListener('click', this._inlineTextClickOutsideHandler, true);
+        }, 100);
+
+        // Keyboard shortcuts
+        editArea.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                this.cancelInlineTextEditor();
+            } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                this.saveInlineTextEditor();
             }
         });
 
-        // Focus the edit area
+        // Store state
+        this.inlineTextEditor = {
+            x, y, groupId, container, editArea,
+            originalDrawMap, currentHtml
+        };
+
+        // Focus
         setTimeout(() => editArea.focus(), 50);
+    }
+
+    showInlineTextToolbar(screenLeft, screenTop, _blockWidth, blockHeight) {
+        const toolbar = document.createElement('div');
+        toolbar.id = 'inline-text-toolbar';
+
+        // Position above the editor by default, below if near top edge
+        const toolbarHeight = 38;
+        const aboveTop = screenTop - toolbarHeight - 6;
+        if (aboveTop < 4) {
+            toolbar.style.top = (screenTop + blockHeight + 6) + 'px';
+        } else {
+            toolbar.style.top = aboveTop + 'px';
+        }
+        toolbar.style.left = screenLeft + 'px';
+
+        // Font dropdown
+        const fontDropdown = this.createFontDropdown();
+
+        // Font size select
+        const fontSizeSelect = document.createElement('select');
+        fontSizeSelect.id = 'text-font-size';
+        fontSizeSelect.innerHTML = `
+            <option value="1">XS</option>
+            <option value="2">Small</option>
+            <option value="3" selected>Medium</option>
+            <option value="5">Large</option>
+            <option value="7">XL</option>
+        `;
+        fontSizeSelect.addEventListener('mousedown', (e) => e.stopPropagation());
+        fontSizeSelect.addEventListener('change', (e) => {
+            const editArea = document.getElementById('text-edit-area');
+            if (editArea) editArea.focus();
+            document.execCommand('fontSize', false, e.target.value);
+        });
+
+        // Format buttons
+        const boldBtn = this._createFormatBtn('<b>B</b>', 'Bold', 'bold');
+        const italicBtn = this._createFormatBtn('<i>I</i>', 'Italic', 'italic');
+        const underlineBtn = this._createFormatBtn('<u>U</u>', 'Underline', 'underline');
+
+        // Color picker
+        const colorPicker = document.createElement('input');
+        colorPicker.type = 'color';
+        colorPicker.id = 'text-color-picker';
+        colorPicker.value = '#ffffff';
+        colorPicker.title = 'Text color';
+        colorPicker.style.cssText = 'width:28px;height:28px;border:none;background:none;cursor:pointer;padding:0;';
+        colorPicker.addEventListener('input', (e) => {
+            const editArea = document.getElementById('text-edit-area');
+            if (editArea) editArea.focus();
+            document.execCommand('foreColor', false, e.target.value);
+        });
+
+        // Save and Cancel buttons
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'inline-text-save';
+        saveBtn.textContent = 'Save';
+        saveBtn.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            this.saveInlineTextEditor();
+        });
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'inline-text-cancel';
+        cancelBtn.textContent = 'Cancel';
+        cancelBtn.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            this.cancelInlineTextEditor();
+        });
+
+        toolbar.appendChild(fontDropdown);
+        toolbar.appendChild(fontSizeSelect);
+        toolbar.appendChild(boldBtn);
+        toolbar.appendChild(italicBtn);
+        toolbar.appendChild(underlineBtn);
+        toolbar.appendChild(colorPicker);
+        toolbar.appendChild(saveBtn);
+        toolbar.appendChild(cancelBtn);
+
+        document.body.appendChild(toolbar);
+    }
+
+    _createFormatBtn(innerHTML, title, cmd) {
+        const btn = document.createElement('button');
+        btn.className = 'text-format-btn';
+        btn.innerHTML = innerHTML;
+        btn.title = title;
+        btn.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            document.execCommand(cmd, false, null);
+        });
+        return btn;
+    }
+
+    createFontDropdown() {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'font-dropdown-wrapper';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'font-dropdown-input';
+        input.value = 'sans-serif';
+        input.title = 'Font family — type to filter';
+
+        const list = document.createElement('div');
+        list.className = 'font-dropdown-list';
+        list.style.display = 'none';
+
+        const renderOptions = (filter) => {
+            list.innerHTML = '';
+            const filtered = filter
+                ? WEB_SAFE_FONTS.filter(f => f.label.toLowerCase().includes(filter.toLowerCase()))
+                : WEB_SAFE_FONTS;
+            filtered.forEach(font => {
+                const option = document.createElement('div');
+                option.className = 'font-dropdown-option';
+                option.textContent = font.label;
+                option.style.fontFamily = font.value;
+                option.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    input.value = font.label;
+                    list.style.display = 'none';
+                    const editArea = document.getElementById('text-edit-area');
+                    if (editArea) editArea.focus();
+                    document.execCommand('fontName', false, font.value);
+                });
+                list.appendChild(option);
+            });
+        };
+
+        input.addEventListener('focus', () => {
+            input.select();
+            renderOptions('');
+            list.style.display = 'block';
+        });
+
+        input.addEventListener('input', () => {
+            renderOptions(input.value);
+            list.style.display = 'block';
+        });
+
+        input.addEventListener('blur', () => {
+            // Delay so mousedown on option fires first
+            setTimeout(() => { list.style.display = 'none'; }, 150);
+        });
+
+        // Prevent clicks inside dropdown from stealing focus from contenteditable
+        input.addEventListener('mousedown', (e) => e.stopPropagation());
+        list.addEventListener('mousedown', (e) => e.stopPropagation());
+
+        wrapper.appendChild(input);
+        wrapper.appendChild(list);
+        return wrapper;
+    }
+
+    saveInlineTextEditor() {
+        if (!this.inlineTextEditor) return;
+        const { x, y, editArea } = this.inlineTextEditor;
+        const html = editArea.innerHTML.trim();
+        textTilesSystem.setGroupHtml(x, y, html || null);
+        this.closeInlineTextEditor();
+        window.drawMap();
+        this.scheduleAutoSave();
+        this.showSaveIndicator('Text saved');
+        setTimeout(() => this.hideSaveIndicator(), 1500);
+    }
+
+    cancelInlineTextEditor() {
+        if (!this.inlineTextEditor) return;
+        this.closeInlineTextEditor();
+        window.drawMap();
+    }
+
+    closeInlineTextEditor() {
+        if (!this.inlineTextEditor) return;
+
+        const { originalDrawMap, groupId } = this.inlineTextEditor;
+
+        // Restore original drawMap
+        window.drawMap = originalDrawMap;
+
+        // Remove DOM elements
+        const editorEl = document.getElementById('inline-text-editor');
+        if (editorEl) editorEl.remove();
+        const toolbarEl = document.getElementById('inline-text-toolbar');
+        if (toolbarEl) toolbarEl.remove();
+
+        // Remove click-outside listener
+        if (this._inlineTextClickOutsideHandler) {
+            window.removeEventListener('click', this._inlineTextClickOutsideHandler, true);
+            this._inlineTextClickOutsideHandler = null;
+        }
+
+        // Restore SVG elements visibility
+        const svgElements = this.svg.querySelectorAll(`[data-text-block="${groupId}"]`);
+        svgElements.forEach(el => el.style.display = '');
+
+        this.inlineTextEditor = null;
     }
 
     removeStructureAt(x, y) {

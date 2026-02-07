@@ -165,8 +165,8 @@ export class Chicken {
             return; // Don't do other activities while laying egg
         }
 
-        // Check if it's time to lay an egg - HIGH PRIORITY
-        if (now >= this.nextEggLay && !this.moving) {
+        // Check if it's time to lay an egg - HIGH PRIORITY (skip in edit mode)
+        if (now >= this.nextEggLay && !this.moving && !(window.mapEditor && window.mapEditor.isActive)) {
             this.isLayingEgg = true;
             this.eggLayStartTime = now;
             this.state = 'peck'; // Use pecking animation for egg laying
