@@ -2,6 +2,7 @@ import { placeStructures } from './structures.js';
 import { loadMapData, convertMapDataToGameFormat } from './mapLoader.js';
 import { getSpriteUrl } from './spriteCache.js';
 import { drawStructures } from './structures.js';
+import { textItemsSystem } from './textItems.js';
 
 // Map generation and tile helpers
 export const tileTypes = {
@@ -15,6 +16,7 @@ export const tileTypes = {
     LARGE_TREE: { color: 'darkgreen', passable: false, resource: 'wood' },
     EGG: { color: 'white', passable: true, resource: 'egg' },
     BADGE: { color: 'gold', passable: true, resource: 'badge' },
+    TEXT_ITEM: { color: 'transparent', passable: true, resource: null },
     FARMHOUSE: { color: 'white', passable: false, resource: null },
 };
 export let MAP_WIDTH_TILES = 60;
@@ -330,6 +332,39 @@ export function drawMap(svg) {
         }
     }
 
+    // Draw text item groups as foreignObject elements
+    const textGroups = textItemsSystem.getAllGroups();
+    for (const group of textGroups) {
+        const { bounds, content } = group;
+        if (!content) continue;
+
+        const fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+        fo.setAttribute('x', offsetX + bounds.x * tileSize);
+        fo.setAttribute('y', offsetY + bounds.y * tileSize);
+        fo.setAttribute('width', bounds.w * tileSize);
+        fo.setAttribute('height', bounds.h * tileSize);
+        fo.style.zIndex = '3';
+        fo.style.pointerEvents = 'none';
+
+        const div = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
+        div.className = 'text-item-content';
+        div.style.width = '100%';
+        div.style.height = '100%';
+        div.style.overflow = 'hidden';
+        div.style.background = 'transparent';
+        div.style.pointerEvents = 'none';
+
+        // Sanitize: strip script tags and event handlers from stored HTML
+        const sanitized = content
+            .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+            .replace(/\bon\w+\s*=\s*["'][^"']*["']/gi, '')
+            .replace(/\bon\w+\s*=\s*[^\s>]*/gi, '');
+        div.innerHTML = sanitized;
+
+        fo.appendChild(div);
+        svg.appendChild(fo);
+    }
+
     // If map editor is active, draw grid and border
     if (window.mapEditor && window.mapEditor.isActive) {
         // Create a group for editor overlay elements
@@ -370,6 +405,21 @@ export function drawMap(svg) {
             line.setAttribute('stroke', 'rgba(255, 255, 255, 0.2)');
             line.setAttribute('stroke-width', '1');
             editorGroup.appendChild(line);
+        }
+
+        // Draw text item tile indicators in editor mode
+        for (const key of textItemsSystem.tiles) {
+            const [tx, ty] = key.split(',').map(Number);
+            const indicator = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            indicator.setAttribute('x', offsetX + tx * tileSize + 1);
+            indicator.setAttribute('y', offsetY + ty * tileSize + 1);
+            indicator.setAttribute('width', tileSize - 2);
+            indicator.setAttribute('height', tileSize - 2);
+            indicator.setAttribute('fill', 'rgba(100, 149, 237, 0.25)');
+            indicator.setAttribute('stroke', 'rgba(100, 149, 237, 0.6)');
+            indicator.setAttribute('stroke-width', '1');
+            indicator.setAttribute('stroke-dasharray', '4,2');
+            editorGroup.appendChild(indicator);
         }
 
         svg.appendChild(editorGroup);

@@ -1,6 +1,7 @@
 import { tileTypes } from './map.js';
 import { loadMapById } from './mapBrowser.js';
 import { collectablesSystem } from './collectables.js';
+import { textItemsSystem } from './textItems.js';
 
 let currentMapData = null;
 let currentMapId = null; // Supabase map ID if loaded from DB
@@ -89,6 +90,7 @@ export function convertMapDataToGameFormat(mapData) {
                     case 'WATER_BORDER': return { ...tileTypes.WATER, color: '#3bbcff' };
                     case 'GRASS': return tileTypes.GRASS;
                     case 'DIRT': return tileTypes.DIRT;
+                    case 'TEXT_ITEM': return tileTypes.TEXT_ITEM;
                     default: return tileTypes.WATER;
                 }
             });
@@ -134,6 +136,24 @@ export function convertMapDataToGameFormat(mapData) {
         collectablesSystem.loadFromMapData([]);
     }
 
+    // Load text items into the system
+    if (mapData.textItems) {
+        textItemsSystem.loadFromMapData(mapData.textItems);
+
+        // Apply TEXT_ITEM tile markers to the map for each text tile
+        for (const group of mapData.textItems) {
+            if (group.tiles) {
+                for (const tile of group.tiles) {
+                    if (tile.x >= 0 && tile.x < width && tile.y >= 0 && tile.y < height) {
+                        gameMap[tile.y][tile.x].push(tileTypes.TEXT_ITEM);
+                    }
+                }
+            }
+        }
+    } else {
+        textItemsSystem.loadFromMapData([]);
+    }
+
     return {
         map: gameMap,
         structures,
@@ -144,7 +164,8 @@ export function convertMapDataToGameFormat(mapData) {
         height: height || 34,
         introText: mapData.introText || null,
         pageTitle: mapData.pageTitle || null,
-        collectables: mapData.collectables || []
+        collectables: mapData.collectables || [],
+        textItems: mapData.textItems || []
     };
 }
 

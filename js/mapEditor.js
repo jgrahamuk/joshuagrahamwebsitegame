@@ -7,6 +7,7 @@ import { saveMapToSupabase } from './mapBrowser.js';
 import { getCurrentUser } from './auth.js';
 import { isConfigured } from './supabase.js';
 import { collectablesSystem } from './collectables.js';
+import { textItemsSystem } from './textItems.js';
 
 export class MapEditor {
     constructor(svg, gameContainer) {
@@ -43,7 +44,9 @@ export class MapEditor {
             { id: 'npc_joshua', name: 'Joshua NPC', icon: 'joshua-front.gif', type: 'npc', npcType: 'Joshua', message: 'Welcome to my farm! It looks like the chickens are having a great time.' },
             // Chickens and Cockerels
             { id: 'chicken', name: 'Chicken', icon: 'chicken-front.gif', type: 'chicken' },
-            { id: 'cockerel', name: 'Cockerel', icon: 'cockerel-front.gif', type: 'cockerel' }
+            { id: 'cockerel', name: 'Cockerel', icon: 'cockerel-front.gif', type: 'cockerel' },
+            // Text items
+            { id: 'text_item', name: 'Text', icon: 'T', type: 'text_item' }
         ];
 
     }
@@ -212,6 +215,10 @@ export class MapEditor {
                 if (this.selectedTool.type !== 'delete' && this.getNPCAt(x, y)) {
                     return; // Skip - let double-click handle it
                 }
+                // Skip if clicking on existing text item (unless delete tool) to allow double-click edit
+                if (this.selectedTool.type !== 'delete' && textItemsSystem.hasTile(x, y)) {
+                    return; // Skip - let double-click handle it
+                }
             }
 
             this.isDragging = true;
@@ -249,6 +256,10 @@ export class MapEditor {
                 }
                 // Skip if clicking on NPC (unless delete tool) to allow double-click config
                 if (this.selectedTool.type !== 'delete' && this.getNPCAt(x, y)) {
+                    return;
+                }
+                // Skip if clicking on existing text item (unless delete tool) to allow double-click edit
+                if (this.selectedTool.type !== 'delete' && textItemsSystem.hasTile(x, y)) {
                     return;
                 }
                 this.handleMapInteraction(e);
@@ -357,6 +368,11 @@ export class MapEditor {
         } else if (this.selectedTool.type === 'cockerel') {
             this.placeCockerel(x, y);
             // Redraw the entire map to ensure cockerels are properly displayed
+            window.drawMap();
+            this.scheduleAutoSave();
+            return;
+        } else if (this.selectedTool.type === 'text_item') {
+            this.placeTextItem(x, y);
             window.drawMap();
             this.scheduleAutoSave();
             return;
@@ -487,6 +503,20 @@ export class MapEditor {
 
         // Remove any collectable data at this position
         collectablesSystem.removeCollectable(x, y);
+
+        // Check if this is a text item tile
+        if (textItemsSystem.hasTile(x, y)) {
+            textItemsSystem.removeTile(x, y);
+            // Remove TEXT_ITEM from tile layers
+            for (let i = tiles.length - 1; i >= 0; i--) {
+                if (tiles[i] === tileTypes.TEXT_ITEM) {
+                    tiles.splice(i, 1);
+                    break;
+                }
+            }
+            window.drawMap();
+            return;
+        }
 
         // Check if this is a structure tile
         const isStructureTile = tiles.some(tile => tile.color === 'white' && !tile.passable);
@@ -693,6 +723,11 @@ export class MapEditor {
     }
 
     isConfigurableItem(x, y) {
+        // Check if there's a text item at this position
+        if (textItemsSystem.hasTile(x, y)) {
+            return true;
+        }
+
         // Check if there's an NPC at this position
         if (this.getNPCAt(x, y)) {
             return true;
@@ -715,6 +750,16 @@ export class MapEditor {
 
     configureItem(x, y) {
         if (!this.isConfigurableItem(x, y)) {
+            return;
+        }
+
+        // Check if it's a text item
+        if (textItemsSystem.hasTile(x, y)) {
+            const group = textItemsSystem.getGroupContaining(x, y);
+            if (group) {
+                const content = textItemsSystem.getGroupContent(group.rootKey);
+                this.showTextEditorDialog(group.rootKey, content);
+            }
             return;
         }
 
@@ -1084,6 +1129,29 @@ export class MapEditor {
         console.log(`Cockerel placed at (${x}, ${y}). Total cockerels: ${window.cockerels.length}`);
     }
 
+    placeTextItem(x, y) {
+        // Don't place on impassable tiles
+        const tiles = map[y][x];
+        const topTile = tiles[tiles.length - 1];
+        if (!topTile.passable && topTile !== tileTypes.TEXT_ITEM) {
+            return;
+        }
+
+        // Don't place if already a text item here
+        if (textItemsSystem.hasTile(x, y)) {
+            return;
+        }
+
+        // Add to text items system
+        textItemsSystem.addTile(x, y);
+
+        // Add TEXT_ITEM marker to the map tile layers
+        map[y][x].push(tileTypes.TEXT_ITEM);
+
+        // Show tip about editing
+        this.showEditTipOnce('textItem', 'Double-click on a text area to edit its content with the rich text editor!');
+    }
+
     removeStructureAt(x, y) {
         // Find which structure this tile belongs to
         let structureFound = false;
@@ -1215,6 +1283,7 @@ export class MapEditor {
                     case 'FLOWER': return tileTypes.FLOWER;
                     case 'EGG': return tileTypes.EGG;
                     case 'BADGE': return tileTypes.BADGE;
+                    case 'TEXT_ITEM': return tileTypes.TEXT_ITEM;
                     default: return tileTypes.GRASS;
                 }
             });
@@ -1300,7 +1369,10 @@ export class MapEditor {
             for (let x = 0; x < MAP_WIDTH_TILES; x++) {
                 const tileLayers = map[y][x];
                 if (tileLayers.length > 1) {
-                    const layers = tileLayers.map(layer => {
+                    // Filter out TEXT_ITEM from tile layers (stored separately in textItems)
+                    const filteredLayers = tileLayers.filter(layer => layer !== tileTypes.TEXT_ITEM);
+
+                    const layers = filteredLayers.map(layer => {
                         if (layer === tileTypes.WATER) return 'WATER';
                         if (layer.color === '#3bbcff') return 'WATER_BORDER';
                         if (layer === tileTypes.GRASS) return 'GRASS';
@@ -1315,10 +1387,13 @@ export class MapEditor {
                         return 'WATER';
                     });
 
-                    tiles.push({ x, y, layers });
+                    // Save tile if it has multiple layers, or a single non-default layer
+                    if (layers.length > 1 || (layers.length === 1 && layers[0] !== 'WATER')) {
+                        tiles.push({ x, y, layers });
+                    }
 
-                    // Check for resources
-                    const topLayer = tileLayers[tileLayers.length - 1];
+                    // Check for resources (use filtered layers to exclude TEXT_ITEM)
+                    const topLayer = filteredLayers[filteredLayers.length - 1];
                     if (topLayer === tileTypes.LARGE_TREE ||
                         topLayer === tileTypes.BUSH ||
                         topLayer === tileTypes.PINE_TREE ||
@@ -1413,8 +1488,137 @@ export class MapEditor {
             cockerels,
             introText: window.currentMapIntroText || null,
             pageTitle: window.currentMapPageTitle || null,
-            collectables: collectablesSystem.toMapData()
+            collectables: collectablesSystem.toMapData(),
+            textItems: textItemsSystem.toMapData()
         };
+    }
+
+    showTextEditorDialog(groupRootKey, currentContent) {
+        // Remove existing dialog if present
+        const existing = document.getElementById('text-editor-dialog');
+        if (existing) existing.remove();
+
+        const dialog = document.createElement('div');
+        dialog.id = 'text-editor-dialog';
+        dialog.innerHTML = `
+            <div class="cloud-save-panel text-editor-panel">
+                <h3>Edit Text</h3>
+                <div class="rte-toolbar">
+                    <select id="rte-font-family" title="Font Family">
+                        <option value="Jersey 10, sans-serif">Jersey 10</option>
+                        <option value="Arial, sans-serif">Arial</option>
+                        <option value="Georgia, serif">Georgia</option>
+                        <option value="Courier New, monospace">Courier New</option>
+                        <option value="Times New Roman, serif">Times New Roman</option>
+                        <option value="Verdana, sans-serif">Verdana</option>
+                        <option value="Comic Sans MS, cursive">Comic Sans MS</option>
+                        <option value="Impact, sans-serif">Impact</option>
+                    </select>
+                    <select id="rte-font-size" title="Font Size">
+                        <option value="1">8px</option>
+                        <option value="2">10px</option>
+                        <option value="3" selected>12px</option>
+                        <option value="4">14px</option>
+                        <option value="5">18px</option>
+                        <option value="6">24px</option>
+                        <option value="7">36px</option>
+                    </select>
+                    <div class="rte-toolbar-separator"></div>
+                    <button class="rte-btn" data-cmd="bold" title="Bold"><b>B</b></button>
+                    <button class="rte-btn" data-cmd="italic" title="Italic"><i>I</i></button>
+                    <button class="rte-btn" data-cmd="underline" title="Underline"><u>U</u></button>
+                    <button class="rte-btn" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+                    <div class="rte-toolbar-separator"></div>
+                    <button class="rte-btn" data-cmd="justifyLeft" title="Align Left">&#9776;</button>
+                    <button class="rte-btn" data-cmd="justifyCenter" title="Align Center">&#9776;</button>
+                    <button class="rte-btn" data-cmd="justifyRight" title="Align Right">&#9776;</button>
+                    <div class="rte-toolbar-separator"></div>
+                    <label class="rte-color-label" title="Text Color">
+                        A
+                        <input type="color" id="rte-text-color" value="#ffffff" />
+                    </label>
+                    <label class="rte-color-label rte-bg-color-label" title="Highlight Color">
+                        <span class="rte-highlight-icon">A</span>
+                        <input type="color" id="rte-bg-color" value="#000000" />
+                    </label>
+                </div>
+                <div id="rte-editor" contenteditable="true"></div>
+                <div class="cloud-save-actions">
+                    <button id="text-editor-confirm" class="auth-btn auth-btn-primary">Save</button>
+                    <button id="text-editor-cancel" class="auth-btn auth-btn-secondary">Cancel</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(dialog);
+
+        const editor = document.getElementById('rte-editor');
+        editor.innerHTML = currentContent || '<p>Enter text here...</p>';
+
+        // Focus the editor
+        setTimeout(() => {
+            editor.focus();
+            // Select all default text if it's the placeholder
+            if (!currentContent) {
+                document.execCommand('selectAll', false, null);
+            }
+        }, 100);
+
+        // Toolbar button handlers
+        dialog.querySelectorAll('.rte-btn[data-cmd]').forEach(btn => {
+            btn.addEventListener('mousedown', (e) => {
+                e.preventDefault(); // Prevent losing focus from editor
+                const cmd = btn.getAttribute('data-cmd');
+                document.execCommand(cmd, false, null);
+                editor.focus();
+            });
+        });
+
+        // Font family handler
+        document.getElementById('rte-font-family').addEventListener('change', (e) => {
+            document.execCommand('fontName', false, e.target.value);
+            editor.focus();
+        });
+
+        // Font size handler
+        document.getElementById('rte-font-size').addEventListener('change', (e) => {
+            document.execCommand('fontSize', false, e.target.value);
+            editor.focus();
+        });
+
+        // Text color handler
+        document.getElementById('rte-text-color').addEventListener('input', (e) => {
+            document.execCommand('foreColor', false, e.target.value);
+            editor.focus();
+        });
+
+        // Background/highlight color handler
+        document.getElementById('rte-bg-color').addEventListener('input', (e) => {
+            document.execCommand('hiliteColor', false, e.target.value);
+            editor.focus();
+        });
+
+        // Save handler
+        document.getElementById('text-editor-confirm').addEventListener('click', () => {
+            const htmlContent = editor.innerHTML;
+            textItemsSystem.setGroupContent(groupRootKey, htmlContent);
+            dialog.remove();
+            window.drawMap();
+            this.scheduleAutoSave();
+            this.showSaveIndicator('Text saved');
+            setTimeout(() => this.hideSaveIndicator(), 1500);
+        });
+
+        // Cancel handler
+        document.getElementById('text-editor-cancel').addEventListener('click', () => {
+            dialog.remove();
+        });
+
+        // Close on click outside
+        dialog.addEventListener('click', (e) => {
+            if (e.target === dialog) {
+                dialog.remove();
+            }
+        });
     }
 
     showIntroTextDialog() {
