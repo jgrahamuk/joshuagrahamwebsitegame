@@ -102,6 +102,24 @@ class CollectablesSystem {
         return `${collected}/${this.totalCount}`;
     }
 
+    // Shift all collectable positions by an offset (used when resizing map)
+    shiftPositions(offsetX, offsetY) {
+        const newCollectables = new Map();
+        this.collectables.forEach((value, key) => {
+            const [x, y] = key.split(',').map(Number);
+            const newKey = `${x + offsetX},${y + offsetY}`;
+            newCollectables.set(newKey, value);
+        });
+        this.collectables = newCollectables;
+
+        const newCollected = new Set();
+        this.collected.forEach(key => {
+            const [x, y] = key.split(',').map(Number);
+            newCollected.add(`${x + offsetX},${y + offsetY}`);
+        });
+        this.collected = newCollected;
+    }
+
     // Show collection message popup (styled like intro)
     showCollectionMessage(text) {
         const svg = window.svg;

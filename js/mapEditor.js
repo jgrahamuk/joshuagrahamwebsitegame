@@ -1,4 +1,4 @@
-import { tileTypes, placeResourceAtPosition, removeResource, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES } from './map.js';
+import { tileTypes, placeResourceAtPosition, removeResource, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, replaceMap } from './map.js';
 import { getSpriteUrl } from './spriteCache.js';
 import { NPC } from './npcs.js';
 import { Chicken, Cockerel } from './chickens.js';
@@ -8,6 +8,7 @@ import { getCurrentUser } from './auth.js';
 import { isConfigured } from './supabase.js';
 import { collectablesSystem } from './collectables.js';
 import { imageTilesSystem } from './imageTiles.js';
+import { getUserTier, isPaidTool, canUseMapSize, getMaxMapSize, MAP_SIZE_PRESETS, TIERS } from './tiers.js';
 
 export class MapEditor {
     constructor(svg, gameContainer) {
@@ -115,9 +116,13 @@ export class MapEditor {
             this.toolbarContainer.appendChild(modeToggleButton);
         }
 
+        // Determine user tier for tool restrictions
+        const userTier = getUserTier();
+
         // Add existing tools
         this.tools.forEach(tool => {
             const toolButton = document.createElement('button');
+            const locked = isPaidTool(tool.id) && userTier !== TIERS.PAID;
 
             if (tool.icon.endsWith('.gif')) {
                 const img = document.createElement('img');
@@ -127,8 +132,22 @@ export class MapEditor {
                 toolButton.innerHTML = tool.icon;
             }
 
-            toolButton.title = tool.name;
+            if (locked) {
+                toolButton.classList.add('tool-locked');
+                const lockBadge = document.createElement('span');
+                lockBadge.className = 'tool-lock-badge';
+                lockBadge.textContent = '\u{1F512}';
+                toolButton.appendChild(lockBadge);
+                toolButton.title = `${tool.name} (Paid)`;
+            } else {
+                toolButton.title = tool.name;
+            }
+
             toolButton.addEventListener('click', () => {
+                if (locked) {
+                    this.showUpgradePrompt(tool.name);
+                    return;
+                }
                 this.selectTool(tool);
             });
             this.toolbarContainer.appendChild(toolButton);
@@ -153,6 +172,18 @@ export class MapEditor {
             this.showPageTitleDialog();
         });
         this.toolbarContainer.appendChild(titleButton);
+
+        // Add map resize button (only for user maps, not demo)
+        if (window.currentMapId) {
+            const resizeButton = document.createElement('button');
+            resizeButton.innerHTML = '\u{1F4D0}';
+            resizeButton.title = 'Map Size';
+            resizeButton.className = 'export-button resize-button';
+            resizeButton.addEventListener('click', () => {
+                this.showMapSizeDialog();
+            });
+            this.toolbarContainer.appendChild(resizeButton);
+        }
 
         this.gameContainer.appendChild(this.toolbarContainer);
     }
@@ -1718,4 +1749,224 @@ export class MapEditor {
             }
         });
     }
-} 
+
+    showUpgradePrompt(featureName) {
+        const existing = document.getElementById('upgrade-prompt-dialog');
+        if (existing) existing.remove();
+
+        const dialog = document.createElement('div');
+        dialog.id = 'upgrade-prompt-dialog';
+        dialog.innerHTML = `
+            <div class="cloud-save-panel upgrade-prompt-panel">
+                <h3>Paid Feature</h3>
+                <p style="color: #888; font-size: 0.9rem; margin-bottom: 12px;">
+                    <strong>${featureName}</strong> is available on the paid plan.
+                    Upgrade to unlock NPCs, structures, and larger maps.
+                </p>
+                <div class="cloud-save-actions">
+                    <button id="upgrade-prompt-subscribe" class="auth-btn auth-btn-primary">Subscribe</button>
+                    <button id="upgrade-prompt-close" class="auth-btn auth-btn-secondary">Close</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(dialog);
+
+        document.getElementById('upgrade-prompt-close').addEventListener('click', () => {
+            dialog.remove();
+        });
+
+        document.getElementById('upgrade-prompt-subscribe').addEventListener('click', () => {
+            dialog.remove();
+            // Trigger the subscribe flow if available
+            const subscribeBtn = document.getElementById('subscribe-now-btn') || document.getElementById('add-payment-btn');
+            if (subscribeBtn) {
+                subscribeBtn.click();
+            } else {
+                window.location.href = '/?signup=1';
+            }
+        });
+
+        dialog.addEventListener('click', (e) => {
+            if (e.target === dialog) {
+                dialog.remove();
+            }
+        });
+    }
+
+    showMapSizeDialog() {
+        const existing = document.getElementById('map-size-dialog');
+        if (existing) existing.remove();
+
+        const userTier = getUserTier();
+        const currentWidth = MAP_WIDTH_TILES;
+        const currentHeight = MAP_HEIGHT_TILES;
+
+        const dialog = document.createElement('div');
+        dialog.id = 'map-size-dialog';
+
+        let presetsHtml = '';
+        MAP_SIZE_PRESETS.forEach((preset, index) => {
+            const isCurrent = currentWidth === preset.width && currentHeight === preset.height;
+            const isLocked = preset.tier === TIERS.PAID && userTier !== TIERS.PAID;
+            const tileCount = preset.width * preset.height;
+            const btnClass = isCurrent ? 'map-size-option current' : isLocked ? 'map-size-option locked' : 'map-size-option';
+
+            presetsHtml += `
+                <button class="${btnClass}" data-index="${index}" ${isCurrent ? 'disabled' : ''}>
+                    <span class="map-size-label">${preset.label}</span>
+                    <span class="map-size-dims">${preset.width} x ${preset.height}</span>
+                    <span class="map-size-tiles">${tileCount.toLocaleString()} tiles</span>
+                    ${isCurrent ? '<span class="map-size-badge">Current</span>' : ''}
+                    ${isLocked ? '<span class="map-size-badge locked-badge">\u{1F512} Paid</span>' : ''}
+                </button>
+            `;
+        });
+
+        dialog.innerHTML = `
+            <div class="cloud-save-panel map-size-panel">
+                <h3>Map Size</h3>
+                <p style="color: #888; font-size: 0.9rem; margin-bottom: 12px;">
+                    Current size: ${currentWidth} x ${currentHeight} (${(currentWidth * currentHeight).toLocaleString()} tiles)
+                </p>
+                <div class="map-size-options">
+                    ${presetsHtml}
+                </div>
+                <p style="color: #666; font-size: 0.8rem; margin-top: 12px;">
+                    Expanding your map adds water around the edges. Your existing content stays in place.
+                </p>
+                <div class="cloud-save-actions">
+                    <button id="map-size-cancel" class="auth-btn auth-btn-secondary">Close</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(dialog);
+
+        // Wire up size option buttons
+        dialog.querySelectorAll('.map-size-option').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const index = parseInt(btn.dataset.index);
+                const preset = MAP_SIZE_PRESETS[index];
+                const isLocked = preset.tier === TIERS.PAID && userTier !== TIERS.PAID;
+
+                if (isLocked) {
+                    dialog.remove();
+                    this.showUpgradePrompt('Larger maps');
+                    return;
+                }
+
+                if (preset.width === currentWidth && preset.height === currentHeight) {
+                    return;
+                }
+
+                dialog.remove();
+                this.resizeMap(preset.width, preset.height);
+            });
+        });
+
+        document.getElementById('map-size-cancel').addEventListener('click', () => {
+            dialog.remove();
+        });
+
+        dialog.addEventListener('click', (e) => {
+            if (e.target === dialog) {
+                dialog.remove();
+            }
+        });
+    }
+
+    resizeMap(newWidth, newHeight) {
+        const oldWidth = MAP_WIDTH_TILES;
+        const oldHeight = MAP_HEIGHT_TILES;
+
+        if (newWidth === oldWidth && newHeight === oldHeight) return;
+
+        // Calculate centering offsets
+        const offsetX = Math.floor((newWidth - oldWidth) / 2);
+        const offsetY = Math.floor((newHeight - oldHeight) / 2);
+
+        // Create new map filled with water
+        const newMap = Array(newHeight).fill(null).map(() =>
+            Array(newWidth).fill(null).map(() => [tileTypes.WATER])
+        );
+
+        // Copy old map data to new positions
+        for (let y = 0; y < oldHeight; y++) {
+            for (let x = 0; x < oldWidth; x++) {
+                const newX = x + offsetX;
+                const newY = y + offsetY;
+                if (newX >= 0 && newX < newWidth && newY >= 0 && newY < newHeight) {
+                    newMap[newY][newX] = map[y][x];
+                }
+            }
+        }
+
+        // Update the map
+        replaceMap(newMap, newWidth, newHeight);
+
+        // Shift structure positions
+        if (window.farmhouse) {
+            window.farmhouse.x += offsetX;
+            window.farmhouse.y += offsetY;
+        }
+        if (window.chickenCoop) {
+            window.chickenCoop.x += offsetX;
+            window.chickenCoop.y += offsetY;
+        }
+        if (window.signObj) {
+            window.signObj.x += offsetX;
+            window.signObj.y += offsetY;
+        }
+
+        // Shift NPC positions
+        if (window.npcs) {
+            window.npcs.forEach(npc => {
+                npc.x += offsetX;
+                npc.y += offsetY;
+            });
+        }
+
+        // Shift chicken positions
+        if (window.chickens) {
+            window.chickens.forEach(chicken => {
+                chicken.x += offsetX;
+                chicken.y += offsetY;
+            });
+        }
+
+        // Shift cockerel positions
+        if (window.cockerels) {
+            window.cockerels.forEach(cockerel => {
+                cockerel.x += offsetX;
+                cockerel.y += offsetY;
+            });
+        }
+
+        // Shift player position
+        if (window.player) {
+            window.player.x += offsetX;
+            window.player.y += offsetY;
+        }
+
+        // Shift collectable positions
+        collectablesSystem.shiftPositions(offsetX, offsetY);
+
+        // Recalculate tile size and redraw
+        if (window.updateTileSize) window.updateTileSize();
+        window.drawMap();
+
+        // Update entity positions visually
+        if (window.player) window.player.updatePosition();
+        if (window.npcs) window.npcs.forEach(npc => npc.updatePosition());
+        if (window.chickens) window.chickens.forEach(c => c.updatePosition());
+        if (window.cockerels) window.cockerels.forEach(c => c.updatePosition());
+
+        // Update viewport for mobile
+        if (window.updateViewport) window.updateViewport();
+
+        // Auto-save the resized map
+        this.scheduleAutoSave();
+
+        this.showSaveIndicator(`Resized to ${newWidth}x${newHeight}`);
+        setTimeout(() => this.hideSaveIndicator(), 2000);
+    }
+}

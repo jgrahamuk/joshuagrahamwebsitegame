@@ -60,12 +60,21 @@ serve(async (req) => {
                          status === "past_due" ? "past_due" :
                          status === "canceled" ? "canceled" : status;
 
+        // Track cancel_at_period_end so user keeps paid access until period ends
+        const updateData: Record<string, unknown> = { subscription_status: newStatus };
+        if (subscription.cancel_at_period_end && subscription.current_period_end) {
+          updateData.subscription_ends_at = new Date(subscription.current_period_end * 1000).toISOString();
+        } else if (!subscription.cancel_at_period_end) {
+          // Reactivated or renewed - clear the end date
+          updateData.subscription_ends_at = null;
+        }
+
         await supabase
           .from("profiles")
-          .update({ subscription_status: newStatus })
+          .update(updateData)
           .eq("stripe_customer_id", customerId);
 
-        console.log(`Updated subscription status to ${newStatus} for customer ${customerId}`);
+        console.log(`Updated subscription status to ${newStatus} for customer ${customerId}, cancel_at_period_end: ${subscription.cancel_at_period_end}`);
         break;
       }
 
