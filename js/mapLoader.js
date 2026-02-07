@@ -2,6 +2,7 @@ import { tileTypes } from './map.js';
 import { loadMapById } from './mapBrowser.js';
 import { collectablesSystem } from './collectables.js';
 import { imageTilesSystem } from './imageTiles.js';
+import { textTilesSystem } from './textTiles.js';
 
 let currentMapData = null;
 let currentMapId = null; // Supabase map ID if loaded from DB
@@ -89,6 +90,7 @@ export function convertMapDataToGameFormat(mapData) {
                     case 'GRASS': return tileTypes.GRASS;
                     case 'DIRT': return tileTypes.DIRT;
                     case 'IMAGE': return tileTypes.IMAGE;
+                    case 'TEXT': return tileTypes.TEXT;
                     default: return tileTypes.WATER;
                 }
             });
@@ -141,6 +143,13 @@ export function convertMapDataToGameFormat(mapData) {
         imageTilesSystem.loadFromMapData([]);
     }
 
+    // Load text tiles into the system
+    if (mapData.textTiles) {
+        textTilesSystem.loadFromMapData(mapData.textTiles);
+    } else {
+        textTilesSystem.loadFromMapData([]);
+    }
+
     return {
         map: gameMap,
         structures,
@@ -152,7 +161,8 @@ export function convertMapDataToGameFormat(mapData) {
         introText: mapData.introText || null,
         pageTitle: mapData.pageTitle || null,
         collectables: mapData.collectables || [],
-        imageTiles: mapData.imageTiles || []
+        imageTiles: mapData.imageTiles || [],
+        textTiles: mapData.textTiles || []
     };
 }
 

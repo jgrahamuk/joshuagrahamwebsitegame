@@ -7,6 +7,7 @@ import { getCurrentUser } from './auth.js';
 import { isConfigured, getSupabase } from './supabase.js';
 import { collectablesSystem } from './collectables.js';
 import { imageTilesSystem } from './imageTiles.js';
+import { textTilesSystem } from './textTiles.js';
 import { getUserTier, isPaidTool, TIERS } from './tiers.js';
 import { config } from './config.js';
 
@@ -45,7 +46,8 @@ export class MapEditor {
             { id: 'chicken', name: 'Chicken', icon: 'chicken-front.gif', type: 'chicken' },
             { id: 'cockerel', name: 'Cockerel', icon: 'cockerel-front.gif', type: 'cockerel' },
             // Image tile
-            { id: 'image', name: 'Image', icon: '🖼️', type: 'image', tileType: tileTypes.IMAGE }
+            { id: 'image', name: 'Image', icon: '🖼️', type: 'image', tileType: tileTypes.IMAGE },
+            { id: 'text', name: 'Text', icon: 'T', type: 'text', tileType: tileTypes.TEXT }
         ];
 
         // Tool groups for the toolbar flyout UI
@@ -58,6 +60,7 @@ export class MapEditor {
             { id: 'creatures', label: 'Creatures', toolIds: ['chicken', 'cockerel'] },
             { id: 'npcs', label: 'NPCs', toolIds: ['npc_joshua'], standalone: true },
             { id: 'image', label: 'Image', toolIds: ['image'], standalone: true },
+            { id: 'text', label: 'Text', toolIds: ['text'], standalone: true },
         ];
 
         // Track which tool is the "primary" (visible) for each group
@@ -88,6 +91,7 @@ export class MapEditor {
             'chicken': 'Place a hen. Hens wander and lay eggs that hatch!',
             'cockerel': 'Place a rooster. Roosters wander and peck.',
             'image': 'Place image tiles next to each other, then double-click to upload.',
+            'text': 'Place text tiles next to each other, then double-click to edit.',
         };
         this.tipsCollapsed = localStorage.getItem('editorTipsCollapsed') === 'true';
         this.helpSystemEl = null;
@@ -367,6 +371,10 @@ export class MapEditor {
                 if (this.selectedTool.type !== 'delete' && imageTilesSystem.hasTile(x, y)) {
                     return; // Skip - let double-click handle it
                 }
+                // Skip if clicking on existing text tile (unless delete tool) to allow double-click config
+                if (this.selectedTool.type !== 'delete' && textTilesSystem.hasTile(x, y)) {
+                    return; // Skip - let double-click handle it
+                }
             }
 
             this.isDragging = true;
@@ -408,6 +416,10 @@ export class MapEditor {
                 }
                 // Skip if clicking on existing image tile (unless delete tool) to allow double-click config
                 if (this.selectedTool.type !== 'delete' && imageTilesSystem.hasTile(x, y)) {
+                    return;
+                }
+                // Skip if clicking on existing text tile (unless delete tool) to allow double-click config
+                if (this.selectedTool.type !== 'delete' && textTilesSystem.hasTile(x, y)) {
                     return;
                 }
                 this.handleMapInteraction(e);
@@ -524,6 +536,11 @@ export class MapEditor {
             return;
         } else if (this.selectedTool.type === 'image') {
             this.placeImageTile(x, y);
+            window.drawMap();
+            this.scheduleAutoSave();
+            return;
+        } else if (this.selectedTool.type === 'text') {
+            this.placeTextTile(x, y);
             window.drawMap();
             this.scheduleAutoSave();
             return;
@@ -661,6 +678,12 @@ export class MapEditor {
             needsRedraw = true;
         }
 
+        // Remove text tile data if present
+        if (textTilesSystem.hasTile(x, y)) {
+            textTilesSystem.removeTile(x, y);
+            needsRedraw = true;
+        }
+
         // Check if this is a structure tile
         const isStructureTile = tiles.some(tile => tile.color === 'white' && !tile.passable);
 
@@ -752,6 +775,11 @@ export class MapEditor {
             return true;
         }
 
+        // Check if there's a text tile at this position
+        if (textTilesSystem.hasTile(x, y)) {
+            return true;
+        }
+
         // Check if there's a collectable resource at this position
         const tiles = map[y][x];
         if (!tiles || tiles.length === 0) return false;
@@ -782,6 +810,12 @@ export class MapEditor {
         // Check if it's an image tile
         if (imageTilesSystem.hasTile(x, y)) {
             this.showImageUploadDialog(x, y);
+            return;
+        }
+
+        // Check if it's a text tile
+        if (textTilesSystem.hasTile(x, y)) {
+            this.showTextEditDialog(x, y);
             return;
         }
 
@@ -943,6 +977,20 @@ export class MapEditor {
 
         const group = imageTilesSystem.getGroup(x, y);
         const hasImage = group && group.imageData;
+        const libraryImages = this._getImageLibrary(x, y);
+
+        const libraryHTML = libraryImages.length > 0 ? `
+                <div class="image-library-section">
+                    <div class="image-library-heading">Library</div>
+                    <div class="image-library-grid">
+                        ${libraryImages.map((dataUrl, i) => `
+                            <div class="image-library-item" data-library-index="${i}">
+                                <img src="${dataUrl}" alt="Library image" />
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+        ` : '';
 
         const dialog = document.createElement('div');
         dialog.id = 'image-upload-dialog';
@@ -956,6 +1004,7 @@ export class MapEditor {
                 <div id="image-upload-preview" class="image-upload-preview">
                     ${hasImage ? `<img src="${group.imageData}" alt="Current image" />` : '<span>No image set</span>'}
                 </div>
+                ${libraryHTML}
                 <input type="file" id="image-upload-input" accept="image/*" style="display: none;" />
                 <div class="cloud-save-actions" style="flex-direction: column; gap: 8px;">
                     <button id="image-upload-choose" class="auth-btn auth-btn-primary">Choose Image</button>
@@ -1012,6 +1061,19 @@ export class MapEditor {
             });
         }
 
+        // Library thumbnail click handlers
+        dialog.querySelectorAll('.image-library-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const idx = parseInt(item.dataset.libraryIndex);
+                const dataUrl = libraryImages[idx];
+                imageTilesSystem.setGroupImage(x, y, dataUrl);
+                preview.innerHTML = `<img src="${dataUrl}" alt="Uploaded image" />`;
+                this._addRemoveButton(dialog, x, y, preview);
+                window.drawMap();
+                this.scheduleAutoSave();
+            });
+        });
+
         document.getElementById('image-upload-cancel').addEventListener('click', () => {
             dialog.remove();
         });
@@ -1022,6 +1084,21 @@ export class MapEditor {
                 dialog.remove();
             }
         });
+    }
+
+    _getImageLibrary(x, y) {
+        const currentGroup = imageTilesSystem.getGroup(x, y);
+        const currentImageData = currentGroup ? currentGroup.imageData : null;
+        const seen = new Set();
+        const images = [];
+        for (const group of imageTilesSystem.getAllGroups()) {
+            if (!group.imageData) continue;
+            if (group.imageData === currentImageData) continue;
+            if (seen.has(group.imageData)) continue;
+            seen.add(group.imageData);
+            images.push(group.imageData);
+        }
+        return images;
     }
 
     _addRemoveButton(dialog, x, y, preview) {
@@ -1343,6 +1420,125 @@ export class MapEditor {
         imageTilesSystem.addTile(x, y);
     }
 
+    placeTextTile(x, y) {
+        const tiles = map[y][x];
+        const topTile = tiles[tiles.length - 1];
+
+        // Don't place on structures
+        if (topTile.color === 'white' && !topTile.passable) return;
+
+        // Don't place if already a text tile or image tile here
+        if (textTilesSystem.hasTile(x, y)) return;
+        if (imageTilesSystem.hasTile(x, y)) return;
+
+        // Set the tile layer to TEXT type (on top of base)
+        if (tiles.length > 1) {
+            // Remove existing resource overlay if any
+            const top = tiles[tiles.length - 1];
+            if (top.resource) tiles.pop();
+        }
+        tiles.push(tileTypes.TEXT);
+
+        // Register in text tile system
+        textTilesSystem.addTile(x, y);
+    }
+
+    showTextEditDialog(x, y) {
+        // Remove existing dialog if present
+        const existing = document.getElementById('text-edit-dialog');
+        if (existing) existing.remove();
+
+        const group = textTilesSystem.getGroup(x, y);
+        const currentHtml = (group && group.htmlContent) || '';
+
+        const dialog = document.createElement('div');
+        dialog.id = 'text-edit-dialog';
+        dialog.innerHTML = `
+            <div class="cloud-save-panel text-edit-panel">
+                <h3>Edit Text</h3>
+                <div class="text-edit-toolbar">
+                    <select id="text-font-family">
+                        <option value="sans-serif">Sans-serif</option>
+                        <option value="serif">Serif</option>
+                        <option value="monospace">Monospace</option>
+                        <option value="'Comic Sans MS', cursive">Comic Sans</option>
+                        <option value="Georgia, serif">Georgia</option>
+                    </select>
+                    <select id="text-font-size">
+                        <option value="2">Small</option>
+                        <option value="3" selected>Medium</option>
+                        <option value="5">Large</option>
+                        <option value="7">XL</option>
+                    </select>
+                    <button class="text-format-btn" data-cmd="bold" title="Bold"><b>B</b></button>
+                    <button class="text-format-btn" data-cmd="italic" title="Italic"><i>I</i></button>
+                    <button class="text-format-btn" data-cmd="underline" title="Underline"><u>U</u></button>
+                    <input type="color" id="text-color-picker" value="#ffffff" title="Text color" style="width:32px;height:32px;border:none;background:none;cursor:pointer;" />
+                </div>
+                <div id="text-edit-area" contenteditable="true">${currentHtml}</div>
+                <div class="cloud-save-actions">
+                    <button id="text-edit-save" class="auth-btn auth-btn-primary">Save</button>
+                    <button id="text-edit-cancel" class="auth-btn auth-btn-secondary">Cancel</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(dialog);
+
+        const editArea = document.getElementById('text-edit-area');
+
+        // Toolbar: format buttons
+        dialog.querySelectorAll('.text-format-btn').forEach(btn => {
+            btn.addEventListener('mousedown', (e) => {
+                e.preventDefault(); // Keep focus on contenteditable
+                document.execCommand(btn.dataset.cmd, false, null);
+            });
+        });
+
+        // Font family
+        document.getElementById('text-font-family').addEventListener('change', (e) => {
+            editArea.focus();
+            document.execCommand('fontName', false, e.target.value);
+        });
+
+        // Font size
+        document.getElementById('text-font-size').addEventListener('change', (e) => {
+            editArea.focus();
+            document.execCommand('fontSize', false, e.target.value);
+        });
+
+        // Color picker
+        document.getElementById('text-color-picker').addEventListener('input', (e) => {
+            editArea.focus();
+            document.execCommand('foreColor', false, e.target.value);
+        });
+
+        // Save
+        document.getElementById('text-edit-save').addEventListener('click', () => {
+            const html = editArea.innerHTML.trim();
+            textTilesSystem.setGroupHtml(x, y, html || null);
+            dialog.remove();
+            window.drawMap();
+            this.scheduleAutoSave();
+            this.showSaveIndicator('Text saved');
+            setTimeout(() => this.hideSaveIndicator(), 1500);
+        });
+
+        // Cancel
+        document.getElementById('text-edit-cancel').addEventListener('click', () => {
+            dialog.remove();
+        });
+
+        // Close on click outside
+        dialog.addEventListener('click', (e) => {
+            if (e.target === dialog) {
+                dialog.remove();
+            }
+        });
+
+        // Focus the edit area
+        setTimeout(() => editArea.focus(), 50);
+    }
+
     removeStructureAt(x, y) {
         // Find which structure this tile belongs to
         let structureFound = false;
@@ -1460,6 +1656,7 @@ export class MapEditor {
                     case 'EGG': return tileTypes.EGG;
                     case 'BADGE': return tileTypes.BADGE;
                     case 'IMAGE': return tileTypes.IMAGE;
+                    case 'TEXT': return tileTypes.TEXT;
                     default: return tileTypes.GRASS;
                 }
             });
@@ -1509,6 +1706,7 @@ export class MapEditor {
                         if (layer === tileTypes.EGG) return 'EGG';
                         if (layer === tileTypes.BADGE) return 'BADGE';
                         if (layer === tileTypes.IMAGE) return 'IMAGE';
+                        if (layer === tileTypes.TEXT) return 'TEXT';
                         return 'WATER';
                     });
 
@@ -1611,7 +1809,8 @@ export class MapEditor {
             introText: window.currentMapIntroText || null,
             pageTitle: window.currentMapPageTitle || null,
             collectables: collectablesSystem.toMapData(),
-            imageTiles: imageTilesSystem.toMapData()
+            imageTiles: imageTilesSystem.toMapData(),
+            textTiles: textTilesSystem.toMapData()
         };
     }
 
@@ -1831,6 +2030,9 @@ export class MapEditor {
 
         // Shift collectable positions
         collectablesSystem.shiftPositions(offsetX, offsetY);
+
+        // Shift text tile positions
+        textTilesSystem.shiftPositions(offsetX, offsetY);
 
         // Recalculate tile size and redraw
         if (window.updateTileSize) window.updateTileSize();

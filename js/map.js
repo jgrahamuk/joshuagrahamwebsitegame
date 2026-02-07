@@ -3,6 +3,55 @@ import { loadMapData, convertMapDataToGameFormat } from './mapLoader.js';
 import { getSpriteUrl } from './spriteCache.js';
 import { drawStructures } from './structures.js';
 import { imageTilesSystem } from './imageTiles.js';
+import { textTilesSystem } from './textTiles.js';
+
+// Sanitize HTML for text tiles - strip dangerous content, allow only safe tags/attributes
+function _sanitizeHtml(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+
+    // Remove script tags
+    div.querySelectorAll('script').forEach(el => el.remove());
+
+    // Allowed tags and attributes
+    const allowedTags = new Set(['b', 'i', 'u', 'span', 'div', 'br', 'font', 'p', 'strong', 'em']);
+    const allowedAttrs = new Set(['style', 'color', 'size', 'face']);
+
+    function cleanNode(node) {
+        const children = Array.from(node.childNodes);
+        for (const child of children) {
+            if (child.nodeType === 1) { // Element
+                const tag = child.tagName.toLowerCase();
+                if (!allowedTags.has(tag)) {
+                    // Replace with its children
+                    while (child.firstChild) {
+                        node.insertBefore(child.firstChild, child);
+                    }
+                    node.removeChild(child);
+                } else {
+                    // Remove disallowed attributes
+                    const attrs = Array.from(child.attributes);
+                    for (const attr of attrs) {
+                        if (!allowedAttrs.has(attr.name) || attr.name.startsWith('on')) {
+                            child.removeAttribute(attr.name);
+                        }
+                    }
+                    // Strip event handlers from style attribute
+                    if (child.hasAttribute('style')) {
+                        const style = child.getAttribute('style');
+                        // Remove any url() or expression() from style
+                        const cleaned = style.replace(/url\s*\([^)]*\)/gi, '').replace(/expression\s*\([^)]*\)/gi, '');
+                        child.setAttribute('style', cleaned);
+                    }
+                    cleanNode(child);
+                }
+            }
+        }
+    }
+
+    cleanNode(div);
+    return div.innerHTML;
+}
 
 // Map generation and tile helpers
 export const tileTypes = {
@@ -18,6 +67,7 @@ export const tileTypes = {
     BADGE: { color: 'gold', passable: true, resource: 'badge' },
     FARMHOUSE: { color: 'white', passable: false, resource: null },
     IMAGE: { color: '#8844aa', passable: false, resource: null },
+    TEXT: { color: '#2288cc', passable: true, resource: null },
 };
 export let MAP_WIDTH_TILES = 60;
 export let MAP_HEIGHT_TILES = 34;
@@ -361,6 +411,61 @@ export function drawMap(svg) {
             text.setAttribute('font-size', Math.min(blockW, blockH, tileSize * 1.5));
             text.setAttribute('pointer-events', 'none');
             text.textContent = '\u{1F5BC}';
+            svg.appendChild(text);
+        }
+    });
+
+    // Draw text tile blocks
+    const textGroups = textTilesSystem.getAllGroups();
+    textGroups.forEach(group => {
+        const blockX = offsetX + group.x * tileSize;
+        const blockY = offsetY + group.y * tileSize;
+        const blockW = group.width * tileSize;
+        const blockH = group.height * tileSize;
+
+        if (group.htmlContent) {
+            // Sanitize the HTML content before rendering
+            const sanitized = _sanitizeHtml(group.htmlContent);
+
+            // Render via SVG foreignObject with transparent background
+            const fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+            fo.setAttribute('x', blockX);
+            fo.setAttribute('y', blockY);
+            fo.setAttribute('width', blockW);
+            fo.setAttribute('height', blockH);
+            fo.setAttribute('data-text-block', group.groupId);
+            fo.style.zIndex = '2';
+
+            const div = document.createElement('div');
+            div.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+            div.style.cssText = `width:100%;height:100%;background:transparent;overflow:hidden;pointer-events:none;color:#fff;font-size:${Math.max(12, tileSize * 0.5)}px;line-height:1.3;word-wrap:break-word;`;
+            div.innerHTML = sanitized;
+            fo.appendChild(div);
+            svg.appendChild(fo);
+        } else {
+            // Draw placeholder for text tiles without content
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', blockX);
+            rect.setAttribute('y', blockY);
+            rect.setAttribute('width', blockW);
+            rect.setAttribute('height', blockH);
+            rect.setAttribute('fill', 'rgba(34, 136, 204, 0.3)');
+            rect.setAttribute('stroke', '#2288cc');
+            rect.setAttribute('stroke-width', '2');
+            rect.setAttribute('stroke-dasharray', '6,3');
+            rect.setAttribute('data-text-block', group.groupId);
+            rect.style.zIndex = '2';
+            svg.appendChild(rect);
+
+            // Add "T" text in center
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', blockX + blockW / 2);
+            text.setAttribute('y', blockY + blockH / 2 + 6);
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('fill', '#55aadd');
+            text.setAttribute('font-size', Math.min(blockW, blockH, tileSize * 1.5));
+            text.setAttribute('pointer-events', 'none');
+            text.textContent = 'T';
             svg.appendChild(text);
         }
     });

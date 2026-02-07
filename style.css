@@ -1047,3 +1047,116 @@ body.portrait .chatbox-text {
   font-size: 0.95rem;
   font-family: "Jersey 10", sans-serif;
 }
+
+.image-library-section {
+  margin-top: 12px;
+}
+
+.image-library-heading {
+  color: #888;
+  font-size: 0.85rem;
+  font-family: "Jersey 10", sans-serif;
+  margin-bottom: 8px;
+}
+
+.image-library-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.image-library-item {
+  aspect-ratio: 1;
+  border: 2px solid #333;
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.image-library-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.image-library-item:hover {
+  border-color: #8844aa;
+}
+
+/* Text Edit Dialog */
+#text-edit-dialog {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-edit-panel {
+  width: 420px;
+}
+
+.text-edit-toolbar {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.text-edit-toolbar select {
+  background: #222;
+  color: #eee;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.text-format-btn {
+  width: 32px;
+  height: 32px;
+  background: #222;
+  color: #eee;
+  border: 1px solid #444;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.text-format-btn:hover {
+  background: #333;
+  border-color: #666;
+}
+
+#text-edit-area {
+  width: 100%;
+  min-height: 120px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  border: 2px solid #444;
+  border-radius: 6px;
+  background: #111;
+  color: #eee;
+  font-family: sans-serif;
+  font-size: 1rem;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+#text-edit-area:focus {
+  border-color: #2288cc;
+}
