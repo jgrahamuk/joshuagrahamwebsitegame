@@ -15,21 +15,29 @@ const spriteNames = [
     'chatbox.gif',
     'chick-front.gif', 'chick-back.gif', 'chick-left.gif', 'chick-right.gif',
     'arrow.gif',
+    'portal-purple.gif',
 ];
 
 const cache = {};
+
+// Names that should keep their raw URL (e.g. animated GIFs that lose animation when drawn to canvas)
+const rawUrlNames = new Set(['portal-purple.gif']);
 
 export function preloadSprites(basePath = 'resources/images/') {
     return Promise.all(spriteNames.map(name => {
         return new Promise(resolve => {
             const img = new window.Image();
             img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                cache[name] = canvas.toDataURL('image/png');
+                if (rawUrlNames.has(name)) {
+                    cache[name] = basePath + name;
+                } else {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    cache[name] = canvas.toDataURL('image/png');
+                }
                 resolve();
             };
             img.src = basePath + name;

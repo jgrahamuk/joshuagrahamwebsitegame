@@ -33,6 +33,19 @@ export function placeStructures(map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES) {
             }
         }
     }
+
+    // Place portals
+    if (window.portals) {
+        window.portals.forEach(portal => {
+            for (let y = portal.y; y < portal.y + portal.h; y++) {
+                for (let x = portal.x; x < portal.x + portal.w; x++) {
+                    if (x >= 0 && y >= 0 && x < MAP_WIDTH_TILES && y < MAP_HEIGHT_TILES) {
+                        map[y][x].push({ color: 'white', passable: false, resource: null });
+                    }
+                }
+            }
+        });
+    }
 }
 
 export function drawStructures(svg, offsetX = 0, offsetY = 0) {
@@ -69,5 +82,18 @@ export function drawStructures(svg, offsetX = 0, offsetY = 0) {
         imgSign.setAttribute('width', window.signObj.w * tileSize);
         imgSign.setAttribute('height', window.signObj.h * tileSize);
         svg.appendChild(imgSign);
+    }
+
+    // Draw portals
+    if (window.portals) {
+        window.portals.forEach(portal => {
+            const imgPortal = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+            imgPortal.setAttribute('href', getSpriteUrl('portal-purple.gif'));
+            imgPortal.setAttribute('x', offsetX + portal.x * tileSize);
+            imgPortal.setAttribute('y', offsetY + portal.y * tileSize);
+            imgPortal.setAttribute('width', portal.w * tileSize);
+            imgPortal.setAttribute('height', portal.h * tileSize);
+            svg.appendChild(imgPortal);
+        });
     }
 } 

@@ -624,6 +624,9 @@ function startGameWithMapData(mapData, options = {}) {
         document.title = `${window.currentMapPageTitle} - maap.to`;
     }
 
+    // Initialize portals array if not already set by mapLoader
+    if (!window.portals) window.portals = [];
+
     updateTileSize();
     drawMap(svg);
 
@@ -818,6 +821,20 @@ function startGameWithMapData(mapData, options = {}) {
         const y = Math.floor((clientY - rect.top - (window.MAP_OFFSET_Y || 0)) / window.TILE_SIZE);
 
         if (x >= 0 && x < MAP_WIDTH_TILES && y >= 0 && y < MAP_HEIGHT_TILES) {
+            // Check if clicking on a portal
+            if (window.portals) {
+                const clickedPortal = window.portals.find(p =>
+                    x >= p.x && x < p.x + p.w && y >= p.y && y < p.y + p.h
+                );
+                if (clickedPortal && clickedPortal.url) {
+                    // In edit mode, don't navigate (let double-click configure)
+                    if (!(window.mapEditor && window.mapEditor.isActive)) {
+                        moveToTarget(clickedPortal.x, clickedPortal.y, window.player, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, 'portal', clickedPortal);
+                        return;
+                    }
+                }
+            }
+
             // Check if clicking on an NPC or surrounding tiles
             const clickedNPC = window.npcs.find(npc => npc.isClicked(x, y));
 

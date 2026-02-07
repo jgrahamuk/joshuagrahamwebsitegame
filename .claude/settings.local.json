@@ -3,7 +3,8 @@
     "allow": [
       "Bash(node --check:*)",
       "WebFetch(domain:maap.to)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(identify:*)"
     ]
   }
 }

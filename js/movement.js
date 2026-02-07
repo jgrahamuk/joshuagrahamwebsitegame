@@ -133,6 +133,8 @@ export function moveToTarget(targetX, targetY, player, getTile, MAP_WIDTH_TILES,
             player.moveTo(path.slice(1), { x: targetX, y: targetY });
         } else if (interactionType === 'npc') {
             player.moveTo(path.slice(1), null, { type: 'npc', data: interactionData });
+        } else if (interactionType === 'portal') {
+            player.moveTo(path.slice(1), null, { type: 'portal', data: interactionData });
         } else {
             player.moveTo(path.slice(1));
         }

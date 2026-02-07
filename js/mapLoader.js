@@ -69,7 +69,7 @@ export function getCurrentMapData() {
 }
 
 export function convertMapDataToGameFormat(mapData) {
-    const { width, height, tiles, structures, resources, npcs, chickens, cockerels } = mapData;
+    const { width, height, tiles, structures, resources, npcs, chickens, cockerels, portals } = mapData;
 
     // Convert tile data to game format
     const gameMap = [];
@@ -129,6 +129,23 @@ export function convertMapDataToGameFormat(mapData) {
         }
     });
 
+    // Load portals
+    window.portals = [];
+    if (portals && portals.length > 0) {
+        portals.forEach(p => {
+            const portal = { x: p.x, y: p.y, w: p.w || 3, h: p.h || 3, url: p.url || '' };
+            window.portals.push(portal);
+            // Mark portal tiles as impassable structures
+            for (let py = portal.y; py < portal.y + portal.h; py++) {
+                for (let px = portal.x; px < portal.x + portal.w; px++) {
+                    if (px >= 0 && px < width && py >= 0 && py < height) {
+                        gameMap[py][px].push({ color: 'white', passable: false, resource: null });
+                    }
+                }
+            }
+        });
+    }
+
     // Load collectables into the system
     if (mapData.collectables) {
         collectablesSystem.loadFromMapData(mapData.collectables);
@@ -156,6 +173,7 @@ export function convertMapDataToGameFormat(mapData) {
         npcs: npcs || [],
         chickens: chickens || [],
         cockerels: cockerels || [],
+        portals: portals || [],
         width: width || 60,
         height: height || 34,
         introText: mapData.introText || null,

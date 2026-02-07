@@ -927,7 +927,9 @@ body.portrait .chatbox-text {
 
 /* Configure Item Dialog */
 #configure-item-dialog,
-#configure-npc-dialog {
+#configure-npc-dialog,
+#configure-portal-dialog,
+#world-settings-dialog {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.7);
@@ -955,6 +957,44 @@ body.portrait .chatbox-text {
 }
 
 .configure-item-panel textarea:focus {
+  outline: none;
+  border-color: #4caf50;
+}
+
+/* World Settings Dialog */
+.world-settings-panel {
+  width: 380px;
+}
+
+.world-settings-label {
+  color: #aaa;
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.world-settings-hint {
+  color: #666;
+  font-size: 0.8rem;
+  margin: 0 0 8px;
+}
+
+.world-settings-panel textarea {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+  border: 2px solid #444;
+  border-radius: 6px;
+  background: #111;
+  color: #eee;
+  font-size: 1rem;
+  font-family: "Jersey 10", sans-serif;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.world-settings-panel textarea:focus {
   outline: none;
   border-color: #4caf50;
 }

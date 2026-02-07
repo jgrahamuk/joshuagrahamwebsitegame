@@ -302,6 +302,10 @@ export class Player {
                 this.checkNPCInteraction(this.interactionData.data);
             }
 
+            if (this.interactionData && this.interactionData.type === 'portal') {
+                this.checkPortalInteraction(this.interactionData.data);
+            }
+
             await new Promise(resolve => setTimeout(resolve, 100));
         }
 
@@ -422,6 +426,27 @@ export class Player {
         const dx = Math.abs(this.x - npc.x);
         const dy = Math.abs(this.y - npc.y);
         return dx <= 1 && dy <= 1;
+    }
+
+    checkPortalInteraction(portal) {
+        if (this.isAdjacentToPortal(portal)) {
+            if (portal.url) {
+                window.location.href = portal.url;
+            }
+            this.interactionData = null;
+        }
+    }
+
+    isAdjacentToPortal(portal) {
+        // Check if player is adjacent to any tile of the portal
+        for (let py = portal.y; py < portal.y + portal.h; py++) {
+            for (let px = portal.x; px < portal.x + portal.w; px++) {
+                const dx = Math.abs(this.x - px);
+                const dy = Math.abs(this.y - py);
+                if (dx <= 1 && dy <= 1) return true;
+            }
+        }
+        return false;
     }
 
     updateInventoryDisplay() {

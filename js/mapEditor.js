@@ -40,6 +40,7 @@ export class MapEditor {
             // Structures
             { id: 'farmhouse', name: 'Farmhouse', icon: 'farmhouse.gif', type: 'structure', structureType: 'FARMHOUSE', width: 10, height: 6 },
             { id: 'chicken_coop', name: 'Chicken Coop', icon: 'chicken-coop.gif', type: 'structure', structureType: 'CHICKEN_COOP', width: 5, height: 3 },
+            { id: 'portal', name: 'Portal', icon: 'portal-purple.gif', type: 'structure', structureType: 'PORTAL', width: 3, height: 3 },
             // NPCs
             { id: 'npc_joshua', name: 'Joshua NPC', icon: 'joshua-front.gif', type: 'npc', npcType: 'Joshua', message: 'Welcome to my farm! It looks like the chickens are having a great time.' },
             // Chickens and Cockerels
@@ -56,7 +57,7 @@ export class MapEditor {
             { id: 'terrain', label: 'Terrain', toolIds: ['grass', 'dirt', 'water'] },
             { id: 'nature', label: 'Nature', toolIds: ['large_tree', 'bush', 'pine_tree', 'rock', 'flower'] },
             { id: 'collectables', label: 'Collectables', toolIds: ['egg', 'badge'] },
-            { id: 'buildings', label: 'Buildings', toolIds: ['farmhouse', 'chicken_coop'] },
+            { id: 'buildings', label: 'Buildings', toolIds: ['farmhouse', 'chicken_coop', 'portal'] },
             { id: 'creatures', label: 'Creatures', toolIds: ['chicken', 'cockerel'] },
             { id: 'npcs', label: 'NPCs', toolIds: ['npc_joshua'], standalone: true },
             { id: 'image', label: 'Image', toolIds: ['image'], standalone: true },
@@ -87,6 +88,7 @@ export class MapEditor {
             'badge': 'Place a collectable badge. Double-click to add a message.',
             'farmhouse': 'Place a farmhouse (10\u00d76). Needs clear space.',
             'chicken_coop': 'Place a chicken coop (5\u00d73). Needs clear space.',
+            'portal': 'Place a portal (3\u00d73). Double-click to set a link URL.',
             'npc_joshua': 'Click to place an NPC. Double-click to edit name and dialog.',
             'chicken': 'Place a hen. Hens wander and lay eggs that hatch!',
             'cockerel': 'Place a rooster. Roosters wander and peck.',
@@ -375,6 +377,10 @@ export class MapEditor {
                 if (this.selectedTool.type !== 'delete' && textTilesSystem.hasTile(x, y)) {
                     return; // Skip - let double-click handle it
                 }
+                // Skip if clicking on a portal (unless delete tool) to allow double-click config
+                if (this.selectedTool.type !== 'delete' && this.getPortalAt(x, y)) {
+                    return; // Skip - let double-click handle it
+                }
             }
 
             this.isDragging = true;
@@ -420,6 +426,10 @@ export class MapEditor {
                 }
                 // Skip if clicking on existing text tile (unless delete tool) to allow double-click config
                 if (this.selectedTool.type !== 'delete' && textTilesSystem.hasTile(x, y)) {
+                    return;
+                }
+                // Skip if clicking on a portal (unless delete tool) to allow double-click config
+                if (this.selectedTool.type !== 'delete' && this.getPortalAt(x, y)) {
                     return;
                 }
                 this.handleMapInteraction(e);
@@ -764,7 +774,19 @@ export class MapEditor {
         });
     }
 
+    getPortalAt(x, y) {
+        if (!window.portals) return null;
+        return window.portals.find(p =>
+            x >= p.x && x < p.x + p.w && y >= p.y && y < p.y + p.h
+        ) || null;
+    }
+
     isConfigurableItem(x, y) {
+        // Check if there's a portal at this position
+        if (this.getPortalAt(x, y)) {
+            return true;
+        }
+
         // Check if there's an NPC at this position
         if (this.getNPCAt(x, y)) {
             return true;
@@ -797,6 +819,13 @@ export class MapEditor {
 
     configureItem(x, y) {
         if (!this.isConfigurableItem(x, y)) {
+            return;
+        }
+
+        // Check if it's a portal
+        const portal = this.getPortalAt(x, y);
+        if (portal) {
+            this.showPortalConfigureDialog(portal);
             return;
         }
 
@@ -959,6 +988,65 @@ export class MapEditor {
             this.scheduleAutoSave();
 
             this.showSaveIndicator('NPC updated');
+            setTimeout(() => this.hideSaveIndicator(), 1500);
+        });
+
+        // Close on click outside
+        dialog.addEventListener('click', (e) => {
+            if (e.target === dialog) {
+                dialog.remove();
+            }
+        });
+    }
+
+    showPortalConfigureDialog(portal) {
+        // Remove existing dialog if present
+        const existing = document.getElementById('configure-portal-dialog');
+        if (existing) existing.remove();
+
+        const dialog = document.createElement('div');
+        dialog.id = 'configure-portal-dialog';
+        dialog.innerHTML = `
+            <div class="cloud-save-panel configure-item-panel">
+                <h3>Configure Portal</h3>
+                <p style="color: #888; font-size: 0.9rem; margin-bottom: 12px;">
+                    Set the URL that visitors will be taken to when they walk to this portal.
+                </p>
+                <label style="color: #aaa; font-size: 0.85rem; display: block; margin-bottom: 4px;">URL</label>
+                <input type="text" id="configure-portal-url" value="${portal.url || ''}" placeholder="https://example.com" />
+                <div class="cloud-save-actions">
+                    <button id="configure-portal-confirm" class="auth-btn auth-btn-primary">Save</button>
+                    <button id="configure-portal-cancel" class="auth-btn auth-btn-secondary">Cancel</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(dialog);
+
+        // Style the input
+        const urlInput = document.getElementById('configure-portal-url');
+        urlInput.style.cssText = `
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #444;
+            border-radius: 6px;
+            background: #111;
+            color: #eee;
+            font-family: inherit;
+            font-size: 1rem;
+            margin-bottom: 12px;
+        `;
+
+        document.getElementById('configure-portal-cancel').addEventListener('click', () => {
+            dialog.remove();
+        });
+
+        document.getElementById('configure-portal-confirm').addEventListener('click', () => {
+            const newUrl = document.getElementById('configure-portal-url').value.trim();
+            portal.url = newUrl;
+            dialog.remove();
+            this.scheduleAutoSave();
+
+            this.showSaveIndicator(newUrl ? 'Portal URL set' : 'Portal URL cleared');
             setTimeout(() => this.hideSaveIndicator(), 1500);
         });
 
@@ -1310,6 +1398,9 @@ export class MapEditor {
             window.chickenCoop = { x, y, w: width, h: height };
         } else if (tool.structureType === 'SIGN') {
             window.signObj = { x, y, w: width, h: height };
+        } else if (tool.structureType === 'PORTAL') {
+            if (!window.portals) window.portals = [];
+            window.portals.push({ x, y, w: width, h: height, url: '' });
         }
 
         // Redraw structures
@@ -1563,6 +1654,16 @@ export class MapEditor {
             window.signObj = null;
             structureFound = true;
         }
+
+        // Check portals
+        if (!structureFound && window.portals) {
+            const portalIndex = window.portals.findIndex(p => this.isInStructure(x, y, p));
+            if (portalIndex >= 0) {
+                this.removeStructure(window.portals[portalIndex], 'PORTAL');
+                window.portals.splice(portalIndex, 1);
+                structureFound = true;
+            }
+        }
     }
 
     isInStructure(x, y, structure) {
@@ -1597,7 +1698,7 @@ export class MapEditor {
         const existingStructures = this.svg.querySelectorAll('image');
         existingStructures.forEach(img => {
             const href = img.getAttribute('href');
-            if (href && (href.includes('farmhouse') || href.includes('chicken-coop') || href.includes('sign-joshuagraham'))) {
+            if (href && (href.includes('farmhouse') || href.includes('chicken-coop') || href.includes('sign-joshuagraham') || href.includes('portal-purple'))) {
                 img.remove();
             }
         });
@@ -1631,6 +1732,19 @@ export class MapEditor {
             imgSign.setAttribute('width', window.signObj.w * window.TILE_SIZE);
             imgSign.setAttribute('height', window.signObj.h * window.TILE_SIZE);
             this.svg.appendChild(imgSign);
+        }
+
+        // Redraw portals
+        if (window.portals) {
+            window.portals.forEach(portal => {
+                const imgPortal = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                imgPortal.setAttribute('href', getSpriteUrl('portal-purple.gif'));
+                imgPortal.setAttribute('x', portal.x * window.TILE_SIZE);
+                imgPortal.setAttribute('y', portal.y * window.TILE_SIZE);
+                imgPortal.setAttribute('width', portal.w * window.TILE_SIZE);
+                imgPortal.setAttribute('height', portal.h * window.TILE_SIZE);
+                this.svg.appendChild(imgPortal);
+            });
         }
     }
 
@@ -1806,6 +1920,7 @@ export class MapEditor {
             npcs,
             chickens,
             cockerels,
+            portals: (window.portals || []).map(p => ({ x: p.x, y: p.y, w: p.w, h: p.h, url: p.url })),
             introText: window.currentMapIntroText || null,
             pageTitle: window.currentMapPageTitle || null,
             collectables: collectablesSystem.toMapData(),
@@ -2019,6 +2134,14 @@ export class MapEditor {
             window.cockerels.forEach(cockerel => {
                 cockerel.x += offsetX;
                 cockerel.y += offsetY;
+            });
+        }
+
+        // Shift portal positions
+        if (window.portals) {
+            window.portals.forEach(portal => {
+                portal.x += offsetX;
+                portal.y += offsetY;
             });
         }
 
