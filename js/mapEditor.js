@@ -57,6 +57,8 @@ export class MapEditor {
             { id: 'grass', name: 'Grass', icon: 'tile-grass.gif', type: 'tile', tileType: tileTypes.GRASS },
             { id: 'dirt', name: 'Dirt', icon: 'tile-dirt.gif', type: 'tile', tileType: tileTypes.DIRT },
             { id: 'water', name: 'Water', icon: 'tile-water.gif', type: 'tile', tileType: tileTypes.WATER },
+            { id: 'bridge_h', name: 'Bridge (H)', icon: 'bridge-horizontal.gif', type: 'tile', tileType: tileTypes.BRIDGE_H },
+            { id: 'bridge_v', name: 'Bridge (V)', icon: 'bridge-vertical.gif', type: 'tile', tileType: tileTypes.BRIDGE_V },
             { id: 'large_tree', name: 'Large Tree', icon: 'tree.gif', type: 'resource', tileType: tileTypes.LARGE_TREE },
             { id: 'bush', name: 'Bush', icon: 'bush.gif', type: 'resource', tileType: tileTypes.BUSH },
             { id: 'pine_tree', name: 'Pine Tree', icon: 'pine-tree.gif', type: 'resource', tileType: tileTypes.PINE_TREE },
@@ -81,7 +83,7 @@ export class MapEditor {
         // Tool groups for the toolbar flyout UI
         this.toolGroups = [
             { id: 'delete', label: 'Delete', toolIds: ['delete'], standalone: true },
-            { id: 'terrain', label: 'Terrain', toolIds: ['grass', 'dirt', 'water'] },
+            { id: 'terrain', label: 'Terrain', toolIds: ['grass', 'dirt', 'water', 'bridge_h', 'bridge_v'] },
             { id: 'nature', label: 'Nature', toolIds: ['large_tree', 'bush', 'pine_tree', 'rock', 'flower'] },
             { id: 'collectables', label: 'Collectables', toolIds: ['egg', 'badge'] },
             { id: 'buildings', label: 'Buildings', toolIds: ['farmhouse', 'chicken_coop', 'portal'] },
@@ -106,6 +108,8 @@ export class MapEditor {
             'grass': 'Click or drag to place grass tiles.',
             'dirt': 'Click or drag to place dirt paths.',
             'water': 'Click or drag to place water. Impassable for visitors.',
+            'bridge_h': 'Click or drag to place a horizontal bridge. Passable.',
+            'bridge_v': 'Click or drag to place a vertical bridge. Passable.',
             'large_tree': 'Click to place trees. Double-click any item to configure.',
             'bush': 'Click to place bushes. Double-click to configure.',
             'pine_tree': 'Click to place pine trees. Double-click to configure.',
@@ -653,10 +657,12 @@ export class MapEditor {
 
         // Redraw the specific tile
         const tiles = map[y][x];
-        let baseTile = tiles.find(t => t === tileTypes.DIRT) ? 'tile-dirt.gif'
-            : tiles.find(t => t === tileTypes.GRASS) ? 'tile-grass.gif'
-                : tiles.find(t => t === tileTypes.WATER || (t.color && t.color === '#3bbcff')) ? 'tile-water.gif'
-                    : 'tile-grass.gif';
+        let baseTile = tiles.find(t => t === tileTypes.BRIDGE_H) ? 'bridge-horizontal.gif'
+            : tiles.find(t => t === tileTypes.BRIDGE_V) ? 'bridge-vertical.gif'
+                : tiles.find(t => t === tileTypes.DIRT) ? 'tile-dirt.gif'
+                    : tiles.find(t => t === tileTypes.GRASS) ? 'tile-grass.gif'
+                        : tiles.find(t => t === tileTypes.WATER || (t.color && t.color === '#3bbcff')) ? 'tile-water.gif'
+                            : 'tile-grass.gif';
 
         const basePath = getSpriteUrl(baseTile);
         const imgBase = document.createElementNS('http://www.w3.org/2000/svg', 'image');
@@ -2066,6 +2072,8 @@ export class MapEditor {
                         if (layer.color === '#3bbcff') return 'WATER_BORDER';
                         if (layer === tileTypes.GRASS) return 'GRASS';
                         if (layer === tileTypes.DIRT) return 'DIRT';
+                        if (layer === tileTypes.BRIDGE_H) return 'BRIDGE_H';
+                        if (layer === tileTypes.BRIDGE_V) return 'BRIDGE_V';
                         if (layer === tileTypes.LARGE_TREE) return 'LARGE_TREE';
                         if (layer === tileTypes.BUSH) return 'BUSH';
                         if (layer === tileTypes.PINE_TREE) return 'PINE_TREE';

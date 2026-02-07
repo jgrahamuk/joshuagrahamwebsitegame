@@ -68,6 +68,8 @@ export const tileTypes = {
     FARMHOUSE: { color: 'white', passable: false, resource: null },
     IMAGE: { color: '#8844aa', passable: false, resource: null },
     TEXT: { color: '#2288cc', passable: true, resource: null },
+    BRIDGE_H: { color: '#8B6914', passable: true, resource: null },
+    BRIDGE_V: { color: '#8B6914', passable: true, resource: null },
 };
 export let MAP_WIDTH_TILES = 60;
 export let MAP_HEIGHT_TILES = 34;
@@ -287,10 +289,12 @@ export function drawMap(svg) {
     for (let y = 0; y < MAP_HEIGHT_TILES; y++) {
         for (let x = 0; x < MAP_WIDTH_TILES; x++) {
             const tiles = map[y][x];
-            let baseTile = tiles.find(t => t === tileTypes.DIRT) ? 'tile-dirt.gif'
-                : tiles.find(t => t === tileTypes.GRASS) ? 'tile-grass.gif'
-                    : tiles.find(t => t === tileTypes.WATER || (t.color && t.color === '#3bbcff')) ? 'tile-water.gif'
-                        : 'tile-grass.gif';
+            let baseTile = tiles.find(t => t === tileTypes.BRIDGE_H) ? 'bridge-horizontal.gif'
+                : tiles.find(t => t === tileTypes.BRIDGE_V) ? 'bridge-vertical.gif'
+                    : tiles.find(t => t === tileTypes.DIRT) ? 'tile-dirt.gif'
+                        : tiles.find(t => t === tileTypes.GRASS) ? 'tile-grass.gif'
+                            : tiles.find(t => t === tileTypes.WATER || (t.color && t.color === '#3bbcff')) ? 'tile-water.gif'
+                                : 'tile-grass.gif';
             let basePath = getSpriteUrl(baseTile);
             const imgBase = document.createElementNS('http://www.w3.org/2000/svg', 'image');
             imgBase.setAttribute('href', basePath);

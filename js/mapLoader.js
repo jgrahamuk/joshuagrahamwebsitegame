@@ -89,6 +89,8 @@ export function convertMapDataToGameFormat(mapData) {
                     case 'WATER_BORDER': return { ...tileTypes.WATER, color: '#3bbcff' };
                     case 'GRASS': return tileTypes.GRASS;
                     case 'DIRT': return tileTypes.DIRT;
+                    case 'BRIDGE_H': return tileTypes.BRIDGE_H;
+                    case 'BRIDGE_V': return tileTypes.BRIDGE_V;
                     case 'IMAGE': return tileTypes.IMAGE;
                     case 'TEXT': return tileTypes.TEXT;
                     default: return tileTypes.WATER;
