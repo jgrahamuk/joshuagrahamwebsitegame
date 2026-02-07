@@ -889,27 +889,31 @@ function startGameWithMapData(mapData, options = {}) {
         const effH = window.effectiveMapHeight || MAP_HEIGHT_TILES;
 
         if (x >= 0 && x < effW && y >= 0 && y < effH) {
+            // In edit mode, teleport — delay viewport shift so dblclick isn't broken
+            if (window.mapEditor && window.mapEditor.isActive) {
+                window.player.x = x;
+                window.player.y = y;
+                if (window._editorTeleportTimer) clearTimeout(window._editorTeleportTimer);
+                window._editorTeleportTimer = setTimeout(() => {
+                    if (window.updateViewport) window.updateViewport();
+                    window._editorTeleportTimer = null;
+                }, 300);
+                return;
+            }
+
             // Check if clicking on a portal
             if (window.portals) {
                 const clickedPortal = window.portals.find(p =>
                     x >= p.x && x < p.x + p.w && y >= p.y && y < p.y + p.h
                 );
                 if (clickedPortal && clickedPortal.url) {
-                    // In edit mode, don't navigate (let double-click configure)
-                    if (!(window.mapEditor && window.mapEditor.isActive)) {
-                        moveToTarget(clickedPortal.x, clickedPortal.y, window.player, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, 'portal', clickedPortal);
-                        return;
-                    }
+                    moveToTarget(clickedPortal.x, clickedPortal.y, window.player, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, 'portal', clickedPortal);
+                    return;
                 }
             }
 
             // Check if clicking on an NPC or surrounding tiles
             const clickedNPC = window.npcs.find(npc => npc.isClicked(x, y));
-
-            // In edit mode, don't process NPC clicks (let double-click configure them)
-            if (window.mapEditor && window.mapEditor.isActive && clickedNPC) {
-                return;
-            }
 
             if (clickedNPC && clickedNPC.isNearPlayer(window.player.x, window.player.y)) {
                 // Already adjacent - show message immediately
@@ -950,9 +954,8 @@ function startGameWithMapData(mapData, options = {}) {
                 return;
             }
 
-            // Otherwise, move to empty tile (in editor mode, allow moving to any tile)
-            const editorMode = window.mapEditor && window.mapEditor.isActive;
-            if (tile && (tile.passable || editorMode)) {
+            // Otherwise, move to empty tile
+            if (tile && tile.passable) {
                 moveToTarget(x, y, window.player, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, 'move');
             }
         }

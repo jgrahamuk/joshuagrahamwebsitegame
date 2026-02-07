@@ -148,10 +148,13 @@ export class MapEditor {
         this.createHelpSystem();
         this.setupMapClickHandler();
 
-        // Hide inventory UI when editing
+        // Hide inventory UI and player character when editing
         const uiContainer = document.getElementById('ui-container');
         if (uiContainer) {
             uiContainer.style.display = 'none';
+        }
+        if (window.player && window.player.element) {
+            window.player.element.style.display = 'none';
         }
     }
 
@@ -170,10 +173,13 @@ export class MapEditor {
         this.destroyHelpSystem();
         this.removeMapClickHandler();
 
-        // Show inventory UI when done editing
+        // Show inventory UI and player character when done editing
         const uiContainer = document.getElementById('ui-container');
         if (uiContainer) {
             uiContainer.style.display = '';
+        }
+        if (window.player && window.player.element) {
+            window.player.element.style.display = '';
         }
     }
 
@@ -471,6 +477,11 @@ export class MapEditor {
 
         this.mapDblClickHandler = (e) => {
             if (this.inlineTextEditor) return;
+            // Cancel any pending teleport viewport shift
+            if (window._editorTeleportTimer) {
+                clearTimeout(window._editorTeleportTimer);
+                window._editorTeleportTimer = null;
+            }
             e.stopPropagation();
             console.log('Double-click detected in map editor');
 
