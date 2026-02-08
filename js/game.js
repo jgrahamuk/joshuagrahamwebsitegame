@@ -972,10 +972,13 @@ function startGameWithMapData(mapData, options = {}) {
         }
     }
 
-    // Drag-to-move: holding and dragging continuously updates the destination
-    let isDragging = false;
-    let lastDragTileX = -1;
-    let lastDragTileY = -1;
+    // Tap vs hold: tap routes to location, hold+drag acts as directional guide
+    let holdTimer = null;
+    let isDirectional = false;
+    let directionalInterval = null;
+    let cursorClientX = 0;
+    let cursorClientY = 0;
+    let pointerDown = false;
 
     function getTileFromClient(clientX, clientY) {
         const rect = svg.getBoundingClientRect();
@@ -985,80 +988,124 @@ function startGameWithMapData(mapData, options = {}) {
         };
     }
 
-    function handleDragMove(clientX, clientY) {
+    function stepInDirection() {
+        if (!pointerDown || !isDirectional) return;
         if (window.player.isInIntro) return;
         if (window.mapEditor && window.mapEditor.isActive) return;
 
-        const { x, y } = getTileFromClient(clientX, clientY);
-        if (x === lastDragTileX && y === lastDragTileY) return;
+        const player = window.player;
+        const px = player.visualX ?? player.x;
+        const py = player.visualY ?? player.y;
+
+        // Get cursor position in tile coords
+        const cursor = getTileFromClient(cursorClientX, cursorClientY);
+
+        // Direction from player to cursor
+        const dx = cursor.x - px;
+        const dy = cursor.y - py;
+
+        // If cursor is on the player, don't move
+        if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return;
+
+        // Pick dominant cardinal direction
+        let nextX = Math.round(px);
+        let nextY = Math.round(py);
+        if (Math.abs(dx) >= Math.abs(dy)) {
+            nextX += dx > 0 ? 1 : -1;
+        } else {
+            nextY += dy > 0 ? 1 : -1;
+        }
 
         const effW = window.effectiveMapWidth || MAP_WIDTH_TILES;
         const effH = window.effectiveMapHeight || MAP_HEIGHT_TILES;
-        if (x < 0 || x >= effW || y < 0 || y >= effH) return;
+        if (nextX < 0 || nextX >= effW || nextY < 0 || nextY >= effH) return;
 
-        const tile = getTile(x, y);
+        const tile = getTile(nextX, nextY);
         if (tile && tile.passable) {
-            lastDragTileX = x;
-            lastDragTileY = y;
-            moveToTarget(x, y, window.player, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, 'move');
+            player.moveTo([{ x: nextX, y: nextY }]);
         }
+    }
+
+    function startDirectional(clientX, clientY) {
+        isDirectional = true;
+        cursorClientX = clientX;
+        cursorClientY = clientY;
+        // Cancel any tap-initiated pathfinding
+        if (window.player) window.player._moveCancelled = true;
+        stepInDirection();
+        directionalInterval = setInterval(stepInDirection, 120);
+    }
+
+    function stopDirectional() {
+        pointerDown = false;
+        isDirectional = false;
+        if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+        if (directionalInterval) { clearInterval(directionalInterval); directionalInterval = null; }
+    }
+
+    function handlePointerDown(clientX, clientY) {
+        if (window.player && window.player.isInIntro) return;
+        if (window.mapEditor && window.mapEditor.isActive && window.mapEditor.selectedTool) return;
+
+        pointerDown = true;
+        cursorClientX = clientX;
+        cursorClientY = clientY;
+
+        // Immediately route (tap behavior)
+        handleMapInteraction(clientX, clientY);
+
+        // After a short hold, switch to directional mode
+        holdTimer = setTimeout(() => {
+            if (pointerDown) {
+                startDirectional(cursorClientX, cursorClientY);
+            }
+        }, 250);
+    }
+
+    function handlePointerMove(clientX, clientY) {
+        cursorClientX = clientX;
+        cursorClientY = clientY;
     }
 
     // Mouse handlers for desktop
     svg.addEventListener('mousedown', (e) => {
         if (e.button !== 0) return;
-        isDragging = true;
-        lastDragTileX = -1;
-        lastDragTileY = -1;
-        handleMapInteraction(e.clientX, e.clientY);
-        const { x, y } = getTileFromClient(e.clientX, e.clientY);
-        lastDragTileX = x;
-        lastDragTileY = y;
+        handlePointerDown(e.clientX, e.clientY);
     });
 
     svg.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        handleDragMove(e.clientX, e.clientY);
+        if (!pointerDown) return;
+        handlePointerMove(e.clientX, e.clientY);
     });
 
     window.addEventListener('mouseup', () => {
-        isDragging = false;
+        stopDirectional();
     });
 
-    // Prevent the click event from double-firing after drag
+    // Prevent click from double-firing after hold
     svg.addEventListener('click', (e) => {
         e.stopPropagation();
     });
 
     // Touch handlers for mobile
     svg.addEventListener('touchstart', (e) => {
-        if (window.player && window.player.isInIntro) return;
-        if (window.mapEditor && window.mapEditor.isActive && window.mapEditor.selectedTool) return;
-
-        isDragging = true;
-        lastDragTileX = -1;
-        lastDragTileY = -1;
-
         if (e.touches.length > 0) {
             const touch = e.touches[0];
-            handleMapInteraction(touch.clientX, touch.clientY);
-            const { x, y } = getTileFromClient(touch.clientX, touch.clientY);
-            lastDragTileX = x;
-            lastDragTileY = y;
+            handlePointerDown(touch.clientX, touch.clientY);
         }
     }, { passive: true });
 
     svg.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
+        if (!pointerDown) return;
         if (e.touches.length > 0) {
             const touch = e.touches[0];
-            handleDragMove(touch.clientX, touch.clientY);
-            e.preventDefault(); // Prevent scrolling while dragging
+            handlePointerMove(touch.clientX, touch.clientY);
+            e.preventDefault();
         }
     }, { passive: false });
 
     svg.addEventListener('touchend', () => {
-        isDragging = false;
+        stopDirectional();
     });
 
     window.addEventListener('resize', () => {
