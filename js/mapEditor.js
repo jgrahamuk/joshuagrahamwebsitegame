@@ -1,4 +1,4 @@
-import { tileTypes, placeResourceAtPosition, removeResource, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, replaceMap } from './map.js';
+import { tileTypes, placeResourceAtPosition, removeResource, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, replaceMap, getTileSprite, getTileRotations, setTileRotation, setTileRotations, pushTileRotation, popTileRotation, clearTileRotation, clearAllTileRotations, isRotatable, isStackable, rotateTile } from './map.js';
 import { getSpriteUrl } from './spriteCache.js';
 import { NPC } from './npcs.js';
 import { Chicken, Cockerel, canPlaceHen, canPlaceRooster } from './chickens.js';
@@ -59,6 +59,9 @@ export class MapEditor {
             { id: 'water', name: 'Water', icon: 'tile-water.gif', type: 'tile', tileType: tileTypes.WATER },
             { id: 'bridge_h', name: 'Bridge (H)', icon: 'bridge-horizontal.gif', type: 'tile', tileType: tileTypes.BRIDGE_H },
             { id: 'bridge_v', name: 'Bridge (V)', icon: 'bridge-vertical.gif', type: 'tile', tileType: tileTypes.BRIDGE_V },
+            { id: 'grass_edge', name: 'Grass Edge', icon: 'tile-grass-edge.gif', type: 'tile', tileType: tileTypes.GRASS_EDGE },
+            { id: 'grass_corner', name: 'Grass Corner', icon: 'tile-grass-corner.gif', type: 'tile', tileType: tileTypes.GRASS_CORNER },
+            { id: 'grass_corner_inside', name: 'Inside Corner', icon: 'tile-grass-corner-inside.gif', type: 'tile', tileType: tileTypes.GRASS_CORNER_INSIDE },
             { id: 'large_tree', name: 'Large Tree', icon: 'tree.gif', type: 'resource', tileType: tileTypes.LARGE_TREE },
             { id: 'bush', name: 'Bush', icon: 'bush.gif', type: 'resource', tileType: tileTypes.BUSH },
             { id: 'pine_tree', name: 'Pine Tree', icon: 'pine-tree.gif', type: 'resource', tileType: tileTypes.PINE_TREE },
@@ -83,7 +86,7 @@ export class MapEditor {
         // Tool groups for the toolbar flyout UI
         this.toolGroups = [
             { id: 'delete', label: 'Delete', toolIds: ['delete'], standalone: true },
-            { id: 'terrain', label: 'Terrain', toolIds: ['grass', 'dirt', 'water', 'bridge_h', 'bridge_v'] },
+            { id: 'terrain', label: 'Terrain', toolIds: ['grass', 'grass_edge', 'grass_corner', 'grass_corner_inside', 'dirt', 'water', 'bridge_h', 'bridge_v'] },
             { id: 'nature', label: 'Nature', toolIds: ['large_tree', 'bush', 'pine_tree', 'rock', 'flower'] },
             { id: 'collectables', label: 'Collectables', toolIds: ['egg', 'badge'] },
             { id: 'buildings', label: 'Buildings', toolIds: ['farmhouse', 'chicken_coop', 'portal'] },
@@ -110,6 +113,9 @@ export class MapEditor {
             'water': 'Click or drag to place water. Impassable for visitors.',
             'bridge_h': 'Click or drag to place a horizontal bridge. Passable.',
             'bridge_v': 'Click or drag to place a vertical bridge. Passable.',
+            'grass_edge': 'Place a grass edge tile. Double-click to rotate.',
+            'grass_corner': 'Place a grass corner tile. Double-click to rotate.',
+            'grass_corner_inside': 'Place an inside corner tile. Double-click to rotate.',
             'large_tree': 'Click to place trees. Double-click any item to configure.',
             'bush': 'Click to place bushes. Double-click to configure.',
             'pine_tree': 'Click to place pine trees. Double-click to configure.',
@@ -131,6 +137,7 @@ export class MapEditor {
         this.tipBubble = null;
         this.statusEl = null;
         this.statusTimeout = null;
+        this.defaultRotation = 0;
 
     }
 
@@ -236,6 +243,28 @@ export class MapEditor {
         }
     }
 
+    cycleDefaultRotation() {
+        this.defaultRotation = (this.defaultRotation + 90) % 360;
+        // Update all visible buttons for this tool to show the rotation
+        if (this.selectedTool) {
+            this.toolbarContainer.querySelectorAll(`button[data-tool-id="${this.selectedTool.id}"] img`).forEach(img => {
+                img.style.transform = this.defaultRotation ? `rotate(${this.defaultRotation}deg)` : '';
+            });
+            // Also update the primary button if it's showing this tool
+            const group = this.toolGroups.find(g => g.toolIds.includes(this.selectedTool.id));
+            if (group && !group.standalone) {
+                const wrapper = this.toolbarContainer.querySelector(`.tool-group[data-group-id="${group.id}"]`);
+                if (wrapper) {
+                    const primaryImg = wrapper.querySelector('.tool-group-primary img');
+                    if (primaryImg) {
+                        primaryImg.style.transform = this.defaultRotation ? `rotate(${this.defaultRotation}deg)` : '';
+                    }
+                }
+            }
+        }
+        this.updateToolTip();
+    }
+
     collapseAllFlyouts() {
         this.expandedGroup = null;
         if (!this.toolbarContainer) return;
@@ -297,6 +326,12 @@ export class MapEditor {
                     }
                     this.selectTool(currentPrimary, true);
                 });
+                primaryBtn.addEventListener('dblclick', (e) => {
+                    e.stopPropagation();
+                    if (this.selectedTool && isRotatable(this.selectedTool.tileType)) {
+                        this.cycleDefaultRotation();
+                    }
+                });
                 wrapper.appendChild(primaryBtn);
 
                 // Flyout container (hidden by default via inline style)
@@ -318,6 +353,12 @@ export class MapEditor {
                         primaryBtn.classList.add('tool-group-primary');
                         this.selectTool(tool, true);
                         this.collapseAllFlyouts();
+                    });
+                    flyBtn.addEventListener('dblclick', (e) => {
+                        e.stopPropagation();
+                        if (isRotatable(tool.tileType)) {
+                            this.cycleDefaultRotation();
+                        }
                     });
                     flyout.appendChild(flyBtn);
                 });
@@ -353,11 +394,24 @@ export class MapEditor {
         // If clicking on already selected tool, deselect it (unless forced)
         if (!forceSelect && this.selectedTool && this.selectedTool.id === tool.id) {
             this.selectedTool = null;
+            this.defaultRotation = 0;
+            this.toolbarContainer.querySelectorAll('button img').forEach(img => {
+                img.style.transform = '';
+            });
             this.toolbarContainer.querySelectorAll('button.selected').forEach(btn => {
                 btn.classList.remove('selected');
             });
             this.updateToolTip();
             return;
+        }
+
+        // Reset default rotation when switching tools
+        if (!this.selectedTool || this.selectedTool.id !== tool.id) {
+            this.defaultRotation = 0;
+            // Clear any icon rotation transforms
+            this.toolbarContainer.querySelectorAll('button img').forEach(img => {
+                img.style.transform = '';
+            });
         }
 
         // Reset all button styles
@@ -621,17 +675,18 @@ export class MapEditor {
     }
 
     updateTileDisplay(x, y) {
-        // Get map offsets
-        const offsetX = window.MAP_OFFSET_X || 0;
-        const offsetY = window.MAP_OFFSET_Y || 0;
+        // Tile position in grid coords (container transform handles panning)
+        const tileX = x * window.TILE_SIZE;
+        const tileY = y * window.TILE_SIZE;
 
-        // Calculate tile position with offsets
-        const tileX = offsetX + x * window.TILE_SIZE;
-        const tileY = offsetY + y * window.TILE_SIZE;
+        // Find the map container for appending new elements
+        const container = this.svg.querySelector('#map-container');
+        const dynamicGroup = container ? container.querySelector('#dynamic-elements') : null;
+        const searchRoot = container || this.svg;
 
         // Remove existing images at this position more efficiently
         const imagesToRemove = [];
-        const existingImages = this.svg.querySelectorAll('image');
+        const existingImages = searchRoot.querySelectorAll('image');
         existingImages.forEach(img => {
             const imgX = parseFloat(img.getAttribute('x'));
             const imgY = parseFloat(img.getAttribute('y'));
@@ -647,7 +702,7 @@ export class MapEditor {
         imagesToRemove.forEach(img => img.remove());
 
         // Remove any existing resource at this position
-        const existingResources = this.svg.querySelectorAll('image[data-resource]');
+        const existingResources = searchRoot.querySelectorAll('image[data-resource]');
         existingResources.forEach(img => {
             const imgX = parseFloat(img.getAttribute('x'));
             const imgY = parseFloat(img.getAttribute('y'));
@@ -668,24 +723,56 @@ export class MapEditor {
 
         // Redraw the specific tile
         const tiles = map[y][x];
-        let baseTile = tiles.find(t => t === tileTypes.BRIDGE_H) ? 'bridge-horizontal.gif'
+
+        // Determine the base terrain tile
+        const baseTile = tiles.find(t => t === tileTypes.BRIDGE_H) ? 'bridge-horizontal.gif'
             : tiles.find(t => t === tileTypes.BRIDGE_V) ? 'bridge-vertical.gif'
                 : tiles.find(t => t === tileTypes.DIRT) ? 'tile-dirt.gif'
                     : tiles.find(t => t === tileTypes.GRASS) ? 'tile-grass.gif'
                         : tiles.find(t => t === tileTypes.WATER || (t.color && t.color === '#3bbcff')) ? 'tile-water.gif'
                             : 'tile-grass.gif';
 
-        const basePath = getSpriteUrl(baseTile);
+        const insertEl = (el) => {
+            if (container && dynamicGroup) {
+                container.insertBefore(el, dynamicGroup);
+            } else {
+                this.svg.appendChild(el);
+            }
+        };
+
         const imgBase = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        imgBase.setAttribute('href', basePath);
+        imgBase.setAttribute('href', getSpriteUrl(baseTile));
         imgBase.setAttribute('x', tileX);
         imgBase.setAttribute('y', tileY);
         imgBase.setAttribute('width', window.TILE_SIZE);
         imgBase.setAttribute('height', window.TILE_SIZE);
         imgBase.style.imageRendering = 'pixelated';
-        // Set a low z-index for base tiles
         imgBase.style.zIndex = '1';
-        this.svg.appendChild(imgBase);
+        insertEl(imgBase);
+
+        // Render custom-sprite tile overlays (grass edge/corner variants)
+        const rotations = getTileRotations(x, y);
+        let rotIdx = 0;
+        for (const t of tiles) {
+            const sprite = getTileSprite(t);
+            if (sprite) {
+                const rot = rotations[rotIdx++] || 0;
+                const imgOv = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                imgOv.setAttribute('href', getSpriteUrl(sprite));
+                imgOv.setAttribute('x', tileX);
+                imgOv.setAttribute('y', tileY);
+                imgOv.setAttribute('width', window.TILE_SIZE);
+                imgOv.setAttribute('height', window.TILE_SIZE);
+                if (rot) {
+                    const cx = tileX + window.TILE_SIZE / 2;
+                    const cy = tileY + window.TILE_SIZE / 2;
+                    imgOv.setAttribute('transform', `rotate(${rot}, ${cx}, ${cy})`);
+                }
+                imgOv.style.imageRendering = 'pixelated';
+                imgOv.style.zIndex = '1';
+                insertEl(imgOv);
+            }
+        }
 
         // Add overlay if needed
         const top = tiles[tiles.length - 1];
@@ -730,9 +817,12 @@ export class MapEditor {
             }
 
             imgOverlay.style.imageRendering = 'pixelated';
-            // Set a higher z-index for resources
             imgOverlay.style.zIndex = '2';
-            this.svg.appendChild(imgOverlay);
+            if (container && dynamicGroup) {
+                container.insertBefore(imgOverlay, dynamicGroup);
+            } else {
+                this.svg.appendChild(imgOverlay);
+            }
         }
     }
 
@@ -742,6 +832,14 @@ export class MapEditor {
 
         // Remove any collectable data at this position
         collectablesSystem.removeCollectable(x, y);
+
+        // Pop or clear tile rotation data depending on whether top tile is stackable
+        const topForRotation = tiles.length > 0 ? tiles[tiles.length - 1] : null;
+        if (topForRotation && isStackable(topForRotation)) {
+            popTileRotation(x, y);
+        } else {
+            clearTileRotation(x, y);
+        }
 
         // Remove image tile data if present
         if (imageTilesSystem.hasTile(x, y)) {
@@ -765,6 +863,9 @@ export class MapEditor {
         } else if (tiles.length > 1) {
             // Remove the top layer (resource or tile)
             tiles.pop();
+        } else if (tiles.length === 1 && tiles[0] !== tileTypes.WATER) {
+            // Single non-water tile (e.g. original grass) — replace with water
+            tiles[0] = tileTypes.WATER;
         }
 
         // Check if there's an NPC at this position (use broad detection)
@@ -804,11 +905,41 @@ export class MapEditor {
 
     placeTile(x, y, tileType) {
         const tiles = map[y][x];
-        // Replace the top layer if it's not water, otherwise add a new layer
-        if (tiles.length > 1 && tiles[tiles.length - 1] !== tileTypes.WATER) {
-            tiles[tiles.length - 1] = tileType;
-        } else {
+
+        // Ensure water is always at the base
+        if (tiles.length === 1 && tiles[0] !== tileTypes.WATER) {
+            tiles[0] = tileTypes.WATER;
+        }
+
+        // Placing water just resets to bare water
+        if (tileType === tileTypes.WATER) {
+            tiles.length = 1;
+            tiles[0] = tileTypes.WATER;
+            clearTileRotation(x, y);
+            return;
+        }
+
+        if (isStackable(tileType)) {
+            // Stackable tiles get pushed on top
             tiles.push(tileType);
+            pushTileRotation(x, y, this.defaultRotation);
+        } else {
+            // Non-stackable: strip any existing stacked custom-sprite tiles first
+            while (tiles.length > 1 && getTileSprite(tiles[tiles.length - 1])) {
+                tiles.pop();
+            }
+            clearTileRotation(x, y);
+
+            // Replace the top layer if it's not water, otherwise add a new layer
+            if (tiles.length > 1 && tiles[tiles.length - 1] !== tileTypes.WATER) {
+                tiles[tiles.length - 1] = tileType;
+            } else {
+                tiles.push(tileType);
+            }
+            // Apply default rotation for rotatable tiles
+            if (isRotatable(tileType) && this.defaultRotation) {
+                setTileRotation(x, y, this.defaultRotation);
+            }
         }
     }
 
@@ -870,6 +1001,9 @@ export class MapEditor {
 
         const topTile = tiles[tiles.length - 1];
 
+        // Check if it's a rotatable tile
+        if (isRotatable(topTile)) return true;
+
         // Check if it's a configurable resource
         const configurableTypes = [
             tileTypes.LARGE_TREE, tileTypes.BUSH, tileTypes.PINE_TREE,
@@ -881,6 +1015,16 @@ export class MapEditor {
 
     configureItem(x, y) {
         if (!this.isConfigurableItem(x, y)) {
+            return;
+        }
+
+        // Check if it's a rotatable tile — rotate it
+        const tiles = map[y][x];
+        const topTile = tiles[tiles.length - 1];
+        if (isRotatable(topTile)) {
+            rotateTile(x, y);
+            this.updateTileDisplay(x, y);
+            this.scheduleAutoSave();
             return;
         }
 
@@ -1390,8 +1534,11 @@ export class MapEditor {
             this.tipBubble.classList.add('hidden');
             return;
         }
-        const tip = this.toolTips[this.selectedTool.id];
+        let tip = this.toolTips[this.selectedTool.id];
         if (tip) {
+            if (this.defaultRotation && isRotatable(this.selectedTool.tileType)) {
+                tip += ` (${this.defaultRotation}\u00b0)`;
+            }
             this.tipBubble.textContent = tip;
             this.tipBubble.classList.remove('hidden');
         } else {
@@ -2021,6 +2168,7 @@ export class MapEditor {
 
     convertMapDataToGameFormat(mapData) {
         // Initialize empty map array
+        clearAllTileRotations();
         const gameMap = Array(mapData.height).fill().map(() =>
             Array(mapData.width).fill().map(() => [tileTypes.GRASS])
         );
@@ -2042,9 +2190,17 @@ export class MapEditor {
                     case 'BADGE': return tileTypes.BADGE;
                     case 'IMAGE': return tileTypes.IMAGE;
                     case 'TEXT': return tileTypes.TEXT;
+                    case 'GRASS_EDGE': return tileTypes.GRASS_EDGE;
+                    case 'GRASS_CORNER': return tileTypes.GRASS_CORNER;
+                    case 'GRASS_CORNER_INSIDE': return tileTypes.GRASS_CORNER_INSIDE;
                     default: return tileTypes.GRASS;
                 }
             });
+            if (tile.rotations) {
+                setTileRotations(tile.x, tile.y, tile.rotations);
+            } else if (tile.rotation) {
+                setTileRotation(tile.x, tile.y, tile.rotation);
+            }
         });
 
         // Apply structure tiles
@@ -2094,10 +2250,20 @@ export class MapEditor {
                         if (layer === tileTypes.BADGE) return 'BADGE';
                         if (layer === tileTypes.IMAGE) return 'IMAGE';
                         if (layer === tileTypes.TEXT) return 'TEXT';
+                        if (layer === tileTypes.GRASS_EDGE) return 'GRASS_EDGE';
+                        if (layer === tileTypes.GRASS_CORNER) return 'GRASS_CORNER';
+                        if (layer === tileTypes.GRASS_CORNER_INSIDE) return 'GRASS_CORNER_INSIDE';
                         return 'WATER';
                     });
 
-                    tiles.push({ x, y, layers });
+                    const rotations = getTileRotations(x, y);
+                    const tileEntry = { x, y, layers };
+                    if (rotations.length === 1) {
+                        tileEntry.rotation = rotations[0];
+                    } else if (rotations.length > 1) {
+                        tileEntry.rotations = rotations;
+                    }
+                    tiles.push(tileEntry);
 
                     // Check for resources
                     const topLayer = tileLayers[tileLayers.length - 1];

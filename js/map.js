@@ -70,7 +70,102 @@ export const tileTypes = {
     TEXT: { color: '#2288cc', passable: true, resource: null },
     BRIDGE_H: { color: '#8B6914', passable: true, resource: null },
     BRIDGE_V: { color: '#8B6914', passable: true, resource: null },
+    GRASS_EDGE: { color: 'green', passable: true, resource: null },
+    GRASS_CORNER: { color: 'green', passable: true, resource: null },
+    GRASS_CORNER_INSIDE: { color: 'green', passable: true, resource: null },
 };
+
+// Sprite file mapping for tile types that have custom sprites
+const tileSprites = new Map();
+tileSprites.set(tileTypes.GRASS_EDGE, 'tile-grass-edge.gif');
+tileSprites.set(tileTypes.GRASS_CORNER, 'tile-grass-corner.gif');
+tileSprites.set(tileTypes.GRASS_CORNER_INSIDE, 'tile-grass-corner-inside.gif');
+
+export function getTileSprite(tileType) {
+    return tileSprites.get(tileType) || null;
+}
+
+// Tile rotation stored per-position: "x,y" -> array of rotation degrees
+// Each element corresponds to a rotatable tile in the layer stack (bottom to top)
+const tileRotations = new Map();
+
+export function getTileRotations(x, y) {
+    return tileRotations.get(`${x},${y}`) || [];
+}
+
+// Get rotation for the first (or only) rotatable tile at this position
+export function getTileRotation(x, y) {
+    const rots = tileRotations.get(`${x},${y}`);
+    return rots && rots.length > 0 ? rots[0] : 0;
+}
+
+export function setTileRotations(x, y, rotations) {
+    if (!rotations || rotations.length === 0 || rotations.every(r => r === 0)) {
+        tileRotations.delete(`${x},${y}`);
+    } else {
+        tileRotations.set(`${x},${y}`, [...rotations]);
+    }
+}
+
+export function setTileRotation(x, y, degrees) {
+    setTileRotations(x, y, [degrees]);
+}
+
+export function pushTileRotation(x, y, degrees) {
+    const rots = getTileRotations(x, y);
+    rots.push(degrees);
+    setTileRotations(x, y, rots);
+}
+
+export function popTileRotation(x, y) {
+    const rots = getTileRotations(x, y);
+    rots.pop();
+    setTileRotations(x, y, rots);
+}
+
+export function clearTileRotation(x, y) {
+    tileRotations.delete(`${x},${y}`);
+}
+
+export function clearAllTileRotations() {
+    tileRotations.clear();
+}
+
+// Tile types that support rotation via double-click
+const rotatableTypes = new Set();
+rotatableTypes.add(tileTypes.GRASS_EDGE);
+rotatableTypes.add(tileTypes.GRASS_CORNER);
+rotatableTypes.add(tileTypes.GRASS_CORNER_INSIDE);
+
+export function isRotatable(tileType) {
+    return rotatableTypes.has(tileType);
+}
+
+// Tile types that can be stacked (multiple on same position)
+const stackableTypes = new Set();
+stackableTypes.add(tileTypes.GRASS_CORNER_INSIDE);
+
+export function isStackable(tileType) {
+    return stackableTypes.has(tileType);
+}
+
+// Rotate the topmost rotatable tile at a position
+export function rotateTile(x, y) {
+    const tiles = map[y][x];
+    if (!tiles || tiles.length === 0) return false;
+    const rots = getTileRotations(x, y);
+    if (rots.length === 0) {
+        // Check if there's a rotatable tile but no rotation stored yet
+        if (!tiles.some(t => isRotatable(t))) return false;
+        setTileRotations(x, y, [90]);
+        return true;
+    }
+    // Rotate the last entry (topmost)
+    rots[rots.length - 1] = (rots[rots.length - 1] + 90) % 360;
+    setTileRotations(x, y, rots);
+    return true;
+}
+
 export let MAP_WIDTH_TILES = 60;
 export let MAP_HEIGHT_TILES = 34;
 export let map = [];
@@ -260,7 +355,6 @@ export function drawMap(svg) {
     const svgWidth = window.innerWidth;
     const svgHeight = window.innerHeight;
 
-    // Use pre-calculated tile size and offsets from updateTileSize/updateViewport
     const tileSize = window.TILE_SIZE;
     const offsetX = window.MAP_OFFSET_X || 0;
     const offsetY = window.MAP_OFFSET_Y || 0;
@@ -269,7 +363,7 @@ export function drawMap(svg) {
     const tileOverlap = 0.5;
     const renderSize = tileSize + tileOverlap;
 
-    // Fill the entire SVG area with water tiles (no gaps)
+    // Fill the entire SVG area with water tiles (fixed to viewport, outside container)
     const numXTiles = Math.ceil(svgWidth / tileSize) + 1;
     const numYTiles = Math.ceil(svgHeight / tileSize) + 1;
     for (let y = 0; y < numYTiles; y++) {
@@ -285,31 +379,62 @@ export function drawMap(svg) {
         }
     }
 
+    // Create map container group — all map content at grid coords, panned via transform
+    const container = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    container.setAttribute('id', 'map-container');
+    container.setAttribute('transform', `translate(${offsetX}, ${offsetY})`);
+
     // Draw the map tiles
     for (let y = 0; y < MAP_HEIGHT_TILES; y++) {
         for (let x = 0; x < MAP_WIDTH_TILES; x++) {
             const tiles = map[y][x];
-            let baseTile = tiles.find(t => t === tileTypes.BRIDGE_H) ? 'bridge-horizontal.gif'
+
+            // Determine the base terrain tile
+            const baseTile = tiles.find(t => t === tileTypes.BRIDGE_H) ? 'bridge-horizontal.gif'
                 : tiles.find(t => t === tileTypes.BRIDGE_V) ? 'bridge-vertical.gif'
                     : tiles.find(t => t === tileTypes.DIRT) ? 'tile-dirt.gif'
                         : tiles.find(t => t === tileTypes.GRASS) ? 'tile-grass.gif'
                             : tiles.find(t => t === tileTypes.WATER || (t.color && t.color === '#3bbcff')) ? 'tile-water.gif'
                                 : 'tile-grass.gif';
-            let basePath = getSpriteUrl(baseTile);
+
             const imgBase = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-            imgBase.setAttribute('href', basePath);
-            imgBase.setAttribute('x', offsetX + x * tileSize);
-            imgBase.setAttribute('y', offsetY + y * tileSize);
+            imgBase.setAttribute('href', getSpriteUrl(baseTile));
+            imgBase.setAttribute('x', x * tileSize);
+            imgBase.setAttribute('y', y * tileSize);
             imgBase.setAttribute('width', renderSize);
             imgBase.setAttribute('height', renderSize);
             imgBase.style.imageRendering = 'pixelated';
             imgBase.style.zIndex = '1';
-            svg.appendChild(imgBase);
+            container.appendChild(imgBase);
+
+            // Render custom-sprite tiles (grass edge/corner variants) as overlays
+            const rotations = getTileRotations(x, y);
+            let rotIdx = 0;
+            for (const t of tiles) {
+                const sprite = getTileSprite(t);
+                if (sprite) {
+                    const rot = rotations[rotIdx++] || 0;
+                    const imgOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                    imgOverlay.setAttribute('href', getSpriteUrl(sprite));
+                    imgOverlay.setAttribute('x', x * tileSize);
+                    imgOverlay.setAttribute('y', y * tileSize);
+                    imgOverlay.setAttribute('width', renderSize);
+                    imgOverlay.setAttribute('height', renderSize);
+                    if (rot) {
+                        const cx = x * tileSize + tileSize / 2;
+                        const cy = y * tileSize + tileSize / 2;
+                        imgOverlay.setAttribute('transform', `rotate(${rot}, ${cx}, ${cy})`);
+                    }
+                    imgOverlay.style.imageRendering = 'pixelated';
+                    imgOverlay.style.zIndex = '1';
+                    container.appendChild(imgOverlay);
+                }
+            }
         }
     }
 
-    // Draw structures using the new module
-    drawStructures(svg, offsetX, offsetY);
+    // Draw structures
+    drawStructures(container, 0, 0);
 
     // Draw overlays/resources
     for (let y = 0; y < MAP_HEIGHT_TILES; y++) {
@@ -349,24 +474,23 @@ export function drawMap(svg) {
                 const imgOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'image');
                 imgOverlay.setAttribute('href', getSpriteUrl(overlay));
 
-                // For scaled resources, adjust position to keep centered
                 if (scale > 1) {
-                    const offset = (window.TILE_SIZE * (scale - 1)) / 2;
-                    imgOverlay.setAttribute('x', offsetX + x * window.TILE_SIZE - offset);
-                    imgOverlay.setAttribute('y', offsetY + y * window.TILE_SIZE - offset);
-                    imgOverlay.setAttribute('width', window.TILE_SIZE * scale);
-                    imgOverlay.setAttribute('height', window.TILE_SIZE * scale);
+                    const offset = (tileSize * (scale - 1)) / 2;
+                    imgOverlay.setAttribute('x', x * tileSize - offset);
+                    imgOverlay.setAttribute('y', y * tileSize - offset);
+                    imgOverlay.setAttribute('width', tileSize * scale);
+                    imgOverlay.setAttribute('height', tileSize * scale);
                 } else {
-                    imgOverlay.setAttribute('x', offsetX + x * window.TILE_SIZE);
-                    imgOverlay.setAttribute('y', offsetY + y * window.TILE_SIZE);
-                    imgOverlay.setAttribute('width', window.TILE_SIZE);
-                    imgOverlay.setAttribute('height', window.TILE_SIZE);
+                    imgOverlay.setAttribute('x', x * tileSize);
+                    imgOverlay.setAttribute('y', y * tileSize);
+                    imgOverlay.setAttribute('width', tileSize);
+                    imgOverlay.setAttribute('height', tileSize);
                 }
 
                 imgOverlay.setAttribute('data-resource', resourceType);
                 imgOverlay.style.imageRendering = 'pixelated';
                 imgOverlay.style.zIndex = '2';
-                svg.appendChild(imgOverlay);
+                container.appendChild(imgOverlay);
             }
         }
     }
@@ -374,13 +498,12 @@ export function drawMap(svg) {
     // Draw image tile blocks
     const imageGroups = imageTilesSystem.getAllGroups();
     imageGroups.forEach(group => {
-        const blockX = offsetX + group.x * tileSize;
-        const blockY = offsetY + group.y * tileSize;
+        const blockX = group.x * tileSize;
+        const blockY = group.y * tileSize;
         const blockW = group.width * tileSize;
         const blockH = group.height * tileSize;
 
         if (group.imageData) {
-            // Draw the uploaded image stretched across the block
             const imgEl = document.createElementNS('http://www.w3.org/2000/svg', 'image');
             imgEl.setAttribute('href', group.imageData);
             imgEl.setAttribute('x', blockX);
@@ -390,9 +513,8 @@ export function drawMap(svg) {
             imgEl.setAttribute('preserveAspectRatio', 'xMidYMid slice');
             imgEl.setAttribute('data-image-block', group.groupId);
             imgEl.style.zIndex = '2';
-            svg.appendChild(imgEl);
+            container.appendChild(imgEl);
         } else {
-            // Draw placeholder for image tiles without an uploaded image
             const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             rect.setAttribute('x', blockX);
             rect.setAttribute('y', blockY);
@@ -404,9 +526,8 @@ export function drawMap(svg) {
             rect.setAttribute('stroke-dasharray', '6,3');
             rect.setAttribute('data-image-block', group.groupId);
             rect.style.zIndex = '2';
-            svg.appendChild(rect);
+            container.appendChild(rect);
 
-            // Add icon text in center
             const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             text.setAttribute('x', blockX + blockW / 2);
             text.setAttribute('y', blockY + blockH / 2 + 6);
@@ -415,23 +536,20 @@ export function drawMap(svg) {
             text.setAttribute('font-size', Math.min(blockW, blockH, tileSize * 1.5));
             text.setAttribute('pointer-events', 'none');
             text.textContent = '\u{1F5BC}';
-            svg.appendChild(text);
+            container.appendChild(text);
         }
     });
 
     // Draw text tile blocks
     const textGroups = textTilesSystem.getAllGroups();
     textGroups.forEach(group => {
-        const blockX = offsetX + group.x * tileSize;
-        const blockY = offsetY + group.y * tileSize;
+        const blockX = group.x * tileSize;
+        const blockY = group.y * tileSize;
         const blockW = group.width * tileSize;
         const blockH = group.height * tileSize;
 
         if (group.htmlContent) {
-            // Sanitize the HTML content before rendering
             const sanitized = _sanitizeHtml(group.htmlContent);
-
-            // Render via SVG foreignObject with transparent background
             const fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
             fo.setAttribute('x', blockX);
             fo.setAttribute('y', blockY);
@@ -445,9 +563,8 @@ export function drawMap(svg) {
             div.style.cssText = `width:100%;height:100%;background:transparent;overflow:hidden;pointer-events:none;color:#fff;font-size:${Math.max(12, tileSize * 0.5)}px;line-height:1.3;word-wrap:break-word;`;
             div.innerHTML = sanitized;
             fo.appendChild(div);
-            svg.appendChild(fo);
+            container.appendChild(fo);
         } else {
-            // Draw placeholder for text tiles without content
             const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             rect.setAttribute('x', blockX);
             rect.setAttribute('y', blockY);
@@ -459,9 +576,8 @@ export function drawMap(svg) {
             rect.setAttribute('stroke-dasharray', '6,3');
             rect.setAttribute('data-text-block', group.groupId);
             rect.style.zIndex = '2';
-            svg.appendChild(rect);
+            container.appendChild(rect);
 
-            // Add "T" text in center
             const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             text.setAttribute('x', blockX + blockW / 2);
             text.setAttribute('y', blockY + blockH / 2 + 6);
@@ -470,45 +586,42 @@ export function drawMap(svg) {
             text.setAttribute('font-size', Math.min(blockW, blockH, tileSize * 1.5));
             text.setAttribute('pointer-events', 'none');
             text.textContent = 'T';
-            svg.appendChild(text);
+            container.appendChild(text);
         }
     });
 
-    // If map editor is active, darken water outside the map boundary
+    // Editor overlays (inside container so they pan with the map)
     if (window.mapEditor && window.mapEditor.isActive) {
         const editorGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         editorGroup.setAttribute('pointer-events', 'none');
         editorGroup.style.zIndex = '3';
 
-        const mapLeft = offsetX;
-        const mapTop = offsetY;
-        const mapRight = offsetX + MAP_WIDTH_TILES * tileSize;
-        const mapBottom = offsetY + MAP_HEIGHT_TILES * tileSize;
-
-        // Dark overlay rectangles around the map area (top, bottom, left, right)
+        const mapRight = MAP_WIDTH_TILES * tileSize;
+        const mapBottom = MAP_HEIGHT_TILES * tileSize;
         const overlayColor = 'rgba(0, 0, 0, 0.35)';
+
+        // Darken areas outside map boundary (in grid coords)
+        const bigPad = 5000; // large padding to cover viewport when panned
         const regions = [
-            { x: 0, y: 0, w: svgWidth, h: mapTop },                          // top
-            { x: 0, y: mapBottom, w: svgWidth, h: svgHeight - mapBottom },     // bottom
-            { x: 0, y: mapTop, w: mapLeft, h: mapBottom - mapTop },            // left
-            { x: mapRight, y: mapTop, w: svgWidth - mapRight, h: mapBottom - mapTop } // right
+            { x: -bigPad, y: -bigPad, w: mapRight + bigPad * 2, h: bigPad },                     // top
+            { x: -bigPad, y: mapBottom, w: mapRight + bigPad * 2, h: bigPad },                    // bottom
+            { x: -bigPad, y: 0, w: bigPad, h: mapBottom },                                        // left
+            { x: mapRight, y: 0, w: bigPad, h: mapBottom }                                        // right
         ];
         regions.forEach(r => {
-            if (r.w > 0 && r.h > 0) {
-                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                rect.setAttribute('x', r.x);
-                rect.setAttribute('y', r.y);
-                rect.setAttribute('width', r.w);
-                rect.setAttribute('height', r.h);
-                rect.setAttribute('fill', overlayColor);
-                editorGroup.appendChild(rect);
-            }
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', r.x);
+            rect.setAttribute('y', r.y);
+            rect.setAttribute('width', r.w);
+            rect.setAttribute('height', r.h);
+            rect.setAttribute('fill', overlayColor);
+            editorGroup.appendChild(rect);
         });
 
-        svg.appendChild(editorGroup);
+        container.appendChild(editorGroup);
     }
 
-    // Draw dark overlay over tiles outside effective (tier-limited) bounds
+    // Tier-limited area overlay
     const effW = window.effectiveMapWidth || MAP_WIDTH_TILES;
     const effH = window.effectiveMapHeight || MAP_HEIGHT_TILES;
     if (effW < MAP_WIDTH_TILES || effH < MAP_HEIGHT_TILES) {
@@ -516,38 +629,39 @@ export function drawMap(svg) {
         restrictedGroup.setAttribute('pointer-events', 'none');
         const overlayColor = 'rgba(0, 0, 0, 0.4)';
 
-        // Right strip: columns effW..MAP_WIDTH_TILES, rows 0..effH
         if (effW < MAP_WIDTH_TILES) {
             const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            rect.setAttribute('x', offsetX + effW * tileSize);
-            rect.setAttribute('y', offsetY);
+            rect.setAttribute('x', effW * tileSize);
+            rect.setAttribute('y', 0);
             rect.setAttribute('width', (MAP_WIDTH_TILES - effW) * tileSize);
             rect.setAttribute('height', effH * tileSize);
             rect.setAttribute('fill', overlayColor);
             restrictedGroup.appendChild(rect);
         }
 
-        // Bottom strip: rows effH..MAP_HEIGHT_TILES, full width
         if (effH < MAP_HEIGHT_TILES) {
             const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            rect.setAttribute('x', offsetX);
-            rect.setAttribute('y', offsetY + effH * tileSize);
+            rect.setAttribute('x', 0);
+            rect.setAttribute('y', effH * tileSize);
             rect.setAttribute('width', MAP_WIDTH_TILES * tileSize);
             rect.setAttribute('height', (MAP_HEIGHT_TILES - effH) * tileSize);
             rect.setAttribute('fill', overlayColor);
             restrictedGroup.appendChild(rect);
         }
 
-        svg.appendChild(restrictedGroup);
+        container.appendChild(restrictedGroup);
     }
 
-    // Create a group for dynamic elements (player, NPCs, chickens)
+    // Dynamic elements group (player, NPCs, chickens) — inside container
     const dynamicGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     dynamicGroup.setAttribute('id', 'dynamic-elements');
     dynamicGroup.style.zIndex = '4';
-    svg.appendChild(dynamicGroup);
+    container.appendChild(dynamicGroup);
 
-    // Redraw player and NPCs on top
+    // Append the container to svg
+    svg.appendChild(container);
+
+    // Re-attach player and entities
     if (window.player) {
         if (window.player.element.parentNode) {
             window.player.element.parentNode.removeChild(window.player.element);
@@ -574,6 +688,5 @@ export function drawMap(svg) {
         });
     }
 
-    // Ensure SVG uses proper stacking context
     svg.style.isolation = 'isolate';
 } 

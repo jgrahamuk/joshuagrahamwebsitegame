@@ -60,12 +60,10 @@ class BadgeSystem {
     isPositionBlocked(position) {
         if (!window.svg) return true;
 
-        const offsetX = window.MAP_OFFSET_X || 0;
-        const offsetY = window.MAP_OFFSET_Y || 0;
-        const targetX = offsetX + position.x * window.TILE_SIZE;
-        const targetY = offsetY + position.y * window.TILE_SIZE;
+        const targetX = position.x * window.TILE_SIZE;
+        const targetY = position.y * window.TILE_SIZE;
 
-        // Check for any resources or structures at this position
+        // Check for any resources or structures at this position (grid coords)
         const elements = window.svg.querySelectorAll('image[data-resource]');
         for (const element of elements) {
             const x = parseFloat(element.getAttribute('x'));
@@ -110,28 +108,29 @@ class BadgeSystem {
     addBadgeElement(position) {
         if (!window.svg) return;
 
-        const offsetX = window.MAP_OFFSET_X || 0;
-        const offsetY = window.MAP_OFFSET_Y || 0;
-
         const badgeElement = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         badgeElement.setAttribute('href', getSpriteUrl('badge.gif'));
-        badgeElement.setAttribute('x', offsetX + position.x * window.TILE_SIZE);
-        badgeElement.setAttribute('y', offsetY + position.y * window.TILE_SIZE);
+        badgeElement.setAttribute('x', position.x * window.TILE_SIZE);
+        badgeElement.setAttribute('y', position.y * window.TILE_SIZE);
         badgeElement.setAttribute('width', window.TILE_SIZE);
         badgeElement.setAttribute('height', window.TILE_SIZE);
         badgeElement.setAttribute('data-resource', 'badge');
 
-        window.svg.appendChild(badgeElement);
+        const container = window.svg.querySelector('#map-container');
+        const dynamicGroup = container ? container.querySelector('#dynamic-elements') : null;
+        if (container && dynamicGroup) {
+            container.insertBefore(badgeElement, dynamicGroup);
+        } else {
+            window.svg.appendChild(badgeElement);
+        }
     }
 
     // Remove badge element from SVG
     removeBadgeElement(position) {
         if (!window.svg) return;
 
-        const offsetX = window.MAP_OFFSET_X || 0;
-        const offsetY = window.MAP_OFFSET_Y || 0;
-        const badgeX = offsetX + position.x * window.TILE_SIZE;
-        const badgeY = offsetY + position.y * window.TILE_SIZE;
+        const badgeX = position.x * window.TILE_SIZE;
+        const badgeY = position.y * window.TILE_SIZE;
 
         const badgeElements = window.svg.querySelectorAll('image[data-resource="badge"]');
         badgeElements.forEach(element => {

@@ -120,19 +120,15 @@ export function moveToTarget(targetX, targetY, player, getTile, MAP_WIDTH_TILES,
     // Check if target is passable (in editor mode, all tiles are walkable)
     const editorMode = window.mapEditor && window.mapEditor.isActive;
     const targetTile = getTile(targetX, targetY);
-    console.log(`[PATH] moveToTarget: start=(${start.x},${start.y}) target=(${targetX},${targetY}) type=${interactionType} targetPassable=${targetTile?.passable} editorMode=${editorMode}`);
     if (editorMode || (targetTile && targetTile.passable)) {
         // Direct path to target
         path = findPath(start, end, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
-        console.log(`[PATH] findPath direct: ${path ? path.length + ' steps' : 'null'}`);
     } else {
         // Find adjacent tile and path to it
         const adjacentTile = findAdjacentTile(targetX, targetY, player.x, player.y, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
-        console.log(`[PATH] target not passable, adjacent tile:`, adjacentTile);
         if (adjacentTile) {
             end = adjacentTile;
             path = findPath(start, end, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES);
-            console.log(`[PATH] findPath to adjacent: ${path ? path.length + ' steps' : 'null'}`);
         }
     }
 

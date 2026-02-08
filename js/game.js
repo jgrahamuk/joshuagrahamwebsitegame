@@ -542,40 +542,16 @@ function updateViewport() {
     offsetY = Math.min(offsetY, 0);
     offsetY = Math.max(offsetY, h - mapPixelHeight);
 
-    const oldOffsetX = window.MAP_OFFSET_X || 0;
-    const oldOffsetY = window.MAP_OFFSET_Y || 0;
-    const dx = offsetX - oldOffsetX;
-    const dy = offsetY - oldOffsetY;
-
     // Skip if nothing changed
-    if (dx === 0 && dy === 0) return;
+    if (offsetX === (window.MAP_OFFSET_X || 0) && offsetY === (window.MAP_OFFSET_Y || 0)) return;
 
     window.MAP_OFFSET_X = offsetX;
     window.MAP_OFFSET_Y = offsetY;
 
-    // Shift all existing SVG elements in-place instead of full redraw
-    const svgEl = window.svg;
-    if (svgEl) {
-        const allImages = svgEl.querySelectorAll('image');
-        allImages.forEach(img => {
-            img.setAttribute('x', parseFloat(img.getAttribute('x')) + dx);
-            img.setAttribute('y', parseFloat(img.getAttribute('y')) + dy);
-        });
-        const allRects = svgEl.querySelectorAll('rect');
-        allRects.forEach(rect => {
-            rect.setAttribute('x', parseFloat(rect.getAttribute('x')) + dx);
-            rect.setAttribute('y', parseFloat(rect.getAttribute('y')) + dy);
-        });
-        const allTexts = svgEl.querySelectorAll('text');
-        allTexts.forEach(text => {
-            text.setAttribute('x', parseFloat(text.getAttribute('x')) + dx);
-            text.setAttribute('y', parseFloat(text.getAttribute('y')) + dy);
-        });
-        const allFOs = svgEl.querySelectorAll('foreignObject');
-        allFOs.forEach(fo => {
-            fo.setAttribute('x', parseFloat(fo.getAttribute('x')) + dx);
-            fo.setAttribute('y', parseFloat(fo.getAttribute('y')) + dy);
-        });
+    // Update the map container transform — single attribute change instead of full redraw
+    const container = document.getElementById('map-container');
+    if (container) {
+        container.setAttribute('transform', `translate(${offsetX}, ${offsetY})`);
     }
 }
 
@@ -714,10 +690,8 @@ function startGameWithMapData(mapData, options = {}) {
     // Update global map reference to point to the current map data
     window.map = map;
 
-    // Create a group for all game entities
-    const gameEntitiesGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    gameEntitiesGroup.setAttribute('id', 'game-entities');
-    svg.appendChild(gameEntitiesGroup);
+    // Use the dynamic-elements group inside the map container (created by drawMap)
+    const gameEntitiesGroup = svg.querySelector('#map-container #dynamic-elements');
 
     // Find a valid player start position
     let start;
@@ -739,6 +713,15 @@ function startGameWithMapData(mapData, options = {}) {
         introText: options.introText || mapData.introText || null
     };
     window.player = new Player(svg, start.x, start.y, playerOptions);
+
+    // If skipping intro, move player element into the map container immediately
+    if (playerOptions.skipIntro && gameEntitiesGroup) {
+        if (window.player.element.parentNode) {
+            window.player.element.parentNode.removeChild(window.player.element);
+        }
+        gameEntitiesGroup.appendChild(window.player.element);
+        window.player.updatePosition();
+    }
 
     // Create chickens from loaded data
     window.chickens = [];
@@ -894,13 +877,11 @@ function startGameWithMapData(mapData, options = {}) {
 
     // Player movement and interaction - handle both click and touch
     function handleMapInteraction(clientX, clientY) {
-        console.log('[NAV] handleMapInteraction called');
-
         // If player is in intro sequence, ignore map clicks
-        if (window.player.isInIntro) { console.log('[NAV] blocked: player in intro'); return; }
+        if (window.player.isInIntro) return;
 
         // If map editor is active with a tool selected, let the editor handle clicks
-        if (window.mapEditor && window.mapEditor.isActive && window.mapEditor.selectedTool) { console.log('[NAV] blocked: editor active with tool'); return; }
+        if (window.mapEditor && window.mapEditor.isActive && window.mapEditor.selectedTool) return;
 
         const rect = svg.getBoundingClientRect();
         const x = Math.floor((clientX - rect.left - (window.MAP_OFFSET_X || 0)) / window.TILE_SIZE);
@@ -908,7 +889,6 @@ function startGameWithMapData(mapData, options = {}) {
 
         const effW = window.effectiveMapWidth || MAP_WIDTH_TILES;
         const effH = window.effectiveMapHeight || MAP_HEIGHT_TILES;
-        console.log(`[NAV] click at tile (${x}, ${y}), player at (${window.player.x}, ${window.player.y}), bounds: ${effW}x${effH}, editorActive: ${window.mapEditor?.isActive}`);
 
         if (x >= 0 && x < effW && y >= 0 && y < effH) {
             // In edit mode, teleport — delay viewport shift so dblclick isn't broken
@@ -947,7 +927,6 @@ function startGameWithMapData(mapData, options = {}) {
             // Check if clicking on a resource - on mobile, also check adjacent tiles for tolerance
             const tile = getTile(x, y);
             if (tile && tile.resource) {
-                console.log(`[NAV] clicked resource at (${x},${y}), type:`, tile.resource);
                 moveToTarget(x, y, window.player, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, 'resource');
                 return;
             }
@@ -978,16 +957,9 @@ function startGameWithMapData(mapData, options = {}) {
             }
 
             // Otherwise, move to empty tile
-            console.log(`[NAV] tile at (${x},${y}):`, tile, 'passable:', tile?.passable);
             if (tile && tile.passable) {
-                console.log(`[NAV] calling moveToTarget from (${window.player.x},${window.player.y}) to (${x},${y})`);
-                const result = moveToTarget(x, y, window.player, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, 'move');
-                console.log('[NAV] moveToTarget returned path:', result ? `${result.length} steps` : 'null (no path found)');
-            } else {
-                console.log('[NAV] tile not passable or null, not moving');
+                moveToTarget(x, y, window.player, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, 'move');
             }
-        } else {
-            console.log(`[NAV] click out of bounds: (${x},${y}) not in 0..${effW-1}, 0..${effH-1}`);
         }
 
         // Only dismiss NPC messages when NOT clicking on an NPC

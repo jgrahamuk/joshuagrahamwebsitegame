@@ -1,4 +1,4 @@
-import { tileTypes } from './map.js';
+import { tileTypes, setTileRotation, setTileRotations, clearAllTileRotations } from './map.js';
 import { loadMapById } from './mapBrowser.js';
 import { collectablesSystem } from './collectables.js';
 import { imageTilesSystem } from './imageTiles.js';
@@ -71,6 +71,9 @@ export function getCurrentMapData() {
 export function convertMapDataToGameFormat(mapData) {
     const { width, height, tiles, structures, resources, npcs, chickens, cockerels, portals } = mapData;
 
+    // Clear any previous rotation data
+    clearAllTileRotations();
+
     // Convert tile data to game format
     const gameMap = [];
     for (let y = 0; y < height; y++) {
@@ -93,9 +96,18 @@ export function convertMapDataToGameFormat(mapData) {
                     case 'BRIDGE_V': return tileTypes.BRIDGE_V;
                     case 'IMAGE': return tileTypes.IMAGE;
                     case 'TEXT': return tileTypes.TEXT;
+                    case 'GRASS_EDGE': return tileTypes.GRASS_EDGE;
+                    case 'GRASS_CORNER': return tileTypes.GRASS_CORNER;
+                    case 'GRASS_CORNER_INSIDE': return tileTypes.GRASS_CORNER_INSIDE;
                     default: return tileTypes.WATER;
                 }
             });
+            // Restore tile rotation if saved
+            if (tile.rotations) {
+                setTileRotations(tile.x, tile.y, tile.rotations);
+            } else if (tile.rotation) {
+                setTileRotation(tile.x, tile.y, tile.rotation);
+            }
         }
     });
 

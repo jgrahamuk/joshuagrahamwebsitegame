@@ -114,8 +114,8 @@ export class Chicken {
             sprite = chickenSprites[this.direction];
         }
         this.element.setAttribute('href', getSpriteUrl(sprite));
-        this.element.setAttribute('x', (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE);
-        this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE);
+        this.element.setAttribute('x', this.x * window.TILE_SIZE);
+        this.element.setAttribute('y', this.y * window.TILE_SIZE);
         this.element.setAttribute('width', window.TILE_SIZE);
         this.element.setAttribute('height', window.TILE_SIZE);
         this.element.style.imageRendering = 'pixelated';
@@ -249,13 +249,19 @@ export class Chicken {
     addEggToSVG(x, y) {
         const eggElement = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         eggElement.setAttribute('href', getSpriteUrl('egg.gif'));
-        eggElement.setAttribute('x', (window.MAP_OFFSET_X || 0) + x * window.TILE_SIZE);
-        eggElement.setAttribute('y', (window.MAP_OFFSET_Y || 0) + y * window.TILE_SIZE);
+        eggElement.setAttribute('x', x * window.TILE_SIZE);
+        eggElement.setAttribute('y', y * window.TILE_SIZE);
         eggElement.setAttribute('width', window.TILE_SIZE);
         eggElement.setAttribute('height', window.TILE_SIZE);
         eggElement.setAttribute('data-resource', 'egg');
         eggElement.style.imageRendering = 'pixelated';
-        this.svg.appendChild(eggElement);
+        const container = this.svg.querySelector('#map-container');
+        const dynamicGroup = container ? container.querySelector('#dynamic-elements') : null;
+        if (container && dynamicGroup) {
+            container.insertBefore(eggElement, dynamicGroup);
+        } else {
+            this.svg.appendChild(eggElement);
+        }
         window.eggTimers[`${x},${y}`] = Date.now();
     }
 }
@@ -305,8 +311,8 @@ export class Cockerel {
             sprite = cockerelSprites[this.direction];
         }
         this.element.setAttribute('href', getSpriteUrl(sprite));
-        this.element.setAttribute('x', (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE);
-        this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE);
+        this.element.setAttribute('x', this.x * window.TILE_SIZE);
+        this.element.setAttribute('y', this.y * window.TILE_SIZE);
         this.element.setAttribute('width', window.TILE_SIZE * 1.5);
         this.element.setAttribute('height', window.TILE_SIZE * 1.5);
         this.element.style.imageRendering = 'pixelated';
@@ -428,8 +434,8 @@ export class Chick {
     updatePosition() {
         let sprite = chickSprites[this.direction];
         this.element.setAttribute('href', getSpriteUrl(sprite));
-        this.element.setAttribute('x', (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE);
-        this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE);
+        this.element.setAttribute('x', this.x * window.TILE_SIZE);
+        this.element.setAttribute('y', this.y * window.TILE_SIZE);
         this.element.setAttribute('width', window.TILE_SIZE);
         this.element.setAttribute('height', window.TILE_SIZE);
         this.element.style.imageRendering = 'pixelated';
@@ -526,7 +532,7 @@ function hatchEggsTick() {
                     const ex = parseInt(el.getAttribute('x'));
                     const ey = parseInt(el.getAttribute('y'));
                     if (Math.round(ex / window.TILE_SIZE) === x && Math.round(ey / window.TILE_SIZE) === y) {
-                        svg.removeChild(el);
+                        el.remove();
                     }
                 });
 

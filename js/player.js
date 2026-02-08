@@ -204,9 +204,12 @@ export class Player {
         }
 
         // Animate character scale down and move to position
+        // Target is in screen coords (element is in root SVG during animation)
         let scale = this.introScale;
-        const targetX = (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE;
-        const targetY = (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE - window.TILE_SIZE;
+        const offsetX = window.MAP_OFFSET_X || 0;
+        const offsetY = window.MAP_OFFSET_Y || 0;
+        const targetX = offsetX + this.x * window.TILE_SIZE;
+        const targetY = offsetY + this.y * window.TILE_SIZE - window.TILE_SIZE;
         const startX = parseFloat(this.element.getAttribute('x'));
         const startY = parseFloat(this.element.getAttribute('y'));
         const dx = targetX - startX;
@@ -216,6 +219,14 @@ export class Player {
             scale -= 0.1;
             if (scale <= 1) {
                 scale = 1;
+                // Move player element into the map container
+                const dynamicGroup = this.svg.querySelector('#map-container #dynamic-elements');
+                if (dynamicGroup) {
+                    if (this.element.parentNode) {
+                        this.element.parentNode.removeChild(this.element);
+                    }
+                    dynamicGroup.appendChild(this.element);
+                }
                 this.updatePosition();
                 // Center viewport on player after intro (for mobile)
                 if (window.updateViewport) window.updateViewport();
@@ -256,8 +267,8 @@ export class Player {
         }
 
         this.element.setAttribute('href', getSpriteUrl(sprite));
-        this.element.setAttribute('x', (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE);
-        this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE - window.TILE_SIZE);
+        this.element.setAttribute('x', this.x * window.TILE_SIZE);
+        this.element.setAttribute('y', this.y * window.TILE_SIZE - window.TILE_SIZE);
         this.element.setAttribute('width', window.TILE_SIZE * 2);
         this.element.setAttribute('height', window.TILE_SIZE * 2);
         this.element.style.imageRendering = 'pixelated';
@@ -305,12 +316,10 @@ export class Player {
                     const elapsed = now - startTime;
                     const t = Math.min(1, elapsed / stepDuration);
 
-                    // Lerp pixel position
-                    const offsetX = window.MAP_OFFSET_X || 0;
-                    const offsetY = window.MAP_OFFSET_Y || 0;
+                    // Lerp pixel position (grid coords, container transform handles panning)
                     const tileSize = window.TILE_SIZE;
-                    const px = offsetX + (fromX + (toX - fromX) * t) * tileSize;
-                    const py = offsetY + (fromY + (toY - fromY) * t) * tileSize - tileSize;
+                    const px = (fromX + (toX - fromX) * t) * tileSize;
+                    const py = (fromY + (toY - fromY) * t) * tileSize - tileSize;
 
                     // Update walk sprite
                     let sprite = `character-${this.direction}.gif`;
@@ -437,8 +446,8 @@ export class Player {
     }
 
     removeResourceElement(resourcePos) {
-        const resourceX = (window.MAP_OFFSET_X || 0) + resourcePos.x * window.TILE_SIZE;
-        const resourceY = (window.MAP_OFFSET_Y || 0) + resourcePos.y * window.TILE_SIZE;
+        const resourceX = resourcePos.x * window.TILE_SIZE;
+        const resourceY = resourcePos.y * window.TILE_SIZE;
         const resourceElements = this.svg.querySelectorAll('image[data-resource]');
 
         resourceElements.forEach(element => {
