@@ -251,21 +251,7 @@ export class Player {
     updatePosition() {
         if (this.isInIntro) return;
 
-        let sprite = `character-${this.direction}.gif`;
-
-        // Add walking animation for left/right movement
-        if (this.isWalking && (this.direction === 'left' || this.direction === 'right')) {
-            const now = Date.now();
-            if (now - this.lastWalkToggle > this.walkToggleInterval) {
-                this.walkFrame = (this.walkFrame + 1) % 2;
-                this.lastWalkToggle = now;
-            }
-
-            if (this.walkFrame === 1) {
-                sprite = `character-${this.direction}-walk.gif`;
-            }
-        }
-
+        const sprite = `character-${this.direction}.gif`;
         this.element.setAttribute('href', getSpriteUrl(sprite));
         this.element.setAttribute('x', this.x * window.TILE_SIZE);
         this.element.setAttribute('y', this.y * window.TILE_SIZE - window.TILE_SIZE);
@@ -285,12 +271,15 @@ export class Player {
         }
 
         // Cancel any previous movement
+        this._moveCancelled = true;
+        // Wait a frame to let the previous animation loop exit
+        await new Promise(r => requestAnimationFrame(r));
         this._moveCancelled = false;
 
         // Start walking animation
         this.isWalking = true;
         this.walkFrame = 0;
-        this.lastWalkToggle = Date.now();
+        this.lastWalkToggle = 0;
 
         const stepDuration = 80; // ms per tile
 
@@ -316,28 +305,34 @@ export class Player {
                     const elapsed = now - startTime;
                     const t = Math.min(1, elapsed / stepDuration);
 
-                    // Lerp pixel position (grid coords, container transform handles panning)
-                    const tileSize = window.TILE_SIZE;
-                    const px = (fromX + (toX - fromX) * t) * tileSize;
-                    const py = (fromY + (toY - fromY) * t) * tileSize - tileSize;
+                    // Lerp position in grid coords
+                    const lerpX = fromX + (toX - fromX) * t;
+                    const lerpY = fromY + (toY - fromY) * t;
 
-                    // Update walk sprite
-                    let sprite = `character-${this.direction}.gif`;
-                    if (this.direction === 'left' || this.direction === 'right') {
-                        const wNow = Date.now();
-                        if (wNow - this.lastWalkToggle > this.walkToggleInterval) {
-                            this.walkFrame = (this.walkFrame + 1) % 2;
-                            this.lastWalkToggle = wNow;
-                        }
-                        if (this.walkFrame === 1) sprite = `character-${this.direction}-walk.gif`;
+                    // Update visual position for smooth viewport tracking
+                    this.visualX = lerpX;
+                    this.visualY = lerpY;
+
+                    // Toggle walk frame
+                    if (now - this.lastWalkToggle > this.walkToggleInterval) {
+                        this.walkFrame = 1 - this.walkFrame;
+                        this.lastWalkToggle = now;
                     }
 
-                    this.element.setAttribute('href', getSpriteUrl(sprite));
+                    const tileSize = window.TILE_SIZE;
+                    const px = lerpX * tileSize;
+                    const py = lerpY * tileSize - tileSize;
+
+                    const walkSuffix = this.walkFrame === 1 && (this.direction === 'left' || this.direction === 'right') ? '-walk' : '';
+                    this.element.setAttribute('href', getSpriteUrl(`character-${this.direction}${walkSuffix}.gif`));
                     this.element.setAttribute('x', px);
                     this.element.setAttribute('y', py);
                     this.element.setAttribute('width', tileSize * 2);
                     this.element.setAttribute('height', tileSize * 2);
                     this.element.style.imageRendering = 'pixelated';
+
+                    // Update viewport smoothly during animation
+                    if (window.updateViewport) window.updateViewport();
 
                     if (t < 1) {
                         requestAnimationFrame(animate);
@@ -348,12 +343,13 @@ export class Player {
                 requestAnimationFrame(animate);
             });
 
-            // Snap logical position
-            this.x = toX;
-            this.y = toY;
-
-            // Update viewport to follow player
-            if (window.updateViewport) window.updateViewport();
+            // Snap logical position (skip if cancelled to avoid jumping)
+            if (!this._moveCancelled) {
+                this.x = toX;
+                this.y = toY;
+                this.visualX = toX;
+                this.visualY = toY;
+            }
 
             // Check interactions at each tile
             if (this.targetResource && this.isAdjacentToResource(this.targetResource)) {
@@ -372,6 +368,8 @@ export class Player {
 
         // Stop walking animation
         this.isWalking = false;
+        this.visualX = undefined;
+        this.visualY = undefined;
         this.updatePosition();
 
         // Clear interaction data after movement completes

@@ -67,6 +67,10 @@ export class MapEditor {
             { id: 'pine_tree', name: 'Pine Tree', icon: 'pine-tree.gif', type: 'resource', tileType: tileTypes.PINE_TREE },
             { id: 'rock', name: 'Rock', icon: 'stone.gif', type: 'resource', tileType: tileTypes.ROCK },
             { id: 'flower', name: 'Flower', icon: 'flower.gif', type: 'resource', tileType: tileTypes.FLOWER },
+            { id: 'flower_rose', name: 'Rose', icon: 'flower-rose.gif', type: 'resource', tileType: tileTypes.FLOWER_ROSE },
+            { id: 'flower_forgetmenot', name: 'Forget-me-not', icon: 'flower-forgetmenot.gif', type: 'resource', tileType: tileTypes.FLOWER_FORGETMENOT },
+            { id: 'flower_tulip', name: 'Tulip', icon: 'flower-tulip.gif', type: 'resource', tileType: tileTypes.FLOWER_TULIP },
+            { id: 'flower_bluebell', name: 'Bluebell', icon: 'flower-bluebell.gif', type: 'resource', tileType: tileTypes.FLOWER_BLUEBELL },
             { id: 'egg', name: 'Egg', icon: 'egg.gif', type: 'resource', tileType: tileTypes.EGG },
             { id: 'badge', name: 'Badge', icon: 'badge.gif', type: 'resource', tileType: tileTypes.BADGE },
             // Structures
@@ -87,7 +91,7 @@ export class MapEditor {
         this.toolGroups = [
             { id: 'delete', label: 'Delete', toolIds: ['delete'], standalone: true },
             { id: 'terrain', label: 'Terrain', toolIds: ['grass', 'grass_edge', 'grass_corner', 'grass_corner_inside', 'dirt', 'water', 'bridge_h', 'bridge_v'] },
-            { id: 'nature', label: 'Nature', toolIds: ['large_tree', 'bush', 'pine_tree', 'rock', 'flower'] },
+            { id: 'nature', label: 'Nature', toolIds: ['large_tree', 'bush', 'pine_tree', 'rock', 'flower', 'flower_rose', 'flower_forgetmenot', 'flower_tulip', 'flower_bluebell'] },
             { id: 'collectables', label: 'Collectables', toolIds: ['egg', 'badge'] },
             { id: 'buildings', label: 'Buildings', toolIds: ['farmhouse', 'chicken_coop', 'portal'] },
             { id: 'creatures', label: 'Creatures', toolIds: ['chicken', 'cockerel'] },
@@ -121,6 +125,10 @@ export class MapEditor {
             'pine_tree': 'Click to place pine trees. Double-click to configure.',
             'rock': 'Click to place rocks. Double-click to configure.',
             'flower': 'Click to place flowers. Double-click to configure.',
+            'flower_rose': 'Click to place roses. Double-click to configure.',
+            'flower_forgetmenot': 'Click to place forget-me-nots. Double-click to configure.',
+            'flower_tulip': 'Click to place tulips. Double-click to configure.',
+            'flower_bluebell': 'Click to place bluebells. Double-click to configure.',
             'egg': 'Place an egg. Chickens also lay eggs that hatch into chicks!',
             'badge': 'Place a collectable badge. Double-click to add a message.',
             'farmhouse': 'Place a farmhouse (10\u00d76). Needs clear space.',
@@ -791,6 +799,14 @@ export class MapEditor {
             overlay = 'stone.gif';
         } else if (top === tileTypes.FLOWER) {
             overlay = 'flower.gif';
+        } else if (top === tileTypes.FLOWER_ROSE) {
+            overlay = 'flower-rose.gif';
+        } else if (top === tileTypes.FLOWER_FORGETMENOT) {
+            overlay = 'flower-forgetmenot.gif';
+        } else if (top === tileTypes.FLOWER_TULIP) {
+            overlay = 'flower-tulip.gif';
+        } else if (top === tileTypes.FLOWER_BLUEBELL) {
+            overlay = 'flower-bluebell.gif';
         } else if (top === tileTypes.EGG) {
             overlay = 'egg.gif';
         } else if (top === tileTypes.BADGE) {
@@ -923,8 +939,20 @@ export class MapEditor {
             // Stackable tiles get pushed on top
             tiles.push(tileType);
             pushTileRotation(x, y, this.defaultRotation);
+        } else if (getTileSprite(tileType)) {
+            // Custom-sprite overlay tiles (grass edge/corner): stack on top of base terrain
+            // Strip any existing custom-sprite overlays first
+            while (tiles.length > 1 && getTileSprite(tiles[tiles.length - 1])) {
+                tiles.pop();
+            }
+            clearTileRotation(x, y);
+            tiles.push(tileType);
+            if (isRotatable(tileType) && this.defaultRotation) {
+                setTileRotation(x, y, this.defaultRotation);
+            }
         } else {
-            // Non-stackable: strip any existing stacked custom-sprite tiles first
+            // Base terrain tiles: replace the top non-water layer
+            // Strip any existing custom-sprite overlays first
             while (tiles.length > 1 && getTileSprite(tiles[tiles.length - 1])) {
                 tiles.pop();
             }
@@ -935,10 +963,6 @@ export class MapEditor {
                 tiles[tiles.length - 1] = tileType;
             } else {
                 tiles.push(tileType);
-            }
-            // Apply default rotation for rotatable tiles
-            if (isRotatable(tileType) && this.defaultRotation) {
-                setTileRotation(x, y, this.defaultRotation);
             }
         }
     }
@@ -1007,7 +1031,7 @@ export class MapEditor {
         // Check if it's a configurable resource
         const configurableTypes = [
             tileTypes.LARGE_TREE, tileTypes.BUSH, tileTypes.PINE_TREE,
-            tileTypes.ROCK, tileTypes.FLOWER, tileTypes.EGG, tileTypes.BADGE
+            tileTypes.ROCK, tileTypes.FLOWER, tileTypes.FLOWER_ROSE, tileTypes.FLOWER_FORGETMENOT, tileTypes.FLOWER_TULIP, tileTypes.FLOWER_BLUEBELL, tileTypes.EGG, tileTypes.BADGE
         ];
 
         return configurableTypes.some(type => topTile === type);
@@ -1856,14 +1880,6 @@ export class MapEditor {
         const toolbar = document.createElement('div');
         toolbar.id = 'inline-text-toolbar';
 
-        // Position above the editor by default, below if near top edge
-        const toolbarHeight = 38;
-        const aboveTop = screenTop - toolbarHeight - 6;
-        if (aboveTop < 4) {
-            toolbar.style.top = (screenTop + blockHeight + 6) + 'px';
-        } else {
-            toolbar.style.top = aboveTop + 'px';
-        }
         toolbar.style.left = screenLeft + 'px';
 
         // Font dropdown
@@ -1904,6 +1920,19 @@ export class MapEditor {
             document.execCommand('foreColor', false, e.target.value);
         });
 
+        // Background color picker
+        const bgColorPicker = document.createElement('input');
+        bgColorPicker.type = 'color';
+        bgColorPicker.id = 'text-bg-color-picker';
+        bgColorPicker.value = '#000000';
+        bgColorPicker.title = 'Background color';
+        bgColorPicker.style.cssText = 'width:28px;height:28px;border:2px solid #666;border-radius:4px;background:none;cursor:pointer;padding:0;';
+        bgColorPicker.addEventListener('input', (e) => {
+            const editArea = document.getElementById('text-edit-area');
+            if (editArea) editArea.focus();
+            document.execCommand('hiliteColor', false, e.target.value);
+        });
+
         // Save and Cancel buttons
         const saveBtn = document.createElement('button');
         saveBtn.className = 'inline-text-save';
@@ -1921,16 +1950,41 @@ export class MapEditor {
             this.cancelInlineTextEditor();
         });
 
+        // Alignment buttons
+        const alignBarStyle = 'display:block;height:2px;background:#eee;margin:1.5px 0;';
+        const alignLeftBtn = this._createFormatBtn(
+            `<span style="display:inline-block;width:14px"><span style="${alignBarStyle}width:100%"></span><span style="${alignBarStyle}width:70%"></span><span style="${alignBarStyle}width:100%"></span><span style="${alignBarStyle}width:50%"></span></span>`,
+            'Align left', 'justifyLeft');
+        const alignCenterBtn = this._createFormatBtn(
+            `<span style="display:flex;flex-direction:column;align-items:center;width:14px"><span style="${alignBarStyle}width:100%"></span><span style="${alignBarStyle}width:70%"></span><span style="${alignBarStyle}width:100%"></span><span style="${alignBarStyle}width:50%"></span></span>`,
+            'Align center', 'justifyCenter');
+        const alignRightBtn = this._createFormatBtn(
+            `<span style="display:flex;flex-direction:column;align-items:flex-end;width:14px"><span style="${alignBarStyle}width:100%"></span><span style="${alignBarStyle}width:70%"></span><span style="${alignBarStyle}width:100%"></span><span style="${alignBarStyle}width:50%"></span></span>`,
+            'Align right', 'justifyRight');
+
         toolbar.appendChild(fontDropdown);
         toolbar.appendChild(fontSizeSelect);
         toolbar.appendChild(boldBtn);
         toolbar.appendChild(italicBtn);
         toolbar.appendChild(underlineBtn);
         toolbar.appendChild(colorPicker);
+        toolbar.appendChild(bgColorPicker);
+        toolbar.appendChild(alignLeftBtn);
+        toolbar.appendChild(alignCenterBtn);
+        toolbar.appendChild(alignRightBtn);
         toolbar.appendChild(saveBtn);
         toolbar.appendChild(cancelBtn);
 
         document.body.appendChild(toolbar);
+
+        // Reposition using actual rendered height
+        const actualHeight = toolbar.offsetHeight;
+        const aboveTopActual = screenTop - actualHeight - 6;
+        if (aboveTopActual < 4) {
+            toolbar.style.top = (screenTop + blockHeight + 6) + 'px';
+        } else {
+            toolbar.style.top = aboveTopActual + 'px';
+        }
     }
 
     _createFormatBtn(innerHTML, title, cmd) {
@@ -2186,6 +2240,10 @@ export class MapEditor {
                     case 'PINE_TREE': return tileTypes.PINE_TREE;
                     case 'ROCK': return tileTypes.ROCK;
                     case 'FLOWER': return tileTypes.FLOWER;
+                    case 'FLOWER_ROSE': return tileTypes.FLOWER_ROSE;
+                    case 'FLOWER_FORGETMENOT': return tileTypes.FLOWER_FORGETMENOT;
+                    case 'FLOWER_TULIP': return tileTypes.FLOWER_TULIP;
+                    case 'FLOWER_BLUEBELL': return tileTypes.FLOWER_BLUEBELL;
                     case 'EGG': return tileTypes.EGG;
                     case 'BADGE': return tileTypes.BADGE;
                     case 'IMAGE': return tileTypes.IMAGE;
@@ -2246,6 +2304,10 @@ export class MapEditor {
                         if (layer === tileTypes.PINE_TREE) return 'PINE_TREE';
                         if (layer === tileTypes.ROCK) return 'ROCK';
                         if (layer === tileTypes.FLOWER) return 'FLOWER';
+                        if (layer === tileTypes.FLOWER_ROSE) return 'FLOWER_ROSE';
+                        if (layer === tileTypes.FLOWER_FORGETMENOT) return 'FLOWER_FORGETMENOT';
+                        if (layer === tileTypes.FLOWER_TULIP) return 'FLOWER_TULIP';
+                        if (layer === tileTypes.FLOWER_BLUEBELL) return 'FLOWER_BLUEBELL';
                         if (layer === tileTypes.EGG) return 'EGG';
                         if (layer === tileTypes.BADGE) return 'BADGE';
                         if (layer === tileTypes.IMAGE) return 'IMAGE';
@@ -2272,6 +2334,10 @@ export class MapEditor {
                         topLayer === tileTypes.PINE_TREE ||
                         topLayer === tileTypes.ROCK ||
                         topLayer === tileTypes.FLOWER ||
+                        topLayer === tileTypes.FLOWER_ROSE ||
+                        topLayer === tileTypes.FLOWER_FORGETMENOT ||
+                        topLayer === tileTypes.FLOWER_TULIP ||
+                        topLayer === tileTypes.FLOWER_BLUEBELL ||
                         topLayer === tileTypes.EGG ||
                         topLayer === tileTypes.BADGE) {
                         let resourceType = 'LARGE_TREE';
@@ -2279,6 +2345,10 @@ export class MapEditor {
                         else if (topLayer === tileTypes.PINE_TREE) resourceType = 'PINE_TREE';
                         else if (topLayer === tileTypes.ROCK) resourceType = 'ROCK';
                         else if (topLayer === tileTypes.FLOWER) resourceType = 'FLOWER';
+                        else if (topLayer === tileTypes.FLOWER_ROSE) resourceType = 'FLOWER_ROSE';
+                        else if (topLayer === tileTypes.FLOWER_FORGETMENOT) resourceType = 'FLOWER_FORGETMENOT';
+                        else if (topLayer === tileTypes.FLOWER_TULIP) resourceType = 'FLOWER_TULIP';
+                        else if (topLayer === tileTypes.FLOWER_BLUEBELL) resourceType = 'FLOWER_BLUEBELL';
                         else if (topLayer === tileTypes.EGG) resourceType = 'EGG';
                         else if (topLayer === tileTypes.BADGE) resourceType = 'BADGE';
 

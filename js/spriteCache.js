@@ -8,7 +8,7 @@ const spriteNames = [
     'cockerel-peck-right.gif', 'cockerel-peck-left.gif',
     'tile-dirt.gif', 'tile-grass.gif', 'tile-water.gif', 'bridge-horizontal.gif', 'bridge-vertical.gif',
     'tile-grass-edge.gif', 'tile-grass-corner.gif', 'tile-grass-corner-inside.gif',
-    'tree.gif', 'bush.gif', 'pine-tree.gif', 'stone.gif', 'flower.gif', 'egg.gif', 'badge.gif',
+    'tree.gif', 'bush.gif', 'pine-tree.gif', 'stone.gif', 'flower.gif', 'flower-rose.gif', 'flower-forgetmenot.gif', 'flower-tulip.gif', 'flower-bluebell.gif', 'egg.gif', 'badge.gif',
     'farmhouse.gif',
     'chicken-coop.gif',
     'sign-joshuagraham.gif',

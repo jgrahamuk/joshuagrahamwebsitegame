@@ -121,6 +121,10 @@ export function convertMapDataToGameFormat(mapData) {
                 case 'PINE_TREE': gameMap[resource.y][resource.x].push(tileTypes.PINE_TREE); break;
                 case 'ROCK': gameMap[resource.y][resource.x].push(tileTypes.ROCK); break;
                 case 'FLOWER': gameMap[resource.y][resource.x].push(tileTypes.FLOWER); break;
+                case 'FLOWER_ROSE': gameMap[resource.y][resource.x].push(tileTypes.FLOWER_ROSE); break;
+                case 'FLOWER_FORGETMENOT': gameMap[resource.y][resource.x].push(tileTypes.FLOWER_FORGETMENOT); break;
+                case 'FLOWER_TULIP': gameMap[resource.y][resource.x].push(tileTypes.FLOWER_TULIP); break;
+                case 'FLOWER_BLUEBELL': gameMap[resource.y][resource.x].push(tileTypes.FLOWER_BLUEBELL); break;
                 case 'EGG': gameMap[resource.y][resource.x].push(tileTypes.EGG); break;
                 case 'BADGE': gameMap[resource.y][resource.x].push(tileTypes.BADGE); break;
             }

@@ -529,8 +529,11 @@ function updateViewport() {
     const mapPixelHeight = MAP_HEIGHT_TILES * tileSize;
 
     // Calculate player's pixel position (center of player tile)
-    const playerCenterX = (window.player.x + 1) * tileSize; // +1 because player sprite is 2 tiles wide
-    const playerCenterY = (window.player.y + 1) * tileSize;
+    // Use visual position (interpolated) if available for smooth camera tracking
+    const px = window.player.visualX ?? window.player.x;
+    const py = window.player.visualY ?? window.player.y;
+    const playerCenterX = (px + 1) * tileSize; // +1 because player sprite is 2 tiles wide
+    const playerCenterY = (py + 1) * tileSize;
 
     // Calculate offset to center player on screen
     let offsetX = (w / 2) - playerCenterX;
@@ -969,31 +972,93 @@ function startGameWithMapData(mapData, options = {}) {
         }
     }
 
-    // Click handler for desktop
-    svg.addEventListener('click', (e) => {
+    // Drag-to-move: holding and dragging continuously updates the destination
+    let isDragging = false;
+    let lastDragTileX = -1;
+    let lastDragTileY = -1;
+
+    function getTileFromClient(clientX, clientY) {
+        const rect = svg.getBoundingClientRect();
+        return {
+            x: Math.floor((clientX - rect.left - (window.MAP_OFFSET_X || 0)) / window.TILE_SIZE),
+            y: Math.floor((clientY - rect.top - (window.MAP_OFFSET_Y || 0)) / window.TILE_SIZE)
+        };
+    }
+
+    function handleDragMove(clientX, clientY) {
+        if (window.player.isInIntro) return;
+        if (window.mapEditor && window.mapEditor.isActive) return;
+
+        const { x, y } = getTileFromClient(clientX, clientY);
+        if (x === lastDragTileX && y === lastDragTileY) return;
+
+        const effW = window.effectiveMapWidth || MAP_WIDTH_TILES;
+        const effH = window.effectiveMapHeight || MAP_HEIGHT_TILES;
+        if (x < 0 || x >= effW || y < 0 || y >= effH) return;
+
+        const tile = getTile(x, y);
+        if (tile && tile.passable) {
+            lastDragTileX = x;
+            lastDragTileY = y;
+            moveToTarget(x, y, window.player, getTile, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, 'move');
+        }
+    }
+
+    // Mouse handlers for desktop
+    svg.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        isDragging = true;
+        lastDragTileX = -1;
+        lastDragTileY = -1;
         handleMapInteraction(e.clientX, e.clientY);
+        const { x, y } = getTileFromClient(e.clientX, e.clientY);
+        lastDragTileX = x;
+        lastDragTileY = y;
     });
 
-    // Touch handler for mobile - needed for reliable touch detection on real devices
-    let touchHandled = false;
+    svg.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        handleDragMove(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+
+    // Prevent the click event from double-firing after drag
+    svg.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    // Touch handlers for mobile
     svg.addEventListener('touchstart', (e) => {
-        touchHandled = false;
-    });
-
-    svg.addEventListener('touchend', (e) => {
-        // Don't handle if player is in intro (let the intro click handler work)
         if (window.player && window.player.isInIntro) return;
-
-        // Don't handle if map editor is active with a tool
         if (window.mapEditor && window.mapEditor.isActive && window.mapEditor.selectedTool) return;
 
-        if (e.changedTouches.length > 0) {
-            const touch = e.changedTouches[0];
-            console.log('Touch at:', touch.clientX, touch.clientY);
+        isDragging = true;
+        lastDragTileX = -1;
+        lastDragTileY = -1;
+
+        if (e.touches.length > 0) {
+            const touch = e.touches[0];
             handleMapInteraction(touch.clientX, touch.clientY);
-            touchHandled = true;
-            e.preventDefault(); // Prevent click from also firing
+            const { x, y } = getTileFromClient(touch.clientX, touch.clientY);
+            lastDragTileX = x;
+            lastDragTileY = y;
         }
+    }, { passive: true });
+
+    svg.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        if (e.touches.length > 0) {
+            const touch = e.touches[0];
+            handleDragMove(touch.clientX, touch.clientY);
+            e.preventDefault(); // Prevent scrolling while dragging
+        }
+    }, { passive: false });
+
+    svg.addEventListener('touchend', () => {
+        isDragging = false;
     });
 
     window.addEventListener('resize', () => {

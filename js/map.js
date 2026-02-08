@@ -60,6 +60,10 @@ export const tileTypes = {
     GRASS: { color: 'green', passable: true, resource: null },
     ROCK: { color: 'grey', passable: true, resource: 'stone' },
     FLOWER: { color: 'pink', passable: true, resource: null },
+    FLOWER_ROSE: { color: 'red', passable: true, resource: null },
+    FLOWER_FORGETMENOT: { color: 'lightblue', passable: true, resource: null },
+    FLOWER_TULIP: { color: 'red', passable: true, resource: null },
+    FLOWER_BLUEBELL: { color: 'blue', passable: true, resource: null },
     BUSH: { color: 'darkgreen', passable: true, resource: 'wood' },
     PINE_TREE: { color: 'darkgreen', passable: true, resource: 'wood' },
     LARGE_TREE: { color: 'darkgreen', passable: true, resource: 'wood' },
@@ -461,6 +465,18 @@ export function drawMap(svg) {
                 resourceType = 'stone';
             } else if (top === tileTypes.FLOWER) {
                 overlay = 'flower.gif';
+                resourceType = 'flower';
+            } else if (top === tileTypes.FLOWER_ROSE) {
+                overlay = 'flower-rose.gif';
+                resourceType = 'flower';
+            } else if (top === tileTypes.FLOWER_FORGETMENOT) {
+                overlay = 'flower-forgetmenot.gif';
+                resourceType = 'flower';
+            } else if (top === tileTypes.FLOWER_TULIP) {
+                overlay = 'flower-tulip.gif';
+                resourceType = 'flower';
+            } else if (top === tileTypes.FLOWER_BLUEBELL) {
+                overlay = 'flower-bluebell.gif';
                 resourceType = 'flower';
             } else if (top === tileTypes.EGG) {
                 overlay = 'egg.gif';
