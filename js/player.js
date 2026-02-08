@@ -206,7 +206,7 @@ export class Player {
         // Animate character scale down and move to position
         let scale = this.introScale;
         const targetX = (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE;
-        const targetY = (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE;
+        const targetY = (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE - window.TILE_SIZE;
         const startX = parseFloat(this.element.getAttribute('x'));
         const startY = parseFloat(this.element.getAttribute('y'));
         const dx = targetX - startX;
@@ -257,15 +257,14 @@ export class Player {
 
         this.element.setAttribute('href', getSpriteUrl(sprite));
         this.element.setAttribute('x', (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE);
-        this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE);
+        this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE - window.TILE_SIZE);
         this.element.setAttribute('width', window.TILE_SIZE * 2);
         this.element.setAttribute('height', window.TILE_SIZE * 2);
         this.element.style.imageRendering = 'pixelated';
     }
     async moveTo(path, targetResource = null, interactionData = null) {
-        this.targetResource = targetResource; // Set the target resource if provided
-        this.interactionData = interactionData; // Set interaction data if provided
-        let last = { x: this.x, y: this.y };
+        this.targetResource = targetResource;
+        this.interactionData = interactionData;
 
         // Check if we're already adjacent to the resource (no movement needed)
         if (this.targetResource && this.isAdjacentToResource(this.targetResource)) {
@@ -274,28 +273,83 @@ export class Player {
             return;
         }
 
+        // Cancel any previous movement
+        this._moveCancelled = false;
+
         // Start walking animation
         this.isWalking = true;
         this.walkFrame = 0;
         this.lastWalkToggle = Date.now();
 
-        for (const point of path) {
-            if (point.x > last.x) this.direction = 'right';
-            else if (point.x < last.x) this.direction = 'left';
-            else if (point.y > last.y) this.direction = 'front';
-            else if (point.y < last.y) this.direction = 'back';
-            last = { ...point };
-            this.x = point.x;
-            this.y = point.y;
-            this.updatePosition();
+        const stepDuration = 80; // ms per tile
 
-            // Update viewport to follow player on mobile
+        for (const point of path) {
+            if (this._moveCancelled) break;
+
+            // Set direction based on movement
+            if (point.x > this.x) this.direction = 'right';
+            else if (point.x < this.x) this.direction = 'left';
+            else if (point.y > this.y) this.direction = 'front';
+            else if (point.y < this.y) this.direction = 'back';
+
+            const fromX = this.x;
+            const fromY = this.y;
+            const toX = point.x;
+            const toY = point.y;
+
+            // Smoothly interpolate between tiles
+            await new Promise(resolve => {
+                const startTime = performance.now();
+                const animate = (now) => {
+                    if (this._moveCancelled) { resolve(); return; }
+                    const elapsed = now - startTime;
+                    const t = Math.min(1, elapsed / stepDuration);
+
+                    // Lerp pixel position
+                    const offsetX = window.MAP_OFFSET_X || 0;
+                    const offsetY = window.MAP_OFFSET_Y || 0;
+                    const tileSize = window.TILE_SIZE;
+                    const px = offsetX + (fromX + (toX - fromX) * t) * tileSize;
+                    const py = offsetY + (fromY + (toY - fromY) * t) * tileSize - tileSize;
+
+                    // Update walk sprite
+                    let sprite = `character-${this.direction}.gif`;
+                    if (this.direction === 'left' || this.direction === 'right') {
+                        const wNow = Date.now();
+                        if (wNow - this.lastWalkToggle > this.walkToggleInterval) {
+                            this.walkFrame = (this.walkFrame + 1) % 2;
+                            this.lastWalkToggle = wNow;
+                        }
+                        if (this.walkFrame === 1) sprite = `character-${this.direction}-walk.gif`;
+                    }
+
+                    this.element.setAttribute('href', getSpriteUrl(sprite));
+                    this.element.setAttribute('x', px);
+                    this.element.setAttribute('y', py);
+                    this.element.setAttribute('width', tileSize * 2);
+                    this.element.setAttribute('height', tileSize * 2);
+                    this.element.style.imageRendering = 'pixelated';
+
+                    if (t < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        resolve();
+                    }
+                };
+                requestAnimationFrame(animate);
+            });
+
+            // Snap logical position
+            this.x = toX;
+            this.y = toY;
+
+            // Update viewport to follow player
             if (window.updateViewport) window.updateViewport();
 
-            // Check if we've reached our destination and should interact
+            // Check interactions at each tile
             if (this.targetResource && this.isAdjacentToResource(this.targetResource)) {
                 this.gatherResource(this.targetResource);
-                this.targetResource = null; // Clear the target
+                this.targetResource = null;
             }
 
             if (this.interactionData && this.interactionData.type === 'npc') {
@@ -305,8 +359,6 @@ export class Player {
             if (this.interactionData && this.interactionData.type === 'portal') {
                 this.checkPortalInteraction(this.interactionData.data);
             }
-
-            await new Promise(resolve => setTimeout(resolve, 100));
         }
 
         // Stop walking animation

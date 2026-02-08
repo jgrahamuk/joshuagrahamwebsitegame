@@ -50,7 +50,7 @@ export class NPC {
         let sprite = `${this.name.toLowerCase()}-${this.direction}.gif`;
         this.element.setAttribute('href', getSpriteUrl(sprite));
         this.element.setAttribute('x', (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE);
-        this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE);
+        this.element.setAttribute('y', (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE - window.TILE_SIZE);
         this.element.setAttribute('width', window.TILE_SIZE * 2);
         this.element.setAttribute('height', window.TILE_SIZE * 2);
         this.element.style.imageRendering = 'pixelated';
@@ -144,7 +144,7 @@ export class NPC {
 
         // Position the chatbox above the NPC
         const npcScreenX = (window.MAP_OFFSET_X || 0) + this.x * window.TILE_SIZE + window.TILE_SIZE; // Center on NPC (2 tiles wide)
-        const npcScreenY = (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE;
+        const npcScreenY = (window.MAP_OFFSET_Y || 0) + this.y * window.TILE_SIZE - window.TILE_SIZE; // Match sprite offset
         const isLandscape = window.innerWidth > window.innerHeight;
         const chatboxHeight = isLandscape ? 310 : 192; // Match the CSS heights
         const chatboxWidth = isLandscape ? 620 : 384;
