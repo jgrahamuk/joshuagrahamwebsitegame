@@ -173,9 +173,11 @@ class ObjectiveSystem {
         const targetWidth = isNPC ? window.TILE_SIZE * 2 : window.TILE_SIZE;
 
         // Position arrow above the target, centered
+        // NPCs are 2 tiles tall (drawn 1 tile above their grid pos), so offset an extra tile
         const targetX = (window.MAP_OFFSET_X || 0) + (pos.x * window.TILE_SIZE);
         const arrowX = targetX + (targetWidth / 2) - (window.TILE_SIZE / 2);
-        const arrowY = (window.MAP_OFFSET_Y || 0) + (pos.y * window.TILE_SIZE) - window.TILE_SIZE - bounceOffset;
+        const extraUp = isNPC ? window.TILE_SIZE : 0;
+        const arrowY = (window.MAP_OFFSET_Y || 0) + (pos.y * window.TILE_SIZE) - window.TILE_SIZE - extraUp - bounceOffset;
 
         this.arrow.setAttribute('x', arrowX);
         this.arrow.setAttribute('y', arrowY);
