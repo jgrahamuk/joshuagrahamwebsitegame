@@ -1,4 +1,4 @@
-import { tileTypes, setTileRotation, setTileRotations, clearAllTileRotations } from './map.js';
+import { tileTypes, setTileRotation, setTileRotations, clearAllTileRotations, setGrassEdgeFlags, clearAllGrassEdgeFlags } from './map.js';
 import { loadMapById } from './mapBrowser.js';
 import { collectablesSystem } from './collectables.js';
 import { imageTilesSystem } from './imageTiles.js';
@@ -71,8 +71,9 @@ export function getCurrentMapData() {
 export function convertMapDataToGameFormat(mapData) {
     const { width, height, tiles, structures, resources, npcs, chickens, cockerels, portals } = mapData;
 
-    // Clear any previous rotation data
+    // Clear any previous rotation and edge flag data
     clearAllTileRotations();
+    clearAllGrassEdgeFlags();
 
     // Convert tile data to game format
     const gameMap = [];
@@ -107,6 +108,10 @@ export function convertMapDataToGameFormat(mapData) {
                 setTileRotations(tile.x, tile.y, tile.rotations);
             } else if (tile.rotation) {
                 setTileRotation(tile.x, tile.y, tile.rotation);
+            }
+            // Restore grass edge flags if saved
+            if (tile.edgeFlags) {
+                setGrassEdgeFlags(tile.x, tile.y, tile.edgeFlags);
             }
         }
     });

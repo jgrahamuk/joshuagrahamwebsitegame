@@ -4,6 +4,7 @@ import { getSpriteUrl, getSpriteCanvas } from './spriteCache.js';
 import { drawStructures } from './structures.js';
 import { imageTilesSystem } from './imageTiles.js';
 import { textTilesSystem } from './textTiles.js';
+import { getGrassTileCanvas } from './grassGenerator.js';
 
 // Offscreen canvas state for pre-rendered terrain
 let mapCanvas = null;
@@ -139,6 +140,30 @@ export function clearTileRotation(x, y) {
 
 export function clearAllTileRotations() {
     tileRotations.clear();
+}
+
+// Grass edge flags stored per-position: "x,y" -> edge flag bitmask
+// Used for procedural grass tile generation
+const grassEdgeFlags = new Map();
+
+export function getGrassEdgeFlags(x, y) {
+    return grassEdgeFlags.get(`${x},${y}`) || 0;
+}
+
+export function setGrassEdgeFlags(x, y, flags) {
+    if (!flags || flags === 0) {
+        grassEdgeFlags.delete(`${x},${y}`);
+    } else {
+        grassEdgeFlags.set(`${x},${y}`, flags);
+    }
+}
+
+export function clearGrassEdgeFlags(x, y) {
+    grassEdgeFlags.delete(`${x},${y}`);
+}
+
+export function clearAllGrassEdgeFlags() {
+    grassEdgeFlags.clear();
 }
 
 // Tile types that support rotation via double-click
@@ -374,20 +399,46 @@ function renderTileToCanvas(ctx, x, y, tileSize) {
     const tiles = map[y][x];
     const { px, py, w, h } = tileRect(x, y, tileSize);
 
-    // Determine the base terrain tile
-    const baseTile = tiles.find(t => t === tileTypes.BRIDGE_H) ? 'bridge-horizontal.gif'
-        : tiles.find(t => t === tileTypes.BRIDGE_V) ? 'bridge-vertical.gif'
-            : tiles.find(t => t === tileTypes.DIRT) ? 'tile-dirt.gif'
-                : tiles.find(t => t === tileTypes.GRASS) ? 'tile-grass.gif'
-                    : tiles.find(t => t === tileTypes.WATER || (t.color && t.color === '#3bbcff')) ? 'tile-water.gif'
-                        : 'tile-grass.gif';
+    // Check if this tile has procedural grass edge flags
+    const edgeFlags = getGrassEdgeFlags(x, y);
 
-    const spriteCanvas = getSpriteCanvas(baseTile);
-    if (spriteCanvas) {
-        ctx.drawImage(spriteCanvas, px, py, w, h);
+    // Determine the base terrain tile
+    const hasBridgeH = tiles.find(t => t === tileTypes.BRIDGE_H);
+    const hasBridgeV = tiles.find(t => t === tileTypes.BRIDGE_V);
+    const hasDirt = tiles.find(t => t === tileTypes.DIRT);
+    const hasGrass = tiles.find(t => t === tileTypes.GRASS);
+
+    // If we have procedural edge flags on a grass tile, render with edges
+    if (edgeFlags > 0 && hasGrass) {
+        // Draw base terrain (water or dirt) first
+        const baseTile = hasDirt ? 'tile-dirt.gif' : 'tile-water.gif';
+        const baseCanvas = getSpriteCanvas(baseTile);
+        if (baseCanvas) {
+            ctx.drawImage(baseCanvas, px, py, w, h);
+        }
+
+        // Draw procedural grass with edges directly from canvas
+        const grassCanvas = getGrassTileCanvas(edgeFlags, tileSize);
+        if (grassCanvas) {
+            ctx.drawImage(grassCanvas, px, py, w, h);
+        }
+    } else {
+        // Standard rendering path
+        const baseTile = hasBridgeH ? 'bridge-horizontal.gif'
+            : hasBridgeV ? 'bridge-vertical.gif'
+                : hasDirt ? 'tile-dirt.gif'
+                    : hasGrass ? 'tile-grass.gif'
+                        : tiles.find(t => t === tileTypes.WATER || (t.color && t.color === '#3bbcff')) ? 'tile-water.gif'
+                            : 'tile-grass.gif';
+
+        const spriteCanvas = getSpriteCanvas(baseTile);
+        if (spriteCanvas) {
+            ctx.drawImage(spriteCanvas, px, py, w, h);
+        }
     }
 
     // Render custom-sprite tile overlays (grass edge/corner variants) with rotation
+    // This handles legacy/manual placements of edge tiles
     const rotations = getTileRotations(x, y);
     let rotIdx = 0;
     for (const t of tiles) {
