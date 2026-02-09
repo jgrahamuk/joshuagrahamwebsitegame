@@ -1,7 +1,8 @@
-import { tileTypes, placeResourceAtPosition, removeResource, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, replaceMap, getTileSprite, getTileRotations, setTileRotation, setTileRotations, pushTileRotation, popTileRotation, clearTileRotation, clearAllTileRotations, isRotatable, isStackable, rotateTile, redrawTileOnCanvas, setGrassEdgeFlags, getGrassEdgeFlags, clearGrassEdgeFlags, setDirtEdgeFlags, getDirtEdgeFlags, clearDirtEdgeFlags } from './map.js';
+import { tileTypes, placeResourceAtPosition, removeResource, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, replaceMap, getTileSprite, getTileRotations, setTileRotation, setTileRotations, pushTileRotation, popTileRotation, clearTileRotation, clearAllTileRotations, isRotatable, isStackable, rotateTile, redrawTileOnCanvas, setGrassEdgeFlags, getGrassEdgeFlags, clearGrassEdgeFlags, setDirtEdgeFlags, getDirtEdgeFlags, clearDirtEdgeFlags, setSandEdgeFlags, getSandEdgeFlags, clearSandEdgeFlags } from './map.js';
 import { getSpriteUrl } from './spriteCache.js';
 import { getEdgeFlagsFromNeighbors, EDGE_NORTH, EDGE_SOUTH, EDGE_EAST, EDGE_WEST, CORNER_NE, CORNER_SE, CORNER_SW, CORNER_NW } from './grassGenerator.js';
 import { getDirtEdgeFlagsFromNeighbors } from './dirtGenerator.js';
+import { getSandEdgeFlagsFromNeighbors } from './sandGenerator.js';
 import { NPC } from './npcs.js';
 import { Chicken, Cockerel, canPlaceHen, canPlaceRooster } from './chickens.js';
 import { saveMapToSupabase } from './mapBrowser.js';
@@ -58,6 +59,7 @@ export class MapEditor {
             { id: 'delete', name: 'Delete', icon: '🗑️', type: 'delete' },
             { id: 'grass', name: 'Grass', icon: 'tile-grass.gif', type: 'tile', tileType: tileTypes.GRASS },
             { id: 'dirt', name: 'Dirt', icon: 'tile-dirt.gif', type: 'tile', tileType: tileTypes.DIRT },
+            { id: 'sand', name: 'Sand', icon: 'tile-sand.gif', type: 'tile', tileType: tileTypes.SAND },
             { id: 'water', name: 'Water', icon: 'tile-water.gif', type: 'tile', tileType: tileTypes.WATER },
             { id: 'bridge_h', name: 'Bridge (H)', icon: 'bridge-horizontal.gif', type: 'tile', tileType: tileTypes.BRIDGE_H },
             { id: 'bridge_v', name: 'Bridge (V)', icon: 'bridge-vertical.gif', type: 'tile', tileType: tileTypes.BRIDGE_V },
@@ -89,7 +91,7 @@ export class MapEditor {
         // Tool groups for the toolbar flyout UI
         this.toolGroups = [
             { id: 'delete', label: 'Delete', toolIds: ['delete'], standalone: true },
-            { id: 'terrain', label: 'Terrain', toolIds: ['grass', 'dirt', 'water', 'bridge_h', 'bridge_v'] },
+            { id: 'terrain', label: 'Terrain', toolIds: ['grass', 'dirt', 'sand', 'water', 'bridge_h', 'bridge_v'] },
             { id: 'nature', label: 'Nature', toolIds: ['large_tree', 'bush', 'pine_tree', 'rock', 'flower', 'flower_rose', 'flower_forgetmenot', 'flower_tulip', 'flower_bluebell'] },
             { id: 'collectables', label: 'Collectables', toolIds: ['egg', 'badge'] },
             { id: 'buildings', label: 'Buildings', toolIds: ['farmhouse', 'chicken_coop', 'portal'] },
@@ -113,6 +115,7 @@ export class MapEditor {
             'delete': 'Click or drag to remove items and resources.',
             'grass': 'Click or drag to place grass tiles.',
             'dirt': 'Click or drag to place dirt paths.',
+            'sand': 'Click or drag to place sand.',
             'water': 'Click or drag to place water. Impassable for visitors.',
             'bridge_h': 'Click or drag to place a horizontal bridge. Passable.',
             'bridge_v': 'Click or drag to place a vertical bridge. Passable.',
@@ -660,8 +663,17 @@ export class MapEditor {
                 this.redrawTilesInArea(x, y, 1);
                 this.scheduleAutoSave();
                 return;
+            } else if (tileType === tileTypes.SAND) {
+                // For sand tiles, use auto-tiling similar to dirt
+                this.placeTile(x, y, tileTypes.SAND);
+                // Auto-tile this sand and all neighbors
+                this.autoTileSandWithNeighbors(x, y);
+                // Redraw all affected tiles
+                this.redrawTilesInArea(x, y, 1);
+                this.scheduleAutoSave();
+                return;
             } else if (tileType === tileTypes.WATER) {
-                // Placing water might affect neighboring grass and dirt tiles
+                // Placing water might affect neighboring grass, dirt, and sand tiles
                 this.placeTile(x, y, tileType);
                 // Update all neighbors
                 const neighbors = [
@@ -676,6 +688,9 @@ export class MapEditor {
                         }
                         if (this.hasDirtAt(nx, ny)) {
                             this.autoTileDirt(nx, ny);
+                        }
+                        if (this.hasSandAt(nx, ny)) {
+                            this.autoTileSand(nx, ny);
                         }
                     }
                 }
@@ -975,6 +990,21 @@ export class MapEditor {
 
             // Add grass on top of whatever is there (water or dirt)
             tiles.push(tileType);
+        } else if (tileType === tileTypes.SAND) {
+            // Sand can be placed on water (like a beach)
+            // Strip any existing custom-sprite overlays first
+            while (tiles.length > 1 && getTileSprite(tiles[tiles.length - 1])) {
+                tiles.pop();
+            }
+            clearTileRotation(x, y);
+
+            // If there's already sand, don't add another
+            if (tiles.includes(tileTypes.SAND)) {
+                return;
+            }
+
+            // Add sand on top of water
+            tiles.push(tileType);
         } else {
             // Other base terrain tiles: replace the top non-water layer
             // Strip any existing custom-sprite overlays first
@@ -1022,6 +1052,16 @@ export class MapEditor {
         const tiles = map[y][x];
         if (!tiles || tiles.length === 0) return false;
         return tiles.some(t => t === tileTypes.DIRT);
+    }
+
+    // Auto-tiling helper: check if position has sand
+    hasSandAt(x, y) {
+        if (x < 0 || x >= MAP_WIDTH_TILES || y < 0 || y >= MAP_HEIGHT_TILES) {
+            return false;
+        }
+        const tiles = map[y][x];
+        if (!tiles || tiles.length === 0) return false;
+        return tiles.some(t => t === tileTypes.SAND);
     }
 
     // Main auto-tiling function: uses procedural grass generation
@@ -1162,6 +1202,81 @@ export class MapEditor {
         for (const [nx, ny] of neighbors) {
             if (nx >= 0 && nx < MAP_WIDTH_TILES && ny >= 0 && ny < MAP_HEIGHT_TILES) {
                 this.autoTileDirt(nx, ny);
+            }
+        }
+    }
+
+    // Auto-tiling helper: check if sand is the TOP terrain layer at position
+    isSandOnTop(x, y) {
+        if (x < 0 || x >= MAP_WIDTH_TILES || y < 0 || y >= MAP_HEIGHT_TILES) {
+            return false;
+        }
+        const tiles = map[y][x];
+        if (!tiles || tiles.length === 0) return false;
+
+        const sandIndex = tiles.findIndex(t => t === tileTypes.SAND);
+        const grassIndex = tiles.findIndex(t => t === tileTypes.GRASS);
+        const dirtIndex = tiles.findIndex(t => t === tileTypes.DIRT);
+
+        // Sand is on top if it exists and is after all other terrain types
+        if (sandIndex < 0) return false;
+        if (grassIndex >= 0 && grassIndex > sandIndex) return false;
+        if (dirtIndex >= 0 && dirtIndex > sandIndex) return false;
+        return true;
+    }
+
+    // Auto-tiling helper: check if position does NOT have sand as top layer
+    isNotSandOnTop(x, y) {
+        return !this.isSandOnTop(x, y);
+    }
+
+    // Main auto-tiling function for sand: uses procedural sand generation
+    autoTileSand(x, y) {
+        if (x < 0 || x >= MAP_WIDTH_TILES || y < 0 || y >= MAP_HEIGHT_TILES) return;
+
+        const tiles = map[y][x];
+        if (!tiles) return;
+
+        // Only auto-tile if sand is on top at this position
+        if (!this.isSandOnTop(x, y)) {
+            clearSandEdgeFlags(x, y);
+            return;
+        }
+
+        // Check cardinal neighbors - sand shows edges against tiles where sand is NOT on top
+        const n = this.isNotSandOnTop(x, y - 1);
+        const s = this.isNotSandOnTop(x, y + 1);
+        const e = this.isNotSandOnTop(x + 1, y);
+        const w = this.isNotSandOnTop(x - 1, y);
+
+        // Check diagonal neighbors (kept for API compatibility)
+        const ne = this.isNotSandOnTop(x + 1, y - 1);
+        const se = this.isNotSandOnTop(x + 1, y + 1);
+        const sw = this.isNotSandOnTop(x - 1, y + 1);
+        const nw = this.isNotSandOnTop(x - 1, y - 1);
+
+        // Calculate edge flags for procedural generation
+        const edgeFlags = getSandEdgeFlagsFromNeighbors(n, s, e, w, ne, se, sw, nw);
+
+        // Set the edge flags for procedural rendering
+        setSandEdgeFlags(x, y, edgeFlags);
+    }
+
+    // Auto-tile sand at a position and all its neighbors
+    autoTileSandWithNeighbors(x, y) {
+        // Auto-tile the placed position
+        this.autoTileSand(x, y);
+
+        // Auto-tile all 8 neighbors (they might need edge updates)
+        const neighbors = [
+            [x - 1, y - 1], [x, y - 1], [x + 1, y - 1],
+            [x - 1, y],                 [x + 1, y],
+            [x - 1, y + 1], [x, y + 1], [x + 1, y + 1]
+        ];
+
+        for (const [nx, ny] of neighbors) {
+            if (nx >= 0 && nx < MAP_WIDTH_TILES && ny >= 0 && ny < MAP_HEIGHT_TILES) {
+                this.autoTileSand(nx, ny);
             }
         }
     }
@@ -2516,6 +2631,7 @@ export class MapEditor {
                         if (layer.color === '#3bbcff') return 'WATER_BORDER';
                         if (layer === tileTypes.GRASS) return 'GRASS';
                         if (layer === tileTypes.DIRT) return 'DIRT';
+                        if (layer === tileTypes.SAND) return 'SAND';
                         if (layer === tileTypes.BRIDGE_H) return 'BRIDGE_H';
                         if (layer === tileTypes.BRIDGE_V) return 'BRIDGE_V';
                         if (layer === tileTypes.LARGE_TREE) return 'LARGE_TREE';
@@ -2540,6 +2656,7 @@ export class MapEditor {
                     const rotations = getTileRotations(x, y);
                     const edgeFlags = getGrassEdgeFlags(x, y);
                     const dirtEdgeFlag = getDirtEdgeFlags(x, y);
+                    const sandEdgeFlag = getSandEdgeFlags(x, y);
                     const tileEntry = { x, y, layers };
                     if (rotations.length === 1) {
                         tileEntry.rotation = rotations[0];
@@ -2551,6 +2668,9 @@ export class MapEditor {
                     }
                     if (dirtEdgeFlag > 0) {
                         tileEntry.dirtEdgeFlags = dirtEdgeFlag;
+                    }
+                    if (sandEdgeFlag > 0) {
+                        tileEntry.sandEdgeFlags = sandEdgeFlag;
                     }
                     tiles.push(tileEntry);
 

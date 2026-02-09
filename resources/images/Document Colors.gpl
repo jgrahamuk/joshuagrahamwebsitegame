@@ -2,22 +2,21 @@ GIMP Palette
 Name: Document Colors
 Columns: 16
 #
-190 120 59 Color 1
-167 104 53 Color 2
-192 125 60 Color 3
-154 92 44 Color 4
-185 119 58 Color 5
-171 105 54 Color 6
-197 128 61 Color 7
-173 107 56 Color 8
-151 89 44 Color 9
-179 110 55 Color 10
-182 116 55 Color 11
-159 97 47 Color 12
-139 77 39 Color 13
-147 86 39 Color 14
-158 95 48 Color 15
-200 131 63 Color 16
-160 95 48 Color 17
-160 95 47 Color 18
-149 88 39 Color 19
+255 255 136 Color 1
+255 240 122 Color 2
+255 255 138 Color 3
+255 212 101 Color 4
+255 255 134 Color 5
+255 242 124 Color 6
+255 255 141 Color 7
+255 205 101 Color 8
+255 247 129 Color 9
+255 253 127 Color 10
+255 255 127 Color 11
+255 224 108 Color 12
+255 219 111 Color 13
+255 255 145 Color 14
+255 198 90 Color 15
+255 177 90 Color 16
+255 219 108 Color 17
+255 203 90 Color 18

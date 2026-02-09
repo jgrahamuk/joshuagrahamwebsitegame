@@ -6,6 +6,7 @@ import { imageTilesSystem } from './imageTiles.js';
 import { textTilesSystem } from './textTiles.js';
 import { getGrassTileCanvas } from './grassGenerator.js';
 import { getDirtTileCanvas } from './dirtGenerator.js';
+import { getSandTileCanvas } from './sandGenerator.js';
 
 // Offscreen canvas state for pre-rendered terrain
 let mapCanvas = null;
@@ -66,6 +67,7 @@ export const tileTypes = {
     WATER: { color: 'blue', passable: false, resource: null },
     DIRT: { color: 'brown', passable: true, resource: null },
     GRASS: { color: 'green', passable: true, resource: null },
+    SAND: { color: 'yellow', passable: true, resource: null },
     ROCK: { color: 'grey', passable: true, resource: 'stone' },
     FLOWER: { color: 'pink', passable: true, resource: null },
     FLOWER_ROSE: { color: 'red', passable: true, resource: null },
@@ -189,6 +191,30 @@ export function clearDirtEdgeFlags(x, y) {
 
 export function clearAllDirtEdgeFlags() {
     dirtEdgeFlags.clear();
+}
+
+// Sand edge flags stored per-position: "x,y" -> edge flag bitmask
+// Used for procedural sand tile generation
+const sandEdgeFlags = new Map();
+
+export function getSandEdgeFlags(x, y) {
+    return sandEdgeFlags.get(`${x},${y}`) || 0;
+}
+
+export function setSandEdgeFlags(x, y, flags) {
+    if (!flags || flags === 0) {
+        sandEdgeFlags.delete(`${x},${y}`);
+    } else {
+        sandEdgeFlags.set(`${x},${y}`, flags);
+    }
+}
+
+export function clearSandEdgeFlags(x, y) {
+    sandEdgeFlags.delete(`${x},${y}`);
+}
+
+export function clearAllSandEdgeFlags() {
+    sandEdgeFlags.clear();
 }
 
 // Tile types that support rotation via double-click
@@ -427,12 +453,14 @@ function renderTileToCanvas(ctx, x, y, tileSize) {
     // Check if this tile has procedural edge flags
     const grassEdgeFlag = getGrassEdgeFlags(x, y);
     const dirtEdgeFlag = getDirtEdgeFlags(x, y);
+    const sandEdgeFlag = getSandEdgeFlags(x, y);
 
     // Determine the base terrain tile
     const hasBridgeH = tiles.find(t => t === tileTypes.BRIDGE_H);
     const hasBridgeV = tiles.find(t => t === tileTypes.BRIDGE_V);
     const hasDirt = tiles.find(t => t === tileTypes.DIRT);
     const hasGrass = tiles.find(t => t === tileTypes.GRASS);
+    const hasSand = tiles.find(t => t === tileTypes.SAND);
 
     // Handle bridges specially
     if (hasBridgeH || hasBridgeV) {
@@ -484,8 +512,90 @@ function renderTileToCanvas(ctx, x, y, tileSize) {
             }
         }
     }
-    // Grass only (no dirt in this tile)
-    else if (hasGrass && !hasDirt) {
+    // Grass on top of sand (or sand on top of grass)
+    else if (hasGrass && hasSand) {
+        const grassIndex = tiles.findIndex(t => t === tileTypes.GRASS);
+        const sandIndex = tiles.findIndex(t => t === tileTypes.SAND);
+
+        if (grassIndex > sandIndex) {
+            // Grass is on top of sand
+            // Draw water first
+            const waterCanvas = getSpriteCanvas('tile-water.gif');
+            if (waterCanvas) {
+                ctx.drawImage(waterCanvas, px, py, w, h);
+            }
+            // Draw procedural sand underneath (no edges since it's covered)
+            const sandCanvas = getSandTileCanvas(0, tileSize);
+            if (sandCanvas) {
+                ctx.drawImage(sandCanvas, px, py, w, h);
+            }
+            // Draw procedural grass with edges on top
+            const grassCanvas = getGrassTileCanvas(grassEdgeFlag, tileSize);
+            if (grassCanvas) {
+                ctx.drawImage(grassCanvas, px, py, w, h);
+            }
+        } else {
+            // Sand is on top of grass
+            // Draw water first
+            const waterCanvas = getSpriteCanvas('tile-water.gif');
+            if (waterCanvas) {
+                ctx.drawImage(waterCanvas, px, py, w, h);
+            }
+            // Draw procedural grass underneath (no edges since it's covered)
+            const grassCanvas = getGrassTileCanvas(0, tileSize);
+            if (grassCanvas) {
+                ctx.drawImage(grassCanvas, px, py, w, h);
+            }
+            // Draw procedural sand with edges on top
+            const sandCanvas = getSandTileCanvas(sandEdgeFlag, tileSize);
+            if (sandCanvas) {
+                ctx.drawImage(sandCanvas, px, py, w, h);
+            }
+        }
+    }
+    // Dirt on top of sand (or sand on top of dirt)
+    else if (hasDirt && hasSand) {
+        const dirtIndex = tiles.findIndex(t => t === tileTypes.DIRT);
+        const sandIndex = tiles.findIndex(t => t === tileTypes.SAND);
+
+        if (dirtIndex > sandIndex) {
+            // Dirt is on top of sand
+            // Draw water first
+            const waterCanvas = getSpriteCanvas('tile-water.gif');
+            if (waterCanvas) {
+                ctx.drawImage(waterCanvas, px, py, w, h);
+            }
+            // Draw procedural sand underneath (no edges since it's covered)
+            const sandCanvas = getSandTileCanvas(0, tileSize);
+            if (sandCanvas) {
+                ctx.drawImage(sandCanvas, px, py, w, h);
+            }
+            // Draw procedural dirt with edges on top
+            const dirtCanvas = getDirtTileCanvas(dirtEdgeFlag, tileSize);
+            if (dirtCanvas) {
+                ctx.drawImage(dirtCanvas, px, py, w, h);
+            }
+        } else {
+            // Sand is on top of dirt
+            // Draw water first
+            const waterCanvas = getSpriteCanvas('tile-water.gif');
+            if (waterCanvas) {
+                ctx.drawImage(waterCanvas, px, py, w, h);
+            }
+            // Draw procedural dirt underneath (no edges since it's covered)
+            const dirtCanvas = getDirtTileCanvas(0, tileSize);
+            if (dirtCanvas) {
+                ctx.drawImage(dirtCanvas, px, py, w, h);
+            }
+            // Draw procedural sand with edges on top
+            const sandCanvas = getSandTileCanvas(sandEdgeFlag, tileSize);
+            if (sandCanvas) {
+                ctx.drawImage(sandCanvas, px, py, w, h);
+            }
+        }
+    }
+    // Grass only (no dirt or sand in this tile)
+    else if (hasGrass && !hasDirt && !hasSand) {
         // Draw water first
         const waterCanvas = getSpriteCanvas('tile-water.gif');
         if (waterCanvas) {
@@ -577,6 +687,86 @@ function renderTileToCanvas(ctx, x, y, tileSize) {
                     ctx.drawImage(grassBgCanvas, 0, 0, cornerSize, cornerSize, px, py, cornerSize, cornerSize);
                 }
             }
+
+            // Helper to check if neighbor has sand-only (no grass underneath)
+            const isSandOnly = (nx, ny) => {
+                if (nx < 0 || nx >= MAP_WIDTH_TILES || ny < 0 || ny >= MAP_HEIGHT_TILES) return false;
+                const neighborTiles = map[ny][nx];
+                if (!neighborTiles) return false;
+                const hasSandN = neighborTiles.some(t => t === tileTypes.SAND);
+                const hasGrassN = neighborTiles.some(t => t === tileTypes.GRASS);
+                return hasSandN && !hasGrassN;
+            };
+
+            // Check each neighbor for sand
+            const northIsSandOnly = isSandOnly(x, y - 1);
+            const southIsSandOnly = isSandOnly(x, y + 1);
+            const eastIsSandOnly = isSandOnly(x + 1, y);
+            const westIsSandOnly = isSandOnly(x - 1, y);
+
+            // For sand-only neighbors, draw sand strips
+            const sandCanvas = getSandTileCanvas(0, tileSize);
+            if (sandCanvas) {
+                if ((grassEdgeFlag & EDGE_N) && northIsSandOnly) {
+                    ctx.drawImage(sandCanvas, 0, 0, tileSize, stripDepth, px, py, w, stripDepth);
+                }
+                if ((grassEdgeFlag & EDGE_S) && southIsSandOnly) {
+                    ctx.drawImage(sandCanvas, 0, tileSize - stripDepth, tileSize, stripDepth, px, py + h - stripDepth, w, stripDepth);
+                }
+                if ((grassEdgeFlag & EDGE_E) && eastIsSandOnly) {
+                    ctx.drawImage(sandCanvas, tileSize - stripDepth, 0, stripDepth, tileSize, px + w - stripDepth, py, stripDepth, h);
+                }
+                if ((grassEdgeFlag & EDGE_W) && westIsSandOnly) {
+                    ctx.drawImage(sandCanvas, 0, 0, stripDepth, tileSize, px, py, stripDepth, h);
+                }
+                // Corners for sand-only
+                if ((grassEdgeFlag & EDGE_N) && (grassEdgeFlag & EDGE_E) && (northIsSandOnly || eastIsSandOnly)) {
+                    ctx.drawImage(sandCanvas, tileSize - cornerSize, 0, cornerSize, cornerSize, px + w - cornerSize, py, cornerSize, cornerSize);
+                }
+                if ((grassEdgeFlag & EDGE_S) && (grassEdgeFlag & EDGE_E) && (southIsSandOnly || eastIsSandOnly)) {
+                    ctx.drawImage(sandCanvas, tileSize - cornerSize, tileSize - cornerSize, cornerSize, cornerSize, px + w - cornerSize, py + h - cornerSize, cornerSize, cornerSize);
+                }
+                if ((grassEdgeFlag & EDGE_S) && (grassEdgeFlag & EDGE_W) && (southIsSandOnly || westIsSandOnly)) {
+                    ctx.drawImage(sandCanvas, 0, tileSize - cornerSize, cornerSize, cornerSize, px, py + h - cornerSize, cornerSize, cornerSize);
+                }
+                if ((grassEdgeFlag & EDGE_N) && (grassEdgeFlag & EDGE_W) && (northIsSandOnly || westIsSandOnly)) {
+                    ctx.drawImage(sandCanvas, 0, 0, cornerSize, cornerSize, px, py, cornerSize, cornerSize);
+                }
+            }
+
+            // For sand-on-grass neighbors, draw grass strips (to match grass layer under the sand)
+            const northIsSandOnGrass = !northIsSandOnly && y > 0 && map[y-1][x]?.some(t => t === tileTypes.SAND);
+            const southIsSandOnGrass = !southIsSandOnly && y < MAP_HEIGHT_TILES-1 && map[y+1][x]?.some(t => t === tileTypes.SAND);
+            const eastIsSandOnGrass = !eastIsSandOnly && x < MAP_WIDTH_TILES-1 && map[y][x+1]?.some(t => t === tileTypes.SAND);
+            const westIsSandOnGrass = !westIsSandOnly && x > 0 && map[y][x-1]?.some(t => t === tileTypes.SAND);
+
+            if (grassBgCanvas) {
+                if ((grassEdgeFlag & EDGE_N) && northIsSandOnGrass) {
+                    ctx.drawImage(grassBgCanvas, 0, 0, tileSize, stripDepth, px, py, w, stripDepth);
+                }
+                if ((grassEdgeFlag & EDGE_S) && southIsSandOnGrass) {
+                    ctx.drawImage(grassBgCanvas, 0, tileSize - stripDepth, tileSize, stripDepth, px, py + h - stripDepth, w, stripDepth);
+                }
+                if ((grassEdgeFlag & EDGE_E) && eastIsSandOnGrass) {
+                    ctx.drawImage(grassBgCanvas, tileSize - stripDepth, 0, stripDepth, tileSize, px + w - stripDepth, py, stripDepth, h);
+                }
+                if ((grassEdgeFlag & EDGE_W) && westIsSandOnGrass) {
+                    ctx.drawImage(grassBgCanvas, 0, 0, stripDepth, tileSize, px, py, stripDepth, h);
+                }
+                // Corners for sand-on-grass
+                if ((grassEdgeFlag & EDGE_N) && (grassEdgeFlag & EDGE_E) && (northIsSandOnGrass || eastIsSandOnGrass)) {
+                    ctx.drawImage(grassBgCanvas, tileSize - cornerSize, 0, cornerSize, cornerSize, px + w - cornerSize, py, cornerSize, cornerSize);
+                }
+                if ((grassEdgeFlag & EDGE_S) && (grassEdgeFlag & EDGE_E) && (southIsSandOnGrass || eastIsSandOnGrass)) {
+                    ctx.drawImage(grassBgCanvas, tileSize - cornerSize, tileSize - cornerSize, cornerSize, cornerSize, px + w - cornerSize, py + h - cornerSize, cornerSize, cornerSize);
+                }
+                if ((grassEdgeFlag & EDGE_S) && (grassEdgeFlag & EDGE_W) && (southIsSandOnGrass || westIsSandOnGrass)) {
+                    ctx.drawImage(grassBgCanvas, 0, tileSize - cornerSize, cornerSize, cornerSize, px, py + h - cornerSize, cornerSize, cornerSize);
+                }
+                if ((grassEdgeFlag & EDGE_N) && (grassEdgeFlag & EDGE_W) && (northIsSandOnGrass || westIsSandOnGrass)) {
+                    ctx.drawImage(grassBgCanvas, 0, 0, cornerSize, cornerSize, px, py, cornerSize, cornerSize);
+                }
+            }
         }
         // Draw procedural grass with edges on top
         const grassCanvas = getGrassTileCanvas(grassEdgeFlag, tileSize);
@@ -584,8 +774,8 @@ function renderTileToCanvas(ctx, x, y, tileSize) {
             ctx.drawImage(grassCanvas, px, py, w, h);
         }
     }
-    // Dirt only (no grass in this tile)
-    else if (hasDirt && !hasGrass) {
+    // Dirt only (no grass or sand in this tile)
+    else if (hasDirt && !hasGrass && !hasSand) {
         // Draw water first
         const waterCanvas = getSpriteCanvas('tile-water.gif');
         if (waterCanvas) {
@@ -682,6 +872,186 @@ function renderTileToCanvas(ctx, x, y, tileSize) {
         const dirtCanvas = getDirtTileCanvas(dirtEdgeFlag, tileSize);
         if (dirtCanvas) {
             ctx.drawImage(dirtCanvas, px, py, w, h);
+        }
+    }
+    // Sand only (no grass or dirt in this tile)
+    else if (hasSand && !hasGrass && !hasDirt) {
+        // Draw water first
+        const waterCanvas = getSpriteCanvas('tile-water.gif');
+        if (waterCanvas) {
+            ctx.drawImage(waterCanvas, px, py, w, h);
+        }
+        // For edges, draw appropriate background strips
+        if (sandEdgeFlag > 0) {
+            const stripDepth = Math.floor(tileSize * 0.18);
+            const cornerSize = Math.floor(tileSize * 0.35);
+            const EDGE_N = 1, EDGE_S = 2, EDGE_E = 4, EDGE_W = 8;
+
+            // Helper to check if neighbor has grass-only (no sand underneath)
+            const isGrassOnly = (nx, ny) => {
+                if (nx < 0 || nx >= MAP_WIDTH_TILES || ny < 0 || ny >= MAP_HEIGHT_TILES) return false;
+                const neighborTiles = map[ny][nx];
+                if (!neighborTiles) return false;
+                const hasSandN = neighborTiles.some(t => t === tileTypes.SAND);
+                const hasGrassN = neighborTiles.some(t => t === tileTypes.GRASS);
+                return hasGrassN && !hasSandN;
+            };
+
+            // Helper to check if neighbor has dirt-only (no sand underneath)
+            const isDirtOnly = (nx, ny) => {
+                if (nx < 0 || nx >= MAP_WIDTH_TILES || ny < 0 || ny >= MAP_HEIGHT_TILES) return false;
+                const neighborTiles = map[ny][nx];
+                if (!neighborTiles) return false;
+                const hasSandN = neighborTiles.some(t => t === tileTypes.SAND);
+                const hasDirtN = neighborTiles.some(t => t === tileTypes.DIRT);
+                return hasDirtN && !hasSandN;
+            };
+
+            // Check each neighbor for grass-only
+            const northIsGrassOnly = isGrassOnly(x, y - 1);
+            const southIsGrassOnly = isGrassOnly(x, y + 1);
+            const eastIsGrassOnly = isGrassOnly(x + 1, y);
+            const westIsGrassOnly = isGrassOnly(x - 1, y);
+
+            // For grass-only neighbors, draw grass strips
+            const grassCanvas = getGrassTileCanvas(0, tileSize);
+            if (grassCanvas) {
+                if ((sandEdgeFlag & EDGE_N) && northIsGrassOnly) {
+                    ctx.drawImage(grassCanvas, 0, 0, tileSize, stripDepth, px, py, w, stripDepth);
+                }
+                if ((sandEdgeFlag & EDGE_S) && southIsGrassOnly) {
+                    ctx.drawImage(grassCanvas, 0, tileSize - stripDepth, tileSize, stripDepth, px, py + h - stripDepth, w, stripDepth);
+                }
+                if ((sandEdgeFlag & EDGE_E) && eastIsGrassOnly) {
+                    ctx.drawImage(grassCanvas, tileSize - stripDepth, 0, stripDepth, tileSize, px + w - stripDepth, py, stripDepth, h);
+                }
+                if ((sandEdgeFlag & EDGE_W) && westIsGrassOnly) {
+                    ctx.drawImage(grassCanvas, 0, 0, stripDepth, tileSize, px, py, stripDepth, h);
+                }
+                // Corners for grass-only
+                if ((sandEdgeFlag & EDGE_N) && (sandEdgeFlag & EDGE_E) && (northIsGrassOnly || eastIsGrassOnly)) {
+                    ctx.drawImage(grassCanvas, tileSize - cornerSize, 0, cornerSize, cornerSize, px + w - cornerSize, py, cornerSize, cornerSize);
+                }
+                if ((sandEdgeFlag & EDGE_S) && (sandEdgeFlag & EDGE_E) && (southIsGrassOnly || eastIsGrassOnly)) {
+                    ctx.drawImage(grassCanvas, tileSize - cornerSize, tileSize - cornerSize, cornerSize, cornerSize, px + w - cornerSize, py + h - cornerSize, cornerSize, cornerSize);
+                }
+                if ((sandEdgeFlag & EDGE_S) && (sandEdgeFlag & EDGE_W) && (southIsGrassOnly || westIsGrassOnly)) {
+                    ctx.drawImage(grassCanvas, 0, tileSize - cornerSize, cornerSize, cornerSize, px, py + h - cornerSize, cornerSize, cornerSize);
+                }
+                if ((sandEdgeFlag & EDGE_N) && (sandEdgeFlag & EDGE_W) && (northIsGrassOnly || westIsGrassOnly)) {
+                    ctx.drawImage(grassCanvas, 0, 0, cornerSize, cornerSize, px, py, cornerSize, cornerSize);
+                }
+            }
+
+            // For grass-on-sand neighbors, draw sand strips (to match sand layer under the grass)
+            const northIsGrassOnSand = !northIsGrassOnly && y > 0 && map[y-1][x]?.some(t => t === tileTypes.GRASS);
+            const southIsGrassOnSand = !southIsGrassOnly && y < MAP_HEIGHT_TILES-1 && map[y+1][x]?.some(t => t === tileTypes.GRASS);
+            const eastIsGrassOnSand = !eastIsGrassOnly && x < MAP_WIDTH_TILES-1 && map[y][x+1]?.some(t => t === tileTypes.GRASS);
+            const westIsGrassOnSand = !westIsGrassOnly && x > 0 && map[y][x-1]?.some(t => t === tileTypes.GRASS);
+
+            const sandBgCanvas = getSandTileCanvas(0, tileSize);
+            if (sandBgCanvas) {
+                if ((sandEdgeFlag & EDGE_N) && northIsGrassOnSand) {
+                    ctx.drawImage(sandBgCanvas, 0, 0, tileSize, stripDepth, px, py, w, stripDepth);
+                }
+                if ((sandEdgeFlag & EDGE_S) && southIsGrassOnSand) {
+                    ctx.drawImage(sandBgCanvas, 0, tileSize - stripDepth, tileSize, stripDepth, px, py + h - stripDepth, w, stripDepth);
+                }
+                if ((sandEdgeFlag & EDGE_E) && eastIsGrassOnSand) {
+                    ctx.drawImage(sandBgCanvas, tileSize - stripDepth, 0, stripDepth, tileSize, px + w - stripDepth, py, stripDepth, h);
+                }
+                if ((sandEdgeFlag & EDGE_W) && westIsGrassOnSand) {
+                    ctx.drawImage(sandBgCanvas, 0, 0, stripDepth, tileSize, px, py, stripDepth, h);
+                }
+                // Corners for grass-on-sand
+                if ((sandEdgeFlag & EDGE_N) && (sandEdgeFlag & EDGE_E) && (northIsGrassOnSand || eastIsGrassOnSand)) {
+                    ctx.drawImage(sandBgCanvas, tileSize - cornerSize, 0, cornerSize, cornerSize, px + w - cornerSize, py, cornerSize, cornerSize);
+                }
+                if ((sandEdgeFlag & EDGE_S) && (sandEdgeFlag & EDGE_E) && (southIsGrassOnSand || eastIsGrassOnSand)) {
+                    ctx.drawImage(sandBgCanvas, tileSize - cornerSize, tileSize - cornerSize, cornerSize, cornerSize, px + w - cornerSize, py + h - cornerSize, cornerSize, cornerSize);
+                }
+                if ((sandEdgeFlag & EDGE_S) && (sandEdgeFlag & EDGE_W) && (southIsGrassOnSand || westIsGrassOnSand)) {
+                    ctx.drawImage(sandBgCanvas, 0, tileSize - cornerSize, cornerSize, cornerSize, px, py + h - cornerSize, cornerSize, cornerSize);
+                }
+                if ((sandEdgeFlag & EDGE_N) && (sandEdgeFlag & EDGE_W) && (northIsGrassOnSand || westIsGrassOnSand)) {
+                    ctx.drawImage(sandBgCanvas, 0, 0, cornerSize, cornerSize, px, py, cornerSize, cornerSize);
+                }
+            }
+
+            // Check each neighbor for dirt-only
+            const northIsDirtOnly = isDirtOnly(x, y - 1);
+            const southIsDirtOnly = isDirtOnly(x, y + 1);
+            const eastIsDirtOnly = isDirtOnly(x + 1, y);
+            const westIsDirtOnly = isDirtOnly(x - 1, y);
+
+            // For dirt-only neighbors, draw dirt strips
+            const dirtCanvas = getDirtTileCanvas(0, tileSize);
+            if (dirtCanvas) {
+                if ((sandEdgeFlag & EDGE_N) && northIsDirtOnly) {
+                    ctx.drawImage(dirtCanvas, 0, 0, tileSize, stripDepth, px, py, w, stripDepth);
+                }
+                if ((sandEdgeFlag & EDGE_S) && southIsDirtOnly) {
+                    ctx.drawImage(dirtCanvas, 0, tileSize - stripDepth, tileSize, stripDepth, px, py + h - stripDepth, w, stripDepth);
+                }
+                if ((sandEdgeFlag & EDGE_E) && eastIsDirtOnly) {
+                    ctx.drawImage(dirtCanvas, tileSize - stripDepth, 0, stripDepth, tileSize, px + w - stripDepth, py, stripDepth, h);
+                }
+                if ((sandEdgeFlag & EDGE_W) && westIsDirtOnly) {
+                    ctx.drawImage(dirtCanvas, 0, 0, stripDepth, tileSize, px, py, stripDepth, h);
+                }
+                // Corners for dirt-only
+                if ((sandEdgeFlag & EDGE_N) && (sandEdgeFlag & EDGE_E) && (northIsDirtOnly || eastIsDirtOnly)) {
+                    ctx.drawImage(dirtCanvas, tileSize - cornerSize, 0, cornerSize, cornerSize, px + w - cornerSize, py, cornerSize, cornerSize);
+                }
+                if ((sandEdgeFlag & EDGE_S) && (sandEdgeFlag & EDGE_E) && (southIsDirtOnly || eastIsDirtOnly)) {
+                    ctx.drawImage(dirtCanvas, tileSize - cornerSize, tileSize - cornerSize, cornerSize, cornerSize, px + w - cornerSize, py + h - cornerSize, cornerSize, cornerSize);
+                }
+                if ((sandEdgeFlag & EDGE_S) && (sandEdgeFlag & EDGE_W) && (southIsDirtOnly || westIsDirtOnly)) {
+                    ctx.drawImage(dirtCanvas, 0, tileSize - cornerSize, cornerSize, cornerSize, px, py + h - cornerSize, cornerSize, cornerSize);
+                }
+                if ((sandEdgeFlag & EDGE_N) && (sandEdgeFlag & EDGE_W) && (northIsDirtOnly || westIsDirtOnly)) {
+                    ctx.drawImage(dirtCanvas, 0, 0, cornerSize, cornerSize, px, py, cornerSize, cornerSize);
+                }
+            }
+
+            // For dirt-on-sand neighbors, draw sand strips (to match sand layer under the dirt)
+            const northIsDirtOnSand = !northIsDirtOnly && y > 0 && map[y-1][x]?.some(t => t === tileTypes.DIRT);
+            const southIsDirtOnSand = !southIsDirtOnly && y < MAP_HEIGHT_TILES-1 && map[y+1][x]?.some(t => t === tileTypes.DIRT);
+            const eastIsDirtOnSand = !eastIsDirtOnly && x < MAP_WIDTH_TILES-1 && map[y][x+1]?.some(t => t === tileTypes.DIRT);
+            const westIsDirtOnSand = !westIsDirtOnly && x > 0 && map[y][x-1]?.some(t => t === tileTypes.DIRT);
+
+            if (sandBgCanvas) {
+                if ((sandEdgeFlag & EDGE_N) && northIsDirtOnSand) {
+                    ctx.drawImage(sandBgCanvas, 0, 0, tileSize, stripDepth, px, py, w, stripDepth);
+                }
+                if ((sandEdgeFlag & EDGE_S) && southIsDirtOnSand) {
+                    ctx.drawImage(sandBgCanvas, 0, tileSize - stripDepth, tileSize, stripDepth, px, py + h - stripDepth, w, stripDepth);
+                }
+                if ((sandEdgeFlag & EDGE_E) && eastIsDirtOnSand) {
+                    ctx.drawImage(sandBgCanvas, tileSize - stripDepth, 0, stripDepth, tileSize, px + w - stripDepth, py, stripDepth, h);
+                }
+                if ((sandEdgeFlag & EDGE_W) && westIsDirtOnSand) {
+                    ctx.drawImage(sandBgCanvas, 0, 0, stripDepth, tileSize, px, py, stripDepth, h);
+                }
+                // Corners for dirt-on-sand
+                if ((sandEdgeFlag & EDGE_N) && (sandEdgeFlag & EDGE_E) && (northIsDirtOnSand || eastIsDirtOnSand)) {
+                    ctx.drawImage(sandBgCanvas, tileSize - cornerSize, 0, cornerSize, cornerSize, px + w - cornerSize, py, cornerSize, cornerSize);
+                }
+                if ((sandEdgeFlag & EDGE_S) && (sandEdgeFlag & EDGE_E) && (southIsDirtOnSand || eastIsDirtOnSand)) {
+                    ctx.drawImage(sandBgCanvas, tileSize - cornerSize, tileSize - cornerSize, cornerSize, cornerSize, px + w - cornerSize, py + h - cornerSize, cornerSize, cornerSize);
+                }
+                if ((sandEdgeFlag & EDGE_S) && (sandEdgeFlag & EDGE_W) && (southIsDirtOnSand || westIsDirtOnSand)) {
+                    ctx.drawImage(sandBgCanvas, 0, tileSize - cornerSize, cornerSize, cornerSize, px, py + h - cornerSize, cornerSize, cornerSize);
+                }
+                if ((sandEdgeFlag & EDGE_N) && (sandEdgeFlag & EDGE_W) && (northIsDirtOnSand || westIsDirtOnSand)) {
+                    ctx.drawImage(sandBgCanvas, 0, 0, cornerSize, cornerSize, px, py, cornerSize, cornerSize);
+                }
+            }
+        }
+        // Draw procedural sand with edges on top
+        const sandCanvas = getSandTileCanvas(sandEdgeFlag, tileSize);
+        if (sandCanvas) {
+            ctx.drawImage(sandCanvas, px, py, w, h);
         }
     }
     else {

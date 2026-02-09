@@ -1,4 +1,4 @@
-import { tileTypes, setTileRotation, setTileRotations, clearAllTileRotations, setGrassEdgeFlags, clearAllGrassEdgeFlags, setDirtEdgeFlags, clearAllDirtEdgeFlags } from './map.js';
+import { tileTypes, setTileRotation, setTileRotations, clearAllTileRotations, setGrassEdgeFlags, clearAllGrassEdgeFlags, setDirtEdgeFlags, clearAllDirtEdgeFlags, setSandEdgeFlags, clearAllSandEdgeFlags } from './map.js';
 import { loadMapById } from './mapBrowser.js';
 import { collectablesSystem } from './collectables.js';
 import { imageTilesSystem } from './imageTiles.js';
@@ -75,6 +75,7 @@ export function convertMapDataToGameFormat(mapData) {
     clearAllTileRotations();
     clearAllGrassEdgeFlags();
     clearAllDirtEdgeFlags();
+    clearAllSandEdgeFlags();
 
     // Convert tile data to game format
     const gameMap = [];
@@ -94,6 +95,7 @@ export function convertMapDataToGameFormat(mapData) {
                     case 'WATER_BORDER': return { ...tileTypes.WATER, color: '#3bbcff' };
                     case 'GRASS': return tileTypes.GRASS;
                     case 'DIRT': return tileTypes.DIRT;
+                    case 'SAND': return tileTypes.SAND;
                     case 'BRIDGE_H': return tileTypes.BRIDGE_H;
                     case 'BRIDGE_V': return tileTypes.BRIDGE_V;
                     case 'IMAGE': return tileTypes.IMAGE;
@@ -117,6 +119,10 @@ export function convertMapDataToGameFormat(mapData) {
             // Restore dirt edge flags if saved
             if (tile.dirtEdgeFlags) {
                 setDirtEdgeFlags(tile.x, tile.y, tile.dirtEdgeFlags);
+            }
+            // Restore sand edge flags if saved
+            if (tile.sandEdgeFlags) {
+                setSandEdgeFlags(tile.x, tile.y, tile.sandEdgeFlags);
             }
         }
     });
