@@ -872,16 +872,28 @@ export class MapEditor {
         }
 
         if (isStackable(tileType)) {
-            // Stackable tiles get pushed on top
+            // Stackable tiles get pushed on top, but remove grass base (keep water/dirt + overlays)
+            // e.g. [WATER, GRASS, GRASS_EDGE] → [WATER, GRASS_EDGE, GRASS_CORNER_INSIDE]
+            for (let i = tiles.length - 1; i > 0; i--) {
+                if (!getTileSprite(tiles[i]) && tiles[i] === tileTypes.GRASS) {
+                    tiles.splice(i, 1);
+                    break;
+                }
+            }
             tiles.push(tileType);
             pushTileRotation(x, y, this.defaultRotation);
         } else if (getTileSprite(tileType)) {
-            // Custom-sprite overlay tiles (grass edge/corner): stack on top of base terrain
-            // Strip any existing custom-sprite overlays first
+            // Custom-sprite overlay tiles (grass edge/corner) — strip existing overlays
+            // and remove grass base (overlays already contain grass), but keep dirt
             while (tiles.length > 1 && getTileSprite(tiles[tiles.length - 1])) {
                 tiles.pop();
             }
             clearTileRotation(x, y);
+            // Remove grass base — the overlay sprite contains its own grass pixels
+            // but keep dirt/other terrain so it shows through the transparent parts
+            if (tiles.length > 1 && tiles[tiles.length - 1] === tileTypes.GRASS) {
+                tiles.pop();
+            }
             tiles.push(tileType);
             if (isRotatable(tileType) && this.defaultRotation) {
                 setTileRotation(x, y, this.defaultRotation);
@@ -1780,7 +1792,10 @@ export class MapEditor {
         };
 
         // Click-outside handler (capture phase, delayed)
-        setTimeout(() => {
+        this._inlineTextClickOutsideTimer = setTimeout(() => {
+            this._inlineTextClickOutsideTimer = null;
+            // Guard: editor may have been closed before this timeout fired
+            if (!this.inlineTextEditor) return;
             this._inlineTextClickOutsideHandler = (e) => {
                 const editorEl = document.getElementById('inline-text-editor');
                 const toolbarEl = document.getElementById('inline-text-toolbar');
@@ -2028,7 +2043,11 @@ export class MapEditor {
         const toolbarEl = document.getElementById('inline-text-toolbar');
         if (toolbarEl) toolbarEl.remove();
 
-        // Remove click-outside listener
+        // Cancel pending click-outside timer and remove listener
+        if (this._inlineTextClickOutsideTimer) {
+            clearTimeout(this._inlineTextClickOutsideTimer);
+            this._inlineTextClickOutsideTimer = null;
+        }
         if (this._inlineTextClickOutsideHandler) {
             window.removeEventListener('click', this._inlineTextClickOutsideHandler, true);
             this._inlineTextClickOutsideHandler = null;

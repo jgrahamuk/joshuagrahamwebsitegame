@@ -492,14 +492,14 @@ function updateTileSize() {
         // Mobile: calculate tile size based on the longer screen dimension
         const isPortrait = h > w;
         if (isPortrait) {
-            window.TILE_SIZE = h / MOBILE_VISIBLE_TILES;
+            window.TILE_SIZE = Math.floor(h / MOBILE_VISIBLE_TILES);
         } else {
-            window.TILE_SIZE = w / MOBILE_VISIBLE_TILES;
+            window.TILE_SIZE = Math.floor(w / MOBILE_VISIBLE_TILES);
         }
     } else {
         // Desktop: fixed zoom level based on 50-tile reference width, zoomed in 25%
         const REFERENCE_WIDTH = 50;
-        window.TILE_SIZE = (w / REFERENCE_WIDTH) * 1.25;
+        window.TILE_SIZE = Math.floor((w / REFERENCE_WIDTH) * 1.25);
     }
 
     // Set initial offsets to center the map (updateViewport will adjust when player exists)

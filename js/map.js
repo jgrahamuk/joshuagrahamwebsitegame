@@ -10,7 +10,6 @@ let mapCanvas = null;
 let mapCtx = null;
 let mapBlobUrl = null;
 let mapImageEl = null;
-let blobUpdatePending = false;
 
 // Sanitize HTML for text tiles - strip dangerous content, allow only safe tags/attributes
 function _sanitizeHtml(html) {
@@ -361,10 +360,19 @@ export function getResourceAt(x, y) {
     return null;
 }
 
+// Compute integer pixel rect for a tile — each tile starts exactly where the
+// previous one ended, eliminating sub-pixel gaps on the canvas.
+function tileRect(x, y, tileSize) {
+    const px = Math.round(x * tileSize);
+    const py = Math.round(y * tileSize);
+    const w = Math.round((x + 1) * tileSize) - px;
+    const h = Math.round((y + 1) * tileSize) - py;
+    return { px, py, w, h };
+}
+
 function renderTileToCanvas(ctx, x, y, tileSize) {
     const tiles = map[y][x];
-    // Small overlap to prevent gaps from floating-point rounding
-    const renderSize = tileSize + 0.5;
+    const { px, py, w, h } = tileRect(x, y, tileSize);
 
     // Determine the base terrain tile
     const baseTile = tiles.find(t => t === tileTypes.BRIDGE_H) ? 'bridge-horizontal.gif'
@@ -376,7 +384,7 @@ function renderTileToCanvas(ctx, x, y, tileSize) {
 
     const spriteCanvas = getSpriteCanvas(baseTile);
     if (spriteCanvas) {
-        ctx.drawImage(spriteCanvas, x * tileSize, y * tileSize, renderSize, renderSize);
+        ctx.drawImage(spriteCanvas, px, py, w, h);
     }
 
     // Render custom-sprite tile overlays (grass edge/corner variants) with rotation
@@ -389,16 +397,16 @@ function renderTileToCanvas(ctx, x, y, tileSize) {
             const overlaySpriteCanvas = getSpriteCanvas(sprite);
             if (overlaySpriteCanvas) {
                 if (rot) {
-                    const cx = x * tileSize + tileSize / 2;
-                    const cy = y * tileSize + tileSize / 2;
+                    const cx = px + w / 2;
+                    const cy = py + h / 2;
                     const rad = rot * Math.PI / 180;
                     ctx.save();
                     ctx.translate(cx, cy);
                     ctx.rotate(rad);
-                    ctx.drawImage(overlaySpriteCanvas, -renderSize / 2, -renderSize / 2, renderSize, renderSize);
+                    ctx.drawImage(overlaySpriteCanvas, -w / 2, -h / 2, w, h);
                     ctx.restore();
                 } else {
-                    ctx.drawImage(overlaySpriteCanvas, x * tileSize, y * tileSize, renderSize, renderSize);
+                    ctx.drawImage(overlaySpriteCanvas, px, py, w, h);
                 }
             }
         }
@@ -408,20 +416,11 @@ function renderTileToCanvas(ctx, x, y, tileSize) {
 export function redrawTileOnCanvas(x, y) {
     if (!mapCanvas || !mapCtx || !mapImageEl) return;
     const tileSize = window.TILE_SIZE;
-    mapCtx.clearRect(x * tileSize, y * tileSize, tileSize, tileSize);
+    const { px, py, w, h } = tileRect(x, y, tileSize);
+    mapCtx.clearRect(px, py, w, h);
     renderTileToCanvas(mapCtx, x, y, tileSize);
-
-    if (!blobUpdatePending) {
-        blobUpdatePending = true;
-        requestAnimationFrame(() => {
-            mapCanvas.toBlob(blob => {
-                if (mapBlobUrl) URL.revokeObjectURL(mapBlobUrl);
-                mapBlobUrl = URL.createObjectURL(blob);
-                mapImageEl.setAttribute('href', mapBlobUrl);
-                blobUpdatePending = false;
-            });
-        });
-    }
+    // Synchronous update so the edit is visible immediately
+    mapImageEl.setAttribute('href', mapCanvas.toDataURL('image/png'));
 }
 
 export function drawMap(svg) {
@@ -442,8 +441,8 @@ export function drawMap(svg) {
     pattern.setAttribute('patternUnits', 'userSpaceOnUse');
     const patternImg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
     patternImg.setAttribute('href', getSpriteUrl('tile-water.gif'));
-    patternImg.setAttribute('width', tileSize + 0.5);
-    patternImg.setAttribute('height', tileSize + 0.5);
+    patternImg.setAttribute('width', tileSize);
+    patternImg.setAttribute('height', tileSize);
     patternImg.style.imageRendering = 'pixelated';
     pattern.appendChild(patternImg);
     defs.appendChild(pattern);
@@ -464,9 +463,11 @@ export function drawMap(svg) {
         URL.revokeObjectURL(mapBlobUrl);
         mapBlobUrl = null;
     }
+    const canvasW = MAP_WIDTH_TILES * tileSize;
+    const canvasH = MAP_HEIGHT_TILES * tileSize;
     mapCanvas = document.createElement('canvas');
-    mapCanvas.width = MAP_WIDTH_TILES * tileSize;
-    mapCanvas.height = MAP_HEIGHT_TILES * tileSize;
+    mapCanvas.width = canvasW;
+    mapCanvas.height = canvasH;
     mapCtx = mapCanvas.getContext('2d');
     mapCtx.imageSmoothingEnabled = false;
 
@@ -481,8 +482,8 @@ export function drawMap(svg) {
     mapImageEl.setAttribute('href', terrainDataUrl);
     mapImageEl.setAttribute('x', 0);
     mapImageEl.setAttribute('y', 0);
-    mapImageEl.setAttribute('width', MAP_WIDTH_TILES * tileSize);
-    mapImageEl.setAttribute('height', MAP_HEIGHT_TILES * tileSize);
+    mapImageEl.setAttribute('width', canvasW);
+    mapImageEl.setAttribute('height', canvasH);
     mapImageEl.style.imageRendering = 'pixelated';
     mapImageEl.style.zIndex = '1';
     container.appendChild(mapImageEl);
