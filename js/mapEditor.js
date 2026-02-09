@@ -882,6 +882,11 @@ export class MapEditor {
             tiles[0] = tileTypes.WATER;
         }
 
+        // Re-calculate edge flags for this tile and all neighbors
+        this.autoTileGrassWithNeighbors(x, y);
+        this.autoTileDirtWithNeighbors(x, y);
+        this.autoTileSandWithNeighbors(x, y);
+
         // Check if there's an NPC at this position (use broad detection)
         const npcToDelete = this.getNPCAt(x, y);
         if (npcToDelete) {
@@ -912,8 +917,8 @@ export class MapEditor {
         if (needsRedraw) {
             window.drawMap();
         } else {
-            // Update only the specific tile instead of redrawing the entire map
-            this.updateTileDisplay(x, y);
+            // Redraw the tile and its neighbors (edges may have changed)
+            this.redrawTilesInArea(x, y, 1);
         }
     }
 

@@ -1,8 +1,11 @@
-import { tileTypes, setTileRotation, setTileRotations, clearAllTileRotations, setGrassEdgeFlags, clearAllGrassEdgeFlags, setDirtEdgeFlags, clearAllDirtEdgeFlags, setSandEdgeFlags, clearAllSandEdgeFlags } from './map.js';
+import { tileTypes, setTileRotation, setTileRotations, clearAllTileRotations, setGrassEdgeFlags, clearAllGrassEdgeFlags, setDirtEdgeFlags, clearAllDirtEdgeFlags, setSandEdgeFlags, clearAllSandEdgeFlags, clearGrassEdgeFlags, clearDirtEdgeFlags, clearSandEdgeFlags } from './map.js';
 import { loadMapById } from './mapBrowser.js';
 import { collectablesSystem } from './collectables.js';
 import { imageTilesSystem } from './imageTiles.js';
 import { textTilesSystem } from './textTiles.js';
+import { getEdgeFlagsFromNeighbors } from './grassGenerator.js';
+import { getDirtEdgeFlagsFromNeighbors } from './dirtGenerator.js';
+import { getSandEdgeFlagsFromNeighbors } from './sandGenerator.js';
 
 let currentMapData = null;
 let currentMapId = null; // Supabase map ID if loaded from DB
@@ -86,6 +89,9 @@ export function convertMapDataToGameFormat(mapData) {
         }
     }
 
+    // Track if we found any old-style tiles that need migration
+    let hasOldStyleTiles = false;
+
     // Apply tile layers
     tiles.forEach(tile => {
         if (tile.x >= 0 && tile.x < width && tile.y >= 0 && tile.y < height) {
@@ -100,30 +106,23 @@ export function convertMapDataToGameFormat(mapData) {
                     case 'BRIDGE_V': return tileTypes.BRIDGE_V;
                     case 'IMAGE': return tileTypes.IMAGE;
                     case 'TEXT': return tileTypes.TEXT;
-                    case 'GRASS_EDGE': return tileTypes.GRASS_EDGE;
-                    case 'GRASS_CORNER': return tileTypes.GRASS_CORNER;
-                    case 'GRASS_CORNER_INSIDE': return tileTypes.GRASS_CORNER_INSIDE;
+                    // Old static edge/corner tiles - mark for migration and skip
+                    case 'GRASS_EDGE':
+                    case 'GRASS_CORNER':
+                    case 'GRASS_CORNER_INSIDE':
+                        hasOldStyleTiles = true;
+                        return null; // Will be filtered out
                     default: return tileTypes.WATER;
                 }
-            });
+            }).filter(t => t !== null); // Remove null entries from old tiles
             // Restore tile rotation if saved
             if (tile.rotations) {
                 setTileRotations(tile.x, tile.y, tile.rotations);
             } else if (tile.rotation) {
                 setTileRotation(tile.x, tile.y, tile.rotation);
             }
-            // Restore grass edge flags if saved
-            if (tile.edgeFlags) {
-                setGrassEdgeFlags(tile.x, tile.y, tile.edgeFlags);
-            }
-            // Restore dirt edge flags if saved
-            if (tile.dirtEdgeFlags) {
-                setDirtEdgeFlags(tile.x, tile.y, tile.dirtEdgeFlags);
-            }
-            // Restore sand edge flags if saved
-            if (tile.sandEdgeFlags) {
-                setSandEdgeFlags(tile.x, tile.y, tile.sandEdgeFlags);
-            }
+            // Note: Edge flags are not restored here - they are always recalculated
+            // by migrateToProceduralTiles() to ensure consistency
         }
     });
 
@@ -201,6 +200,10 @@ export function convertMapDataToGameFormat(mapData) {
         textTilesSystem.loadFromMapData([]);
     }
 
+    // Migrate old-style tiles to procedural generation
+    // Always recalculate edge flags to ensure consistency
+    migrateToProceduralTiles(gameMap, width, height, hasOldStyleTiles);
+
     return {
         map: gameMap,
         structures,
@@ -242,4 +245,106 @@ export function saveMap() {
     a.download = 'map.json';
     a.click();
     URL.revokeObjectURL(url);
+}
+
+// Migrate old-style static edge/corner tiles to procedural generation
+// Recalculates edge flags for all grass, dirt, and sand tiles
+function migrateToProceduralTiles(gameMap, width, height, hasOldStyleTiles) {
+    if (hasOldStyleTiles) {
+        console.log('Migrating old-style tiles to procedural generation...');
+    }
+
+    // Helper functions for terrain detection
+    const isGrassOnTop = (x, y) => {
+        if (x < 0 || x >= width || y < 0 || y >= height) return false;
+        const tiles = gameMap[y]?.[x];
+        if (!tiles || tiles.length === 0) return false;
+        const grassIndex = tiles.findIndex(t => t === tileTypes.GRASS);
+        const dirtIndex = tiles.findIndex(t => t === tileTypes.DIRT);
+        const sandIndex = tiles.findIndex(t => t === tileTypes.SAND);
+        if (grassIndex < 0) return false;
+        if (dirtIndex < 0 && sandIndex < 0) return true;
+        return grassIndex > Math.max(dirtIndex, sandIndex);
+    };
+
+    const isDirtOnTop = (x, y) => {
+        if (x < 0 || x >= width || y < 0 || y >= height) return false;
+        const tiles = gameMap[y]?.[x];
+        if (!tiles || tiles.length === 0) return false;
+        const grassIndex = tiles.findIndex(t => t === tileTypes.GRASS);
+        const dirtIndex = tiles.findIndex(t => t === tileTypes.DIRT);
+        const sandIndex = tiles.findIndex(t => t === tileTypes.SAND);
+        if (dirtIndex < 0) return false;
+        if (grassIndex < 0 && sandIndex < 0) return true;
+        return dirtIndex > Math.max(grassIndex, sandIndex);
+    };
+
+    const isSandOnTop = (x, y) => {
+        if (x < 0 || x >= width || y < 0 || y >= height) return false;
+        const tiles = gameMap[y]?.[x];
+        if (!tiles || tiles.length === 0) return false;
+        const grassIndex = tiles.findIndex(t => t === tileTypes.GRASS);
+        const dirtIndex = tiles.findIndex(t => t === tileTypes.DIRT);
+        const sandIndex = tiles.findIndex(t => t === tileTypes.SAND);
+        if (sandIndex < 0) return false;
+        if (grassIndex < 0 && dirtIndex < 0) return true;
+        return sandIndex > Math.max(grassIndex, dirtIndex);
+    };
+
+    // Recalculate edge flags for all tiles
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            // Auto-tile grass
+            if (isGrassOnTop(x, y)) {
+                const n = !isGrassOnTop(x, y - 1);
+                const s = !isGrassOnTop(x, y + 1);
+                const e = !isGrassOnTop(x + 1, y);
+                const w = !isGrassOnTop(x - 1, y);
+                const ne = !isGrassOnTop(x + 1, y - 1);
+                const se = !isGrassOnTop(x + 1, y + 1);
+                const sw = !isGrassOnTop(x - 1, y + 1);
+                const nw = !isGrassOnTop(x - 1, y - 1);
+                const flags = getEdgeFlagsFromNeighbors(n, s, e, w, ne, se, sw, nw);
+                setGrassEdgeFlags(x, y, flags);
+            } else {
+                clearGrassEdgeFlags(x, y);
+            }
+
+            // Auto-tile dirt
+            if (isDirtOnTop(x, y)) {
+                const n = !isDirtOnTop(x, y - 1);
+                const s = !isDirtOnTop(x, y + 1);
+                const e = !isDirtOnTop(x + 1, y);
+                const w = !isDirtOnTop(x - 1, y);
+                const ne = !isDirtOnTop(x + 1, y - 1);
+                const se = !isDirtOnTop(x + 1, y + 1);
+                const sw = !isDirtOnTop(x - 1, y + 1);
+                const nw = !isDirtOnTop(x - 1, y - 1);
+                const flags = getDirtEdgeFlagsFromNeighbors(n, s, e, w, ne, se, sw, nw);
+                setDirtEdgeFlags(x, y, flags);
+            } else {
+                clearDirtEdgeFlags(x, y);
+            }
+
+            // Auto-tile sand
+            if (isSandOnTop(x, y)) {
+                const n = !isSandOnTop(x, y - 1);
+                const s = !isSandOnTop(x, y + 1);
+                const e = !isSandOnTop(x + 1, y);
+                const w = !isSandOnTop(x - 1, y);
+                const ne = !isSandOnTop(x + 1, y - 1);
+                const se = !isSandOnTop(x + 1, y + 1);
+                const sw = !isSandOnTop(x - 1, y + 1);
+                const nw = !isSandOnTop(x - 1, y - 1);
+                const flags = getSandEdgeFlagsFromNeighbors(n, s, e, w, ne, se, sw, nw);
+                setSandEdgeFlags(x, y, flags);
+            } else {
+                clearSandEdgeFlags(x, y);
+            }
+        }
+    }
+
+    if (hasOldStyleTiles) {
+        console.log('Migration complete. Old edge/corner tiles converted to procedural rendering.');
+    }
 }
