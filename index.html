@@ -32,15 +32,25 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://js.stripe.com/v3/"></script>
+    <script
+      defer
+      src="https://cloud.umami.is/script.js"
+      data-website-id="d424105b-8b8c-4bcd-8172-d109dedecbb6"
+    ></script>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-NPP3XJMTRE"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-NPP3XJMTRE"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
 
-  gtag('config', 'G-NPP3XJMTRE');
-</script>
+      gtag("config", "G-NPP3XJMTRE");
+    </script>
   </head>
   <body>
     <!-- Animated tile background -->
@@ -136,9 +146,7 @@
       <!-- Pricing -->
       <section id="pricing" class="pricing-section">
         <h2>Pricing</h2>
-        <p class="pricing-sub">
-          Start free. Upgrade when you're ready.
-        </p>
+        <p class="pricing-sub">Start free. Upgrade when you're ready.</p>
         <div class="pricing-cards">
           <div class="pricing-card free-tier">
             <div class="card-badge free-badge">Free</div>
@@ -154,10 +162,7 @@
               <li>Core map editor tools</li>
               <li>Public or private worlds</li>
             </ul>
-            <button
-              class="btn btn-outline btn-lg card-cta"
-              data-plan="free"
-            >
+            <button class="btn btn-outline btn-lg card-cta" data-plan="free">
               Get Started Free
             </button>
           </div>
@@ -184,8 +189,6 @@
               Get Started - $2/mo
             </button>
           </div>
-
-
         </div>
       </section>
 
