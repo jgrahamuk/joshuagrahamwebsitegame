@@ -1024,7 +1024,7 @@ function renderTileToCanvas(ctx, x, y, tileSize) {
                 if ((sandEdgeFlag & EDGE_N) && northIsDirtOnSand) {
                     ctx.drawImage(sandBgCanvas, 0, 0, tileSize, stripDepth, px, py, w, stripDepth);
                 }
-                if ((sandEdgeFlag & EDGE_S) && southIsDirtOnSand) {
+                if ((sandEdgeFlag & EDGE_S) && northIsDirtOnSand) {
                     ctx.drawImage(sandBgCanvas, 0, tileSize - stripDepth, tileSize, stripDepth, px, py + h - stripDepth, w, stripDepth);
                 }
                 if ((sandEdgeFlag & EDGE_E) && eastIsDirtOnSand) {
