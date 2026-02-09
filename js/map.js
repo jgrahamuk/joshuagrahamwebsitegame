@@ -1,9 +1,16 @@
 import { placeStructures } from './structures.js';
 import { loadMapData, convertMapDataToGameFormat } from './mapLoader.js';
-import { getSpriteUrl } from './spriteCache.js';
+import { getSpriteUrl, getSpriteCanvas } from './spriteCache.js';
 import { drawStructures } from './structures.js';
 import { imageTilesSystem } from './imageTiles.js';
 import { textTilesSystem } from './textTiles.js';
+
+// Offscreen canvas state for pre-rendered terrain
+let mapCanvas = null;
+let mapCtx = null;
+let mapBlobUrl = null;
+let mapImageEl = null;
+let blobUpdatePending = false;
 
 // Sanitize HTML for text tiles - strip dangerous content, allow only safe tags/attributes
 function _sanitizeHtml(html) {
@@ -354,6 +361,69 @@ export function getResourceAt(x, y) {
     return null;
 }
 
+function renderTileToCanvas(ctx, x, y, tileSize) {
+    const tiles = map[y][x];
+    // Small overlap to prevent gaps from floating-point rounding
+    const renderSize = tileSize + 0.5;
+
+    // Determine the base terrain tile
+    const baseTile = tiles.find(t => t === tileTypes.BRIDGE_H) ? 'bridge-horizontal.gif'
+        : tiles.find(t => t === tileTypes.BRIDGE_V) ? 'bridge-vertical.gif'
+            : tiles.find(t => t === tileTypes.DIRT) ? 'tile-dirt.gif'
+                : tiles.find(t => t === tileTypes.GRASS) ? 'tile-grass.gif'
+                    : tiles.find(t => t === tileTypes.WATER || (t.color && t.color === '#3bbcff')) ? 'tile-water.gif'
+                        : 'tile-grass.gif';
+
+    const spriteCanvas = getSpriteCanvas(baseTile);
+    if (spriteCanvas) {
+        ctx.drawImage(spriteCanvas, x * tileSize, y * tileSize, renderSize, renderSize);
+    }
+
+    // Render custom-sprite tile overlays (grass edge/corner variants) with rotation
+    const rotations = getTileRotations(x, y);
+    let rotIdx = 0;
+    for (const t of tiles) {
+        const sprite = getTileSprite(t);
+        if (sprite) {
+            const rot = rotations[rotIdx++] || 0;
+            const overlaySpriteCanvas = getSpriteCanvas(sprite);
+            if (overlaySpriteCanvas) {
+                if (rot) {
+                    const cx = x * tileSize + tileSize / 2;
+                    const cy = y * tileSize + tileSize / 2;
+                    const rad = rot * Math.PI / 180;
+                    ctx.save();
+                    ctx.translate(cx, cy);
+                    ctx.rotate(rad);
+                    ctx.drawImage(overlaySpriteCanvas, -renderSize / 2, -renderSize / 2, renderSize, renderSize);
+                    ctx.restore();
+                } else {
+                    ctx.drawImage(overlaySpriteCanvas, x * tileSize, y * tileSize, renderSize, renderSize);
+                }
+            }
+        }
+    }
+}
+
+export function redrawTileOnCanvas(x, y) {
+    if (!mapCanvas || !mapCtx || !mapImageEl) return;
+    const tileSize = window.TILE_SIZE;
+    mapCtx.clearRect(x * tileSize, y * tileSize, tileSize, tileSize);
+    renderTileToCanvas(mapCtx, x, y, tileSize);
+
+    if (!blobUpdatePending) {
+        blobUpdatePending = true;
+        requestAnimationFrame(() => {
+            mapCanvas.toBlob(blob => {
+                if (mapBlobUrl) URL.revokeObjectURL(mapBlobUrl);
+                mapBlobUrl = URL.createObjectURL(blob);
+                mapImageEl.setAttribute('href', mapBlobUrl);
+                blobUpdatePending = false;
+            });
+        });
+    }
+}
+
 export function drawMap(svg) {
     svg.innerHTML = '';
     const svgWidth = window.innerWidth;
@@ -363,79 +433,59 @@ export function drawMap(svg) {
     const offsetX = window.MAP_OFFSET_X || 0;
     const offsetY = window.MAP_OFFSET_Y || 0;
 
-    // Small overlap to prevent gaps from floating-point rounding
-    const tileOverlap = 0.5;
-    const renderSize = tileSize + tileOverlap;
-
-    // Fill the entire SVG area with water tiles (fixed to viewport, outside container)
-    const numXTiles = Math.ceil(svgWidth / tileSize) + 1;
-    const numYTiles = Math.ceil(svgHeight / tileSize) + 1;
-    for (let y = 0; y < numYTiles; y++) {
-        for (let x = 0; x < numXTiles; x++) {
-            const imgWater = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-            imgWater.setAttribute('href', getSpriteUrl('tile-water.gif'));
-            imgWater.setAttribute('x', x * tileSize);
-            imgWater.setAttribute('y', y * tileSize);
-            imgWater.setAttribute('width', renderSize);
-            imgWater.setAttribute('height', renderSize);
-            imgWater.style.imageRendering = 'pixelated';
-            svg.appendChild(imgWater);
-        }
-    }
+    // Fill the entire SVG area with water using an SVG pattern (2 elements instead of ~1400)
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    const pattern = document.createElementNS('http://www.w3.org/2000/svg', 'pattern');
+    pattern.setAttribute('id', 'water-pat');
+    pattern.setAttribute('width', tileSize);
+    pattern.setAttribute('height', tileSize);
+    pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+    const patternImg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+    patternImg.setAttribute('href', getSpriteUrl('tile-water.gif'));
+    patternImg.setAttribute('width', tileSize + 0.5);
+    patternImg.setAttribute('height', tileSize + 0.5);
+    patternImg.style.imageRendering = 'pixelated';
+    pattern.appendChild(patternImg);
+    defs.appendChild(pattern);
+    svg.appendChild(defs);
+    const waterRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    waterRect.setAttribute('width', svgWidth);
+    waterRect.setAttribute('height', svgHeight);
+    waterRect.setAttribute('fill', 'url(#water-pat)');
+    svg.appendChild(waterRect);
 
     // Create map container group — all map content at grid coords, panned via transform
     const container = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     container.setAttribute('id', 'map-container');
     container.setAttribute('transform', `translate(${offsetX}, ${offsetY})`);
 
-    // Draw the map tiles
+    // Pre-render all terrain tiles to an offscreen canvas (single SVG <image> instead of ~2040+ elements)
+    if (mapBlobUrl) {
+        URL.revokeObjectURL(mapBlobUrl);
+        mapBlobUrl = null;
+    }
+    mapCanvas = document.createElement('canvas');
+    mapCanvas.width = MAP_WIDTH_TILES * tileSize;
+    mapCanvas.height = MAP_HEIGHT_TILES * tileSize;
+    mapCtx = mapCanvas.getContext('2d');
+    mapCtx.imageSmoothingEnabled = false;
+
     for (let y = 0; y < MAP_HEIGHT_TILES; y++) {
         for (let x = 0; x < MAP_WIDTH_TILES; x++) {
-            const tiles = map[y][x];
-
-            // Determine the base terrain tile
-            const baseTile = tiles.find(t => t === tileTypes.BRIDGE_H) ? 'bridge-horizontal.gif'
-                : tiles.find(t => t === tileTypes.BRIDGE_V) ? 'bridge-vertical.gif'
-                    : tiles.find(t => t === tileTypes.DIRT) ? 'tile-dirt.gif'
-                        : tiles.find(t => t === tileTypes.GRASS) ? 'tile-grass.gif'
-                            : tiles.find(t => t === tileTypes.WATER || (t.color && t.color === '#3bbcff')) ? 'tile-water.gif'
-                                : 'tile-grass.gif';
-
-            const imgBase = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-            imgBase.setAttribute('href', getSpriteUrl(baseTile));
-            imgBase.setAttribute('x', x * tileSize);
-            imgBase.setAttribute('y', y * tileSize);
-            imgBase.setAttribute('width', renderSize);
-            imgBase.setAttribute('height', renderSize);
-            imgBase.style.imageRendering = 'pixelated';
-            imgBase.style.zIndex = '1';
-            container.appendChild(imgBase);
-
-            // Render custom-sprite tiles (grass edge/corner variants) as overlays
-            const rotations = getTileRotations(x, y);
-            let rotIdx = 0;
-            for (const t of tiles) {
-                const sprite = getTileSprite(t);
-                if (sprite) {
-                    const rot = rotations[rotIdx++] || 0;
-                    const imgOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-                    imgOverlay.setAttribute('href', getSpriteUrl(sprite));
-                    imgOverlay.setAttribute('x', x * tileSize);
-                    imgOverlay.setAttribute('y', y * tileSize);
-                    imgOverlay.setAttribute('width', renderSize);
-                    imgOverlay.setAttribute('height', renderSize);
-                    if (rot) {
-                        const cx = x * tileSize + tileSize / 2;
-                        const cy = y * tileSize + tileSize / 2;
-                        imgOverlay.setAttribute('transform', `rotate(${rot}, ${cx}, ${cy})`);
-                    }
-                    imgOverlay.style.imageRendering = 'pixelated';
-                    imgOverlay.style.zIndex = '1';
-                    container.appendChild(imgOverlay);
-                }
-            }
+            renderTileToCanvas(mapCtx, x, y, tileSize);
         }
     }
+
+    const terrainDataUrl = mapCanvas.toDataURL('image/png');
+    mapImageEl = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+    mapImageEl.setAttribute('href', terrainDataUrl);
+    mapImageEl.setAttribute('x', 0);
+    mapImageEl.setAttribute('y', 0);
+    mapImageEl.setAttribute('width', MAP_WIDTH_TILES * tileSize);
+    mapImageEl.setAttribute('height', MAP_HEIGHT_TILES * tileSize);
+    mapImageEl.style.imageRendering = 'pixelated';
+    mapImageEl.style.zIndex = '1';
+    container.appendChild(mapImageEl);
 
     // Draw structures
     drawStructures(container, 0, 0);

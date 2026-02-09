@@ -20,6 +20,7 @@ const spriteNames = [
 ];
 
 const cache = {};
+const canvasCache = {};
 
 // Names that should keep their raw URL (e.g. animated GIFs that lose animation when drawn to canvas)
 const rawUrlNames = new Set(['portal-purple.gif']);
@@ -37,6 +38,7 @@ export function preloadSprites(basePath = 'resources/images/') {
                     canvas.height = img.height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0);
+                    canvasCache[name] = canvas;
                     cache[name] = canvas.toDataURL('image/png');
                 }
                 resolve();
@@ -51,4 +53,8 @@ export function getSpriteUrl(name) {
         console.warn('Sprite not cached:', name);
     }
     return cache[name] || '';
+}
+
+export function getSpriteCanvas(name) {
+    return canvasCache[name] || null;
 } 

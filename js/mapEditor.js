@@ -1,4 +1,4 @@
-import { tileTypes, placeResourceAtPosition, removeResource, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, replaceMap, getTileSprite, getTileRotations, setTileRotation, setTileRotations, pushTileRotation, popTileRotation, clearTileRotation, clearAllTileRotations, isRotatable, isStackable, rotateTile } from './map.js';
+import { tileTypes, placeResourceAtPosition, removeResource, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, replaceMap, getTileSprite, getTileRotations, setTileRotation, setTileRotations, pushTileRotation, popTileRotation, clearTileRotation, clearAllTileRotations, isRotatable, isStackable, rotateTile, redrawTileOnCanvas } from './map.js';
 import { getSpriteUrl } from './spriteCache.js';
 import { NPC } from './npcs.js';
 import { Chicken, Cockerel, canPlaceHen, canPlaceRooster } from './chickens.js';
@@ -692,24 +692,10 @@ export class MapEditor {
         const dynamicGroup = container ? container.querySelector('#dynamic-elements') : null;
         const searchRoot = container || this.svg;
 
-        // Remove existing images at this position more efficiently
-        const imagesToRemove = [];
-        const existingImages = searchRoot.querySelectorAll('image');
-        existingImages.forEach(img => {
-            const imgX = parseFloat(img.getAttribute('x'));
-            const imgY = parseFloat(img.getAttribute('y'));
+        // Update base terrain + overlays on the offscreen canvas
+        redrawTileOnCanvas(x, y);
 
-            // Only remove images that are exactly at this tile position
-            // and don't have a data-resource attribute (base tiles only)
-            if (imgX === tileX && imgY === tileY && !img.hasAttribute('data-resource')) {
-                imagesToRemove.push(img);
-            }
-        });
-
-        // Remove the base tile images
-        imagesToRemove.forEach(img => img.remove());
-
-        // Remove any existing resource at this position
+        // Remove any existing resource SVG at this position
         const existingResources = searchRoot.querySelectorAll('image[data-resource]');
         existingResources.forEach(img => {
             const imgX = parseFloat(img.getAttribute('x'));
@@ -729,58 +715,8 @@ export class MapEditor {
             }
         });
 
-        // Redraw the specific tile
+        // Redraw the specific tile's resource overlay
         const tiles = map[y][x];
-
-        // Determine the base terrain tile
-        const baseTile = tiles.find(t => t === tileTypes.BRIDGE_H) ? 'bridge-horizontal.gif'
-            : tiles.find(t => t === tileTypes.BRIDGE_V) ? 'bridge-vertical.gif'
-                : tiles.find(t => t === tileTypes.DIRT) ? 'tile-dirt.gif'
-                    : tiles.find(t => t === tileTypes.GRASS) ? 'tile-grass.gif'
-                        : tiles.find(t => t === tileTypes.WATER || (t.color && t.color === '#3bbcff')) ? 'tile-water.gif'
-                            : 'tile-grass.gif';
-
-        const insertEl = (el) => {
-            if (container && dynamicGroup) {
-                container.insertBefore(el, dynamicGroup);
-            } else {
-                this.svg.appendChild(el);
-            }
-        };
-
-        const imgBase = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        imgBase.setAttribute('href', getSpriteUrl(baseTile));
-        imgBase.setAttribute('x', tileX);
-        imgBase.setAttribute('y', tileY);
-        imgBase.setAttribute('width', window.TILE_SIZE);
-        imgBase.setAttribute('height', window.TILE_SIZE);
-        imgBase.style.imageRendering = 'pixelated';
-        imgBase.style.zIndex = '1';
-        insertEl(imgBase);
-
-        // Render custom-sprite tile overlays (grass edge/corner variants)
-        const rotations = getTileRotations(x, y);
-        let rotIdx = 0;
-        for (const t of tiles) {
-            const sprite = getTileSprite(t);
-            if (sprite) {
-                const rot = rotations[rotIdx++] || 0;
-                const imgOv = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-                imgOv.setAttribute('href', getSpriteUrl(sprite));
-                imgOv.setAttribute('x', tileX);
-                imgOv.setAttribute('y', tileY);
-                imgOv.setAttribute('width', window.TILE_SIZE);
-                imgOv.setAttribute('height', window.TILE_SIZE);
-                if (rot) {
-                    const cx = tileX + window.TILE_SIZE / 2;
-                    const cy = tileY + window.TILE_SIZE / 2;
-                    imgOv.setAttribute('transform', `rotate(${rot}, ${cx}, ${cy})`);
-                }
-                imgOv.style.imageRendering = 'pixelated';
-                imgOv.style.zIndex = '1';
-                insertEl(imgOv);
-            }
-        }
 
         // Add overlay if needed
         const top = tiles[tiles.length - 1];
