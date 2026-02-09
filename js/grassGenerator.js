@@ -78,10 +78,13 @@ function generateJaggedEdge(length, maxDepth, seed) {
 
 // Generate a grass tile with specified edge configuration
 // Returns an object with both the canvas and data URL for flexibility
-// edgeFlags contains both cardinal edges (bits 0-3) and inside corner preservation (bits 4-7)
+// edgeFlags contains cardinal edges only (bits 0-3)
 export function generateGrassTile(edgeFlags, tileSize = 32) {
+    // Only use cardinal edge flags (mask out any corner flags)
+    const cardinalFlags = edgeFlags & 0x0F;
+
     // Check cache first
-    const cacheKey = `${edgeFlags}-${tileSize}`;
+    const cacheKey = `${cardinalFlags}-${tileSize}`;
     if (tileCache.has(cacheKey)) {
         return tileCache.get(cacheKey);
     }
@@ -92,53 +95,29 @@ export function generateGrassTile(edgeFlags, tileSize = 32) {
     const ctx = canvas.getContext('2d');
 
     // Determine which edges are exposed to water/dirt
-    const hasN = (edgeFlags & EDGE_NORTH) !== 0;
-    const hasS = (edgeFlags & EDGE_SOUTH) !== 0;
-    const hasE = (edgeFlags & EDGE_EAST) !== 0;
-    const hasW = (edgeFlags & EDGE_WEST) !== 0;
-
-    // Determine which inside corners to preserve (don't cut edges there)
-    // These are set when there's grass diagonally adjacent
-    const preserveNE = (edgeFlags & CORNER_NE) !== 0;
-    const preserveSE = (edgeFlags & CORNER_SE) !== 0;
-    const preserveSW = (edgeFlags & CORNER_SW) !== 0;
-    const preserveNW = (edgeFlags & CORNER_NW) !== 0;
+    const hasN = (cardinalFlags & EDGE_NORTH) !== 0;
+    const hasS = (cardinalFlags & EDGE_SOUTH) !== 0;
+    const hasE = (cardinalFlags & EDGE_EAST) !== 0;
+    const hasW = (cardinalFlags & EDGE_WEST) !== 0;
 
     // Generate full grass pattern first
-    generateGrassPattern(ctx, tileSize, tileSize, edgeFlags * 1000);
+    generateGrassPattern(ctx, tileSize, tileSize, cardinalFlags * 1000);
 
     // Cut out edges and corners using clearRect
     const edgeDepth = Math.floor(tileSize * 0.12);
     const cornerRadius = Math.floor(tileSize * 0.28);
-    const preserveSize = edgeDepth + 2; // Size of corner area to preserve for inside corners
 
-    // Cut jagged edges along exposed sides, but skip preserved inside corners
-    if (hasN) {
-        const startX = preserveNW ? preserveSize : 0;
-        const endX = preserveNE ? tileSize - preserveSize : tileSize;
-        if (startX < endX) addJaggedEdge(ctx, startX, endX, tileSize, edgeDepth, 'north', edgeFlags + 1000);
-    }
-    if (hasS) {
-        const startX = preserveSW ? preserveSize : 0;
-        const endX = preserveSE ? tileSize - preserveSize : tileSize;
-        if (startX < endX) addJaggedEdge(ctx, startX, endX, tileSize, edgeDepth, 'south', edgeFlags + 2000);
-    }
-    if (hasE) {
-        const startY = preserveNE ? preserveSize : 0;
-        const endY = preserveSE ? tileSize - preserveSize : tileSize;
-        if (startY < endY) addJaggedEdgeVertical(ctx, tileSize, startY, endY, tileSize, edgeDepth, 'east', edgeFlags + 3000);
-    }
-    if (hasW) {
-        const startY = preserveNW ? preserveSize : 0;
-        const endY = preserveSW ? tileSize - preserveSize : tileSize;
-        if (startY < endY) addJaggedEdgeVertical(ctx, 0, startY, endY, tileSize, edgeDepth, 'west', edgeFlags + 4000);
-    }
+    // Cut jagged edges along exposed sides
+    if (hasN) addJaggedEdge(ctx, 0, tileSize, tileSize, edgeDepth, 'north', cardinalFlags + 1000);
+    if (hasS) addJaggedEdge(ctx, 0, tileSize, tileSize, edgeDepth, 'south', cardinalFlags + 2000);
+    if (hasE) addJaggedEdgeVertical(ctx, tileSize, 0, tileSize, tileSize, edgeDepth, 'east', cardinalFlags + 3000);
+    if (hasW) addJaggedEdgeVertical(ctx, 0, 0, tileSize, tileSize, edgeDepth, 'west', cardinalFlags + 4000);
 
-    // Round the outside corners where two edges meet (only if both edges exist and corner isn't preserved)
-    if (hasN && hasE && !preserveNE) cutRoundedCorner(ctx, tileSize, 0, cornerRadius, 'ne', edgeFlags + 100);
-    if (hasS && hasE && !preserveSE) cutRoundedCorner(ctx, tileSize, tileSize, cornerRadius, 'se', edgeFlags + 200);
-    if (hasS && hasW && !preserveSW) cutRoundedCorner(ctx, 0, tileSize, cornerRadius, 'sw', edgeFlags + 300);
-    if (hasN && hasW && !preserveNW) cutRoundedCorner(ctx, 0, 0, cornerRadius, 'nw', edgeFlags + 400);
+    // Round the outside corners where two edges meet
+    if (hasN && hasE) cutRoundedCorner(ctx, tileSize, 0, cornerRadius, 'ne', cardinalFlags + 100);
+    if (hasS && hasE) cutRoundedCorner(ctx, tileSize, tileSize, cornerRadius, 'se', cardinalFlags + 200);
+    if (hasS && hasW) cutRoundedCorner(ctx, 0, tileSize, cornerRadius, 'sw', cardinalFlags + 300);
+    if (hasN && hasW) cutRoundedCorner(ctx, 0, 0, cornerRadius, 'nw', cardinalFlags + 400);
 
     // Cache the result
     const result = { canvas, dataUrl: null };
@@ -375,6 +354,7 @@ export function getGrassTileCanvas(edgeFlags, tileSize = 32) {
 
 // Get edge flags from neighbor configuration
 // Get edge flags for a GRASS tile based on which neighbors are water/dirt
+// Only returns cardinal edge flags (diagonal parameters kept for API compatibility but ignored)
 export function getEdgeFlagsFromNeighbors(n, s, e, w, ne, se, sw, nw) {
     let flags = 0;
 
@@ -383,17 +363,6 @@ export function getEdgeFlagsFromNeighbors(n, s, e, w, ne, se, sw, nw) {
     if (s) flags |= EDGE_SOUTH;
     if (e) flags |= EDGE_EAST;
     if (w) flags |= EDGE_WEST;
-
-    // Inside corner preservation - don't cut edges where grass meets diagonally
-    // An inside corner exists when: one cardinal has water, perpendicular has grass, diagonal has water
-    // NE: (north edge OR east edge, but not both) AND water diagonal
-    if (((n && !e) || (e && !n)) && ne) flags |= CORNER_NE;
-    // SE: (south edge OR east edge, but not both) AND water diagonal
-    if (((s && !e) || (e && !s)) && se) flags |= CORNER_SE;
-    // SW: (south edge OR west edge, but not both) AND water diagonal
-    if (((s && !w) || (w && !s)) && sw) flags |= CORNER_SW;
-    // NW: (north edge OR west edge, but not both) AND water diagonal
-    if (((n && !w) || (w && !n)) && nw) flags |= CORNER_NW;
 
     return flags;
 }

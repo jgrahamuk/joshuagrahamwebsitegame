@@ -5,7 +5,8 @@
       "WebFetch(domain:maap.to)",
       "mcp__ide__getDiagnostics",
       "Bash(identify:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(grep:*)"
     ]
   }
 }

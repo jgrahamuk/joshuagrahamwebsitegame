@@ -1,6 +1,7 @@
-import { tileTypes, placeResourceAtPosition, removeResource, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, replaceMap, getTileSprite, getTileRotations, setTileRotation, setTileRotations, pushTileRotation, popTileRotation, clearTileRotation, clearAllTileRotations, isRotatable, isStackable, rotateTile, redrawTileOnCanvas, setGrassEdgeFlags, getGrassEdgeFlags, clearGrassEdgeFlags } from './map.js';
+import { tileTypes, placeResourceAtPosition, removeResource, map, MAP_WIDTH_TILES, MAP_HEIGHT_TILES, replaceMap, getTileSprite, getTileRotations, setTileRotation, setTileRotations, pushTileRotation, popTileRotation, clearTileRotation, clearAllTileRotations, isRotatable, isStackable, rotateTile, redrawTileOnCanvas, setGrassEdgeFlags, getGrassEdgeFlags, clearGrassEdgeFlags, setDirtEdgeFlags, getDirtEdgeFlags, clearDirtEdgeFlags } from './map.js';
 import { getSpriteUrl } from './spriteCache.js';
 import { getEdgeFlagsFromNeighbors, EDGE_NORTH, EDGE_SOUTH, EDGE_EAST, EDGE_WEST, CORNER_NE, CORNER_SE, CORNER_SW, CORNER_NW } from './grassGenerator.js';
+import { getDirtEdgeFlagsFromNeighbors } from './dirtGenerator.js';
 import { NPC } from './npcs.js';
 import { Chicken, Cockerel, canPlaceHen, canPlaceRooster } from './chickens.js';
 import { saveMapToSupabase } from './mapBrowser.js';
@@ -60,9 +61,6 @@ export class MapEditor {
             { id: 'water', name: 'Water', icon: 'tile-water.gif', type: 'tile', tileType: tileTypes.WATER },
             { id: 'bridge_h', name: 'Bridge (H)', icon: 'bridge-horizontal.gif', type: 'tile', tileType: tileTypes.BRIDGE_H },
             { id: 'bridge_v', name: 'Bridge (V)', icon: 'bridge-vertical.gif', type: 'tile', tileType: tileTypes.BRIDGE_V },
-            { id: 'grass_edge', name: 'Grass Edge', icon: 'tile-grass-edge.gif', type: 'tile', tileType: tileTypes.GRASS_EDGE },
-            { id: 'grass_corner', name: 'Grass Corner', icon: 'tile-grass-corner.gif', type: 'tile', tileType: tileTypes.GRASS_CORNER },
-            { id: 'grass_corner_inside', name: 'Inside Corner', icon: 'tile-grass-corner-inside.gif', type: 'tile', tileType: tileTypes.GRASS_CORNER_INSIDE },
             { id: 'large_tree', name: 'Large Tree', icon: 'tree.gif', type: 'resource', tileType: tileTypes.LARGE_TREE },
             { id: 'bush', name: 'Bush', icon: 'bush.gif', type: 'resource', tileType: tileTypes.BUSH },
             { id: 'pine_tree', name: 'Pine Tree', icon: 'pine-tree.gif', type: 'resource', tileType: tileTypes.PINE_TREE },
@@ -91,7 +89,7 @@ export class MapEditor {
         // Tool groups for the toolbar flyout UI
         this.toolGroups = [
             { id: 'delete', label: 'Delete', toolIds: ['delete'], standalone: true },
-            { id: 'terrain', label: 'Terrain', toolIds: ['grass', 'grass_edge', 'grass_corner', 'grass_corner_inside', 'dirt', 'water', 'bridge_h', 'bridge_v'] },
+            { id: 'terrain', label: 'Terrain', toolIds: ['grass', 'dirt', 'water', 'bridge_h', 'bridge_v'] },
             { id: 'nature', label: 'Nature', toolIds: ['large_tree', 'bush', 'pine_tree', 'rock', 'flower', 'flower_rose', 'flower_forgetmenot', 'flower_tulip', 'flower_bluebell'] },
             { id: 'collectables', label: 'Collectables', toolIds: ['egg', 'badge'] },
             { id: 'buildings', label: 'Buildings', toolIds: ['farmhouse', 'chicken_coop', 'portal'] },
@@ -118,9 +116,6 @@ export class MapEditor {
             'water': 'Click or drag to place water. Impassable for visitors.',
             'bridge_h': 'Click or drag to place a horizontal bridge. Passable.',
             'bridge_v': 'Click or drag to place a vertical bridge. Passable.',
-            'grass_edge': 'Place a grass edge tile. Double-click to rotate.',
-            'grass_corner': 'Place a grass corner tile. Double-click to rotate.',
-            'grass_corner_inside': 'Place an inside corner tile. Double-click to rotate.',
             'large_tree': 'Click to place trees. Double-click any item to configure.',
             'bush': 'Click to place bushes. Double-click to configure.',
             'pine_tree': 'Click to place pine trees. Double-click to configure.',
@@ -648,14 +643,27 @@ export class MapEditor {
                 this.placeTile(x, y, tileTypes.GRASS);
                 // Then auto-tile this position and all neighbors
                 this.autoTileGrassWithNeighbors(x, y);
+                // Also update any dirt neighbors
+                this.autoTileDirtWithNeighbors(x, y);
                 // Redraw all affected tiles
                 this.redrawTilesInArea(x, y, 1);
                 this.scheduleAutoSave();
                 return;
-            } else if (tileType === tileTypes.WATER || tileType === tileTypes.DIRT) {
-                // Placing water or dirt might affect neighboring grass tiles
+            } else if (tileType === tileTypes.DIRT) {
+                // For dirt tiles, use auto-tiling similar to grass
+                this.placeTile(x, y, tileTypes.DIRT);
+                // Auto-tile this dirt and all neighbors
+                this.autoTileDirtWithNeighbors(x, y);
+                // Also update grass neighbors
+                this.autoTileGrassWithNeighbors(x, y);
+                // Redraw all affected tiles
+                this.redrawTilesInArea(x, y, 1);
+                this.scheduleAutoSave();
+                return;
+            } else if (tileType === tileTypes.WATER) {
+                // Placing water might affect neighboring grass and dirt tiles
                 this.placeTile(x, y, tileType);
-                // Update all neighbors that have grass
+                // Update all neighbors
                 const neighbors = [
                     [x - 1, y - 1], [x, y - 1], [x + 1, y - 1],
                     [x - 1, y],                 [x + 1, y],
@@ -665,6 +673,9 @@ export class MapEditor {
                     if (nx >= 0 && nx < MAP_WIDTH_TILES && ny >= 0 && ny < MAP_HEIGHT_TILES) {
                         if (this.hasGrassAt(nx, ny)) {
                             this.autoTileGrass(nx, ny);
+                        }
+                        if (this.hasDirtAt(nx, ny)) {
+                            this.autoTileDirt(nx, ny);
                         }
                     }
                 }
@@ -934,8 +945,38 @@ export class MapEditor {
             if (isRotatable(tileType) && this.defaultRotation) {
                 setTileRotation(x, y, this.defaultRotation);
             }
+        } else if (tileType === tileTypes.DIRT) {
+            // Dirt can be placed on top of grass (like a path through grass)
+            // Strip any existing custom-sprite overlays first
+            while (tiles.length > 1 && getTileSprite(tiles[tiles.length - 1])) {
+                tiles.pop();
+            }
+            clearTileRotation(x, y);
+
+            // If there's already dirt on top, don't add another
+            if (tiles.includes(tileTypes.DIRT)) {
+                return;
+            }
+
+            // Add dirt on top of whatever is there (water or grass)
+            tiles.push(tileType);
+        } else if (tileType === tileTypes.GRASS) {
+            // Grass can be placed on top of dirt (like grass growing through dirt)
+            // Strip any existing custom-sprite overlays first
+            while (tiles.length > 1 && getTileSprite(tiles[tiles.length - 1])) {
+                tiles.pop();
+            }
+            clearTileRotation(x, y);
+
+            // If there's already grass, don't add another
+            if (tiles.includes(tileTypes.GRASS)) {
+                return;
+            }
+
+            // Add grass on top of whatever is there (water or dirt)
+            tiles.push(tileType);
         } else {
-            // Base terrain tiles: replace the top non-water layer
+            // Other base terrain tiles: replace the top non-water layer
             // Strip any existing custom-sprite overlays first
             while (tiles.length > 1 && getTileSprite(tiles[tiles.length - 1])) {
                 tiles.pop();
@@ -951,22 +992,10 @@ export class MapEditor {
         }
     }
 
-    // Auto-tiling helper: check if position is out of bounds or has water/dirt as top terrain
-    isWaterOrDirtAt(x, y) {
-        if (x < 0 || x >= MAP_WIDTH_TILES || y < 0 || y >= MAP_HEIGHT_TILES) {
-            return true; // Treat out of bounds as water
-        }
-        const tiles = map[y][x];
-        if (!tiles || tiles.length === 0) return true;
-
-        // Check for water or dirt - look for the terrain layer (ignore overlays)
-        // The terrain is typically at index 0 (water) or index 1 (grass/dirt on water)
-        const hasGrass = tiles.some(t => t === tileTypes.GRASS || getTileSprite(t));
-        if (hasGrass) return false;
-
-        // If no grass-related tiles, check if it's water or dirt
-        const topTerrain = tiles.find(t => t === tileTypes.DIRT) || tiles[0];
-        return topTerrain === tileTypes.WATER || topTerrain === tileTypes.DIRT;
+    // Auto-tiling helper: check if grass is NOT on top (water, dirt-on-top, or out of bounds)
+    // Used for grass edge detection - grass shows edges against tiles where grass is not on top
+    isNotGrassOnTop(x, y) {
+        return !this.isGrassOnTop(x, y);
     }
 
     // Auto-tiling helper: check if position has grass (including edge/corner variants)
@@ -1002,44 +1031,26 @@ export class MapEditor {
         const tiles = map[y][x];
         if (!tiles) return;
 
-        // Only auto-tile if this position has grass
-        if (!this.hasGrassAt(x, y)) return;
+        // Only auto-tile if grass is on top at this position
+        if (!this.isGrassOnTop(x, y)) {
+            clearGrassEdgeFlags(x, y);
+            return;
+        }
 
-        // Check cardinal neighbors for water/dirt
-        const n = this.isWaterOrDirtAt(x, y - 1);
-        const s = this.isWaterOrDirtAt(x, y + 1);
-        const e = this.isWaterOrDirtAt(x + 1, y);
-        const w = this.isWaterOrDirtAt(x - 1, y);
+        // Check cardinal neighbors - grass shows edges against tiles where grass is NOT on top
+        const n = this.isNotGrassOnTop(x, y - 1);
+        const s = this.isNotGrassOnTop(x, y + 1);
+        const e = this.isNotGrassOnTop(x + 1, y);
+        const w = this.isNotGrassOnTop(x - 1, y);
 
         // Check diagonal neighbors for inside corners
-        const ne = this.isWaterOrDirtAt(x + 1, y - 1);
-        const se = this.isWaterOrDirtAt(x + 1, y + 1);
-        const sw = this.isWaterOrDirtAt(x - 1, y + 1);
-        const nw = this.isWaterOrDirtAt(x - 1, y - 1);
-
-        // Check if any neighbor has dirt (for stacking base layer)
-        const hasDirtNeighbor = this.hasDirtAt(x, y - 1) || this.hasDirtAt(x, y + 1) ||
-                                this.hasDirtAt(x + 1, y) || this.hasDirtAt(x - 1, y);
-
-        // Clear existing grass overlays but keep base layers
-        while (tiles.length > 1 && getTileSprite(tiles[tiles.length - 1])) {
-            tiles.pop();
-        }
-        clearTileRotation(x, y);
+        const ne = this.isNotGrassOnTop(x + 1, y - 1);
+        const se = this.isNotGrassOnTop(x + 1, y + 1);
+        const sw = this.isNotGrassOnTop(x - 1, y + 1);
+        const nw = this.isNotGrassOnTop(x - 1, y - 1);
 
         // Calculate edge flags for procedural generation
         const edgeFlags = getEdgeFlagsFromNeighbors(n, s, e, w, ne, se, sw, nw);
-
-        // Ensure grass is in the tile layers
-        if (!tiles.includes(tileTypes.GRASS)) {
-            // Add dirt layer if adjacent to dirt
-            if (hasDirtNeighbor && !tiles.includes(tileTypes.DIRT)) {
-                if (tiles.length === 1 && tiles[0] === tileTypes.WATER) {
-                    tiles.push(tileTypes.DIRT);
-                }
-            }
-            tiles.push(tileTypes.GRASS);
-        }
 
         // Set the edge flags for procedural rendering
         setGrassEdgeFlags(x, y, edgeFlags);
@@ -1060,6 +1071,97 @@ export class MapEditor {
         for (const [nx, ny] of neighbors) {
             if (nx >= 0 && nx < MAP_WIDTH_TILES && ny >= 0 && ny < MAP_HEIGHT_TILES) {
                 this.autoTileGrass(nx, ny);
+            }
+        }
+    }
+
+    // Auto-tiling helper: check if dirt is the TOP terrain layer at position
+    isDirtOnTop(x, y) {
+        if (x < 0 || x >= MAP_WIDTH_TILES || y < 0 || y >= MAP_HEIGHT_TILES) {
+            return false;
+        }
+        const tiles = map[y][x];
+        if (!tiles || tiles.length === 0) return false;
+
+        const grassIndex = tiles.findIndex(t => t === tileTypes.GRASS);
+        const dirtIndex = tiles.findIndex(t => t === tileTypes.DIRT);
+
+        // Dirt is on top if it exists and either no grass or dirt is after grass
+        if (dirtIndex < 0) return false; // No dirt
+        if (grassIndex < 0) return true; // Dirt exists, no grass
+        return dirtIndex > grassIndex; // Dirt is above grass
+    }
+
+    // Auto-tiling helper: check if grass is the TOP terrain layer at position
+    isGrassOnTop(x, y) {
+        if (x < 0 || x >= MAP_WIDTH_TILES || y < 0 || y >= MAP_HEIGHT_TILES) {
+            return false;
+        }
+        const tiles = map[y][x];
+        if (!tiles || tiles.length === 0) return false;
+
+        const grassIndex = tiles.findIndex(t => t === tileTypes.GRASS);
+        const dirtIndex = tiles.findIndex(t => t === tileTypes.DIRT);
+
+        // Grass is on top if it exists and either no dirt or grass is after dirt
+        if (grassIndex < 0) return false; // No grass
+        if (dirtIndex < 0) return true; // Grass exists, no dirt
+        return grassIndex > dirtIndex; // Grass is above dirt
+    }
+
+    // Auto-tiling helper: check if position does NOT have dirt as top layer
+    // Used for dirt edge detection - dirt shows edges against water AND grass-on-top
+    isNotDirtOnTop(x, y) {
+        return !this.isDirtOnTop(x, y);
+    }
+
+    // Main auto-tiling function for dirt: uses procedural dirt generation
+    autoTileDirt(x, y) {
+        if (x < 0 || x >= MAP_WIDTH_TILES || y < 0 || y >= MAP_HEIGHT_TILES) return;
+
+        const tiles = map[y][x];
+        if (!tiles) return;
+
+        // Only auto-tile if dirt is on top at this position
+        if (!this.isDirtOnTop(x, y)) {
+            clearDirtEdgeFlags(x, y);
+            return;
+        }
+
+        // Check cardinal neighbors - dirt shows edges against tiles where dirt is NOT on top
+        const n = this.isNotDirtOnTop(x, y - 1);
+        const s = this.isNotDirtOnTop(x, y + 1);
+        const e = this.isNotDirtOnTop(x + 1, y);
+        const w = this.isNotDirtOnTop(x - 1, y);
+
+        // Check diagonal neighbors for inside corners
+        const ne = this.isNotDirtOnTop(x + 1, y - 1);
+        const se = this.isNotDirtOnTop(x + 1, y + 1);
+        const sw = this.isNotDirtOnTop(x - 1, y + 1);
+        const nw = this.isNotDirtOnTop(x - 1, y - 1);
+
+        // Calculate edge flags for procedural generation
+        const edgeFlags = getDirtEdgeFlagsFromNeighbors(n, s, e, w, ne, se, sw, nw);
+
+        // Set the edge flags for procedural rendering
+        setDirtEdgeFlags(x, y, edgeFlags);
+    }
+
+    // Auto-tile dirt at a position and all its neighbors
+    autoTileDirtWithNeighbors(x, y) {
+        // Auto-tile the placed position
+        this.autoTileDirt(x, y);
+
+        // Auto-tile all 8 neighbors (they might need edge updates)
+        const neighbors = [
+            [x - 1, y - 1], [x, y - 1], [x + 1, y - 1],
+            [x - 1, y],                 [x + 1, y],
+            [x - 1, y + 1], [x, y + 1], [x + 1, y + 1]
+        ];
+
+        for (const [nx, ny] of neighbors) {
+            if (nx >= 0 && nx < MAP_WIDTH_TILES && ny >= 0 && ny < MAP_HEIGHT_TILES) {
+                this.autoTileDirt(nx, ny);
             }
         }
     }
@@ -2437,6 +2539,7 @@ export class MapEditor {
 
                     const rotations = getTileRotations(x, y);
                     const edgeFlags = getGrassEdgeFlags(x, y);
+                    const dirtEdgeFlag = getDirtEdgeFlags(x, y);
                     const tileEntry = { x, y, layers };
                     if (rotations.length === 1) {
                         tileEntry.rotation = rotations[0];
@@ -2445,6 +2548,9 @@ export class MapEditor {
                     }
                     if (edgeFlags > 0) {
                         tileEntry.edgeFlags = edgeFlags;
+                    }
+                    if (dirtEdgeFlag > 0) {
+                        tileEntry.dirtEdgeFlags = dirtEdgeFlag;
                     }
                     tiles.push(tileEntry);
 

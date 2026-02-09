@@ -1,4 +1,4 @@
-import { tileTypes, setTileRotation, setTileRotations, clearAllTileRotations, setGrassEdgeFlags, clearAllGrassEdgeFlags } from './map.js';
+import { tileTypes, setTileRotation, setTileRotations, clearAllTileRotations, setGrassEdgeFlags, clearAllGrassEdgeFlags, setDirtEdgeFlags, clearAllDirtEdgeFlags } from './map.js';
 import { loadMapById } from './mapBrowser.js';
 import { collectablesSystem } from './collectables.js';
 import { imageTilesSystem } from './imageTiles.js';
@@ -74,6 +74,7 @@ export function convertMapDataToGameFormat(mapData) {
     // Clear any previous rotation and edge flag data
     clearAllTileRotations();
     clearAllGrassEdgeFlags();
+    clearAllDirtEdgeFlags();
 
     // Convert tile data to game format
     const gameMap = [];
@@ -112,6 +113,10 @@ export function convertMapDataToGameFormat(mapData) {
             // Restore grass edge flags if saved
             if (tile.edgeFlags) {
                 setGrassEdgeFlags(tile.x, tile.y, tile.edgeFlags);
+            }
+            // Restore dirt edge flags if saved
+            if (tile.dirtEdgeFlags) {
+                setDirtEdgeFlags(tile.x, tile.y, tile.dirtEdgeFlags);
             }
         }
     });
