@@ -465,6 +465,12 @@ export class Chick {
                 const chicken = new Chicken(window.svg, this.x, this.y);
                 if (chicken) {  // Only add if constructor succeeded
                     window.chickens.push(chicken);
+                    // Move into map container so viewport offset applies
+                    const dynamicGroup = window.svg.querySelector('#map-container #dynamic-elements');
+                    if (dynamicGroup) {
+                        if (chicken.element.parentNode) chicken.element.parentNode.removeChild(chicken.element);
+                        dynamicGroup.appendChild(chicken.element);
+                    }
                 }
             }
             return;
@@ -541,6 +547,12 @@ function hatchEggsTick() {
                     const chick = new Chick(window.svg, x, y);
                     if (chick) {  // Only add if constructor succeeded
                         window.chicks.push(chick);
+                        // Move into map container so viewport offset applies
+                        const dynamicGroup = svg.querySelector('#map-container #dynamic-elements');
+                        if (dynamicGroup) {
+                            if (chick.element.parentNode) chick.element.parentNode.removeChild(chick.element);
+                            dynamicGroup.appendChild(chick.element);
+                        }
                     }
                 }
 
